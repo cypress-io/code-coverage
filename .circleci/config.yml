@@ -1,17 +1,19 @@
 version: 2.1
-orbs:
-  cypress: cypress-io/cypress@1.7.0
-jobs:
-  release:
-    executor: cypress/base-10
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run: npm run semantic-release
 workflows:
   build:
     jobs:
-      - cypress/run
-      - release:
-          requires:
-            - cypress/run
+      - cypress/run:
+          # we need to start the web application
+          start: npm start
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          post-steps:
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: coverage
+            # publish new version if necessary
+            - run: npm run semantic-release
+

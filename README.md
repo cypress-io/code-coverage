@@ -1,4 +1,4 @@
-# cypress-istanbul [![renovate-app badge][renovate-badge]][renovate-app]
+# cypress-istanbul [![CircleCI](https://circleci.com/gh/cypress-io/cypress-istanbul.svg?style=svg)](https://circleci.com/gh/cypress-io/cypress-istanbul) [![renovate-app badge][renovate-badge]][renovate-app]
 
 > Saves the code coverage collected from instrumented code
 

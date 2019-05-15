@@ -1,0 +1,17 @@
+version: 2.1
+orbs:
+  cypress: cypress-io/cypress@1.7.0
+jobs:
+  release:
+    executor: cypress/base-10
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run: npm run semantic-release
+workflows:
+  build:
+    jobs:
+      - cypress/run
+      - release:
+          requires:
+            - cypress/run

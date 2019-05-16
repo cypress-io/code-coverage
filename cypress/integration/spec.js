@@ -16,4 +16,9 @@ context('Page test', () => {
       .should('have.been.calledOnce')
       .should('have.been.calledWith', 'just names', ['joe', 'mary'])
   })
+
+  it('clicks on the button', function () {
+    cy.get('#click').click()
+    cy.get('@log').should('have.been.calledWith', 'clicked')
+  })
 })

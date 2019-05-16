@@ -7,3 +7,7 @@ if (true) {
 } else {
   console.error('never reached')
 }
+
+document.getElementById('click').addEventListener('click', () => {
+  console.log('clicked')
+})

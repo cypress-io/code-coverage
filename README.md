@@ -32,6 +32,11 @@ If your application is loaded Istanbul-instrumented source code, then the covera
 
 ![Coverage report](images/coverage.jpg)
 
+## Examples
+
+- [Demo battery app](https://github.com/bahmutov/demo-battery-api/tree/bundle) branch "bundle"
+- Read ["Code Coverage by Parcel Bundler"](https://glebbahmutov.com/blog/code-coverage-by-parcel/) blog post
+
 ## License
 
 This project is licensed under the terms of the [MIT license](/LICENSE.md).

@@ -32,6 +32,39 @@ If your application is loaded Istanbul-instrumented source code, then the covera
 
 ![Coverage report](images/coverage.jpg)
 
+## Instrument unit tests
+
+If you test your application code directly from `specs` you might want to instrument them and combine unit test code coverage with any end-to-end code coverage (from iframe). You can easily instrument spec files using [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul) for example. Put the following in `cypress/plugins/index.js` file to use `.babelrc` file
+
+```js
+const browserify = require('@cypress/browserify-preprocessor')
+
+module.exports = (on, config) => {
+  on('task', require('cypress-istanbul/task'))
+
+  // tell Cypress to use .babelrc when bundling spec code
+  const options = browserify.defaultOptions
+  options.browserifyOptions.transform[1][1].babelrc = true
+  on('file:preprocessor', browserify(options))
+}
+```
+
+Install the plugin
+
+```
+npm i -D babel-plugin-istanbul
+```
+
+and set in your `.babelrc` file
+
+```rc
+{
+  "plugins": ["istanbul"]
+}
+```
+
+Now the code coverage from spec files will be combined with end-to-end coverage.
+
 ## Examples
 
 - [Demo battery app](https://github.com/bahmutov/demo-battery-api/tree/bundle) branch "bundle"

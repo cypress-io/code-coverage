@@ -47,6 +47,9 @@
     "semantic-release": "15.13.12"
   },
   "dependencies": {
-    "its-name": "1.0.0"
+    "chokidar": "2.1.6",
+    "globby": "9.2.0",
+    "its-name": "1.0.0",
+    "ws": "6.2.1"
   }
 }

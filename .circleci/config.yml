@@ -16,6 +16,8 @@ workflows:
             # to see live static HTML site
             - store_artifacts:
                 path: coverage
+            # print code coverage summary to the terminal
+            - run: npx nyc report
             # publish new version if necessary
             - run: npm run semantic-release
 

@@ -2,6 +2,8 @@
 // https://on.cypress.io/intelligent-code-completion
 /// <reference types="Cypress" />
 
+import {add} from '../unit'
+
 context('Page test', () => {
   beforeEach(() => {
     cy.visit('/', {
@@ -15,5 +17,15 @@ context('Page test', () => {
     cy.get('@log')
       .should('have.been.calledOnce')
       .should('have.been.calledWith', 'just names', ['joe', 'mary'])
+  })
+})
+
+context('Unit tests', () => {
+  it('adds numbers', () => {
+    expect(add(2, 3)).to.equal(5)
+  })
+
+  it('concatenates strings', () => {
+    expect(add('foo', 'Bar')).to.equal('fooBar')
   })
 })

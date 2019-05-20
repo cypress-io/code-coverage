@@ -35,6 +35,9 @@
   "files": [
     "*.js"
   ],
+  "dependencies": {
+    "@cypress/browserify-preprocessor": "2.1.0"
+  },
   "devDependencies": {
     "@babel/core": "7.4.4",
     "babel-plugin-istanbul": "5.1.4",

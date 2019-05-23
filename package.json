@@ -8,7 +8,8 @@
     "start": "parcel serve cypress/index.html",
     "cy:open": "cypress open",
     "dev": "start-test 1234 cy:open",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "test:ci": "start-test 1234"
   },
   "peerDependencies": {
     "cypress": "*",

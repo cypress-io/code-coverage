@@ -36,7 +36,8 @@
     "*.js"
   ],
   "dependencies": {
-    "@cypress/browserify-preprocessor": "2.1.0"
+    "@cypress/browserify-preprocessor": "2.1.0",
+    "debug": "4.1.1"
   },
   "devDependencies": {
     "@babel/core": "7.4.4",

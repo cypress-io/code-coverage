@@ -2,6 +2,7 @@ const istanbul = require('istanbul-lib-coverage')
 const { join } = require('path')
 const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
 const execa = require('execa')
+const debug = require('debug')('cypress-istanbul')
 
 // these are standard folder and file names used by NYC tools
 const outputFolder = '.nyc_output'
@@ -11,7 +12,7 @@ const nycFilename = join(coverageFolder, 'out.json')
 function saveCoverage (coverage) {
   if (!existsSync(coverageFolder)) {
     mkdirSync(coverageFolder)
-    console.log('created folder %s for output coverage', coverageFolder)
+    debug('created folder %s for output coverage', coverageFolder)
   }
 
   writeFileSync(nycFilename, JSON.stringify(coverage, null, 2))
@@ -29,7 +30,7 @@ module.exports = {
    */
   resetCoverage ({ isInteractive }) {
     if (isInteractive) {
-      console.log('reset code coverage in interactive mode')
+      debug('reset code coverage in interactive mode')
       const coverageMap = istanbul.createCoverageMap({})
       saveCoverage(coverageMap)
     }
@@ -54,7 +55,7 @@ module.exports = {
     const coverageMap = istanbul.createCoverageMap(previous)
     coverageMap.merge(coverage)
     saveCoverage(coverageMap)
-    console.log('wrote coverage file %s', nycFilename)
+    debug('wrote coverage file %s', nycFilename)
 
     return null
   },
@@ -69,8 +70,10 @@ module.exports = {
       console.warn('Skipping coverage report')
       return null
     }
-    console.log('saving coverage report')
+    const command = 'nyc'
+    const args = ['report', '--reporter=html']
+    debug('saving coverage report using command: %s %s', command, args)
     // should we generate report via NYC module API?
-    return execa('nyc', ['report', '--reporter=html'], { stdio: 'inherit' })
+    return execa(command, args, { stdio: 'inherit' })
   }
 }

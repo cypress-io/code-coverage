@@ -1,11 +1,11 @@
-# cypress-istanbul [![CircleCI](https://circleci.com/gh/cypress-io/cypress-istanbul.svg?style=svg)](https://circleci.com/gh/cypress-io/cypress-istanbul) [![renovate-app badge][renovate-badge]][renovate-app]
+# @cypress/code-coverage [![renovate-app badge][renovate-badge]][renovate-app] [![CircleCI](https://circleci.com/gh/cypress-io/cypress-istanbul.svg?style=svg)](https://circleci.com/gh/cypress-io/cypress-istanbul)
 
-> Saves the code coverage collected from instrumented code
+> Saves the code coverage collected during Cypress tests
 
 ## Install
 
 ```shell
-npm install -D cypress-istanbul
+npm install -D @cypress/code-coverage
 ```
 
 and its peer dependencies
@@ -17,14 +17,14 @@ npm install -D nyc istanbul-lib-coverage cypress
 Add to your `cypress/support/index.js` file
 
 ```js
-import 'cypress-istanbul/support'
+import '@cypress/code-coverage/support'
 ```
 
 Register tasks in your `cypress/plugins/index.js` file
 
 ```js
 module.exports = (on, config) => {
-  on('task', require('cypress-istanbul/task'))
+  on('task', require('@cypress/code-coverage/task'))
 }
 ```
 
@@ -56,8 +56,8 @@ Put the following in `cypress/plugins/index.js` file to use `.babelrc` file
 
 ```js
 module.exports = (on, config) => {
-  on('task', require('cypress-istanbul/task'))
-  on('file:preprocessor', require('cypress-istanbul/use-babelrc'))
+  on('task', require('@cypress/code-coverage/task'))
+  on('file:preprocessor', require('@cypress/code-coverage/use-babelrc'))
 }
 ```
 
@@ -71,7 +71,7 @@ Now the code coverage from spec files will be combined with end-to-end coverage.
 
 ## Debugging
 
-Run tests with `DEBUG=cypress-istanbul` environment variable to see log messages
+Run tests with `DEBUG=code-coverage` environment variable to see log messages
 
 ## License
 

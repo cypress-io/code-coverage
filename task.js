@@ -2,7 +2,7 @@ const istanbul = require('istanbul-lib-coverage')
 const { join } = require('path')
 const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
 const execa = require('execa')
-const debug = require('debug')('cypress-istanbul')
+const debug = require('debug')('code-coverage')
 
 // these are standard folder and file names used by NYC tools
 const outputFolder = '.nyc_output'

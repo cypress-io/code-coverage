@@ -41,7 +41,7 @@
   },
   "private": false,
   "dependencies": {
-    "@cypress/browserify-preprocessor": "2.1.0",
+    "@cypress/browserify-preprocessor": "2.1.1",
     "debug": "4.1.1"
   },
   "devDependencies": {

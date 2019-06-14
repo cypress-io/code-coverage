@@ -65,6 +65,7 @@ Now the code coverage from spec files will be combined with end-to-end coverage.
 
 ## Examples
 
+- [Cypress code coverage guide](http://on.cypress.io/code-coverage)
 - [cypress-example-todomvc-redux](https://github.com/cypress-io/cypress-example-todomvc-redux)
 - Read ["Code Coverage by Parcel Bundler"](https://glebbahmutov.com/blog/code-coverage-by-parcel/) blog post
 - Read ["Combined End-to-end and Unit Test Coverage"](https://glebbahmutov.com/blog/combined-end-to-end-and-unit-test-coverage/)

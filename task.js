@@ -18,6 +18,19 @@ function saveCoverage (coverage) {
   writeFileSync(nycFilename, JSON.stringify(coverage, null, 2))
 }
 
+// Remove potential Webpack loaders string and query parameters from sourcemap path
+function fixSourcePathes (coverage) {
+  Object.keys(coverage).forEach(file => {
+    const sourcemap = coverage[file].inputSourceMap
+    sourcemap.sources = sourcemap.sources.map(source => {
+      let cleaned = source
+      if (cleaned.includes('!')) cleaned = cleaned.split('!').pop()
+      if (cleaned.includes('?')) cleaned = cleaned.split('?').shift()
+      return cleaned
+    })
+  })
+}
+
 module.exports = {
   /**
    * Clears accumulated code coverage information.
@@ -49,6 +62,7 @@ module.exports = {
    * with previously collected coverage.
    */
   combineCoverage (coverage) {
+    fixSourcePathes(coverage)
     const previous = existsSync(nycFilename)
       ? JSON.parse(readFileSync(nycFilename))
       : istanbul.createCoverageMap({})

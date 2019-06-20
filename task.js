@@ -3,6 +3,7 @@ const { join } = require('path')
 const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
 const execa = require('execa')
 const debug = require('debug')('code-coverage')
+const { fixSourcePathes } = require('./utils')
 
 // these are standard folder and file names used by NYC tools
 const outputFolder = '.nyc_output'
@@ -16,20 +17,6 @@ function saveCoverage (coverage) {
   }
 
   writeFileSync(nycFilename, JSON.stringify(coverage, null, 2))
-}
-
-// Remove potential Webpack loaders string and query parameters from sourcemap path
-function fixSourcePathes (coverage) {
-  Object.keys(coverage).forEach(file => {
-    const sourcemap = coverage[file].inputSourceMap
-    if (!sourcemap) return
-    sourcemap.sources = sourcemap.sources.map(source => {
-      let cleaned = source
-      if (cleaned.includes('!')) cleaned = cleaned.split('!').pop()
-      if (cleaned.includes('?')) cleaned = cleaned.split('?').shift()
-      return cleaned
-    })
-  })
 }
 
 module.exports = {

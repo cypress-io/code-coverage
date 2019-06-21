@@ -3,6 +3,7 @@ const { join } = require('path')
 const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
 const execa = require('execa')
 const debug = require('debug')('code-coverage')
+const { fixSourcePathes } = require('./utils')
 
 // these are standard folder and file names used by NYC tools
 const outputFolder = '.nyc_output'
@@ -49,6 +50,7 @@ module.exports = {
    * with previously collected coverage.
    */
   combineCoverage (coverage) {
+    fixSourcePathes(coverage)
     const previous = existsSync(nycFilename)
       ? JSON.parse(readFileSync(nycFilename))
       : istanbul.createCoverageMap({})

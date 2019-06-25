@@ -115,10 +115,13 @@ if (global.__coverage__) {
 }
 ```
 
+That should be enough - the code coverage from the server will be requested at the end of the test run and merged with the client-side code coverage, producing a combined report
+
 ## Examples
 
 - [Cypress code coverage guide](http://on.cypress.io/code-coverage)
 - [cypress-example-todomvc-redux](https://github.com/cypress-io/cypress-example-todomvc-redux)
+- Full frontend + backend code coverage in [bahmutov/realworld](https://github.com/bahmutov/realworld) repo
 - Read ["Code Coverage by Parcel Bundler"](https://glebbahmutov.com/blog/code-coverage-by-parcel/) blog post
 - Read ["Combined End-to-end and Unit Test Coverage"](https://glebbahmutov.com/blog/combined-end-to-end-and-unit-test-coverage/)
 

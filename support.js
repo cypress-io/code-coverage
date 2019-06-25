@@ -21,6 +21,24 @@ afterEach(() => {
 })
 
 after(() => {
+  // there might be server-side code coverage information
+  // we should grab it once after all tests finish
+  cy.request({
+    url: '/__coverage__',
+    log: false,
+    failOnStatusCode: false
+  })
+    .then(r => Cypress._.get(r, 'body.coverage', null), { log: false })
+    .then(coverage => {
+      if (!coverage) {
+        // we did not get code coverage - this is the
+        // original failed request
+        return
+      }
+      cy.task('combineCoverage', coverage)
+    })
+
+  // collect and merge frontend coverage
   const specFolder = Cypress.config('integrationFolder')
   const supportFolder = Cypress.config('supportFolder')
 

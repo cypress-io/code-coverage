@@ -4,3 +4,5 @@ cypress/screenshots
 coverage/
 .nyc_output/
 dist/
+.cache/
+.vscode/

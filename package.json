@@ -34,7 +34,8 @@
   },
   "homepage": "https://github.com/cypress-io/code-coverage#readme",
   "files": [
-    "*.js"
+    "*.js",
+    "middleware"
   ],
   "publishConfig": {
     "access": "public"

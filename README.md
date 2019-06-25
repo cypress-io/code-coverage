@@ -73,7 +73,7 @@ You can also instrument your server-side code and produce combined coverage repo
 ```js
 const express = require('express')
 const app = express()
-require('@cypress/code-coverage/middleware')(app)
+require('@cypress/code-coverage/middleware/express')(app)
 ```
 
 **Tip:** you can register the endpoint only if there is global code coverage object, and you can exclude the middleware code from the coverage numbers
@@ -82,24 +82,25 @@ require('@cypress/code-coverage/middleware')(app)
 // https://github.com/gotwarlost/istanbul/blob/master/ignoring-code-for-coverage.md
 /* istanbul ignore next */
 if (global.__coverage__) {
-  require('@cypress/code-coverage/middleware')(app)
+  require('@cypress/code-coverage/middleware/express')(app)
 }
 ```
 
 If you use Hapi server, define the endpoint yourself and return the object
 
 ```js
-// https://github.com/gotwarlost/istanbul/blob/master/ignoring-code-for-coverage.md
-/* istanbul ignore next */
 if (global.__coverage__) {
-  // https://hapijs.com/tutorials/routing?lang=en_US
-  server.route({
-    method: 'GET',
-    path: '/__coverage__',
-    handler () {
-      return { coverage: global.__coverage__ }
-    }
-  })
+  require('@cypress/code-coverage/middleware/hapi')(server)
+}
+```
+
+For any other server, define the endpoint yourself and return the coverage object:
+
+```js
+if (global.__coverage__) {
+  // add method "GET /__coverage__" and response with JSON
+  onRequest = (response) =>
+    response.sendJSON({coverage: global.__coverage__ })
 }
 ```
 

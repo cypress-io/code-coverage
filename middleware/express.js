@@ -1,3 +1,4 @@
+// for Express.js
 module.exports = app => {
   // expose "GET __coverage__" endpoint that just returns
   // global coverage information (if the application has been instrumented)

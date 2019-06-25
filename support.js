@@ -23,8 +23,9 @@ afterEach(() => {
 after(() => {
   // there might be server-side code coverage information
   // we should grab it once after all tests finish
+  const url = Cypress._.get(Cypress.env('codeCoverage'), 'url', '/__coverage__')
   cy.request({
-    url: '/__coverage__',
+    url,
     log: false,
     failOnStatusCode: false
   })

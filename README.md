@@ -63,6 +63,58 @@ module.exports = (on, config) => {
 
 Now the code coverage from spec files will be combined with end-to-end coverage.
 
+## Instrument backend code
+
+You can also instrument your server-side code and produce combined coverage report that covers both the backend and frontend code.
+
+1. Run the server code with instrumentation. The simplest way is to use [nyc](https://github.com/istanbuljs/nyc). If normally you run `node src/server` then to run instrumented version you can do `nyc --silent node src/server`.
+2. Add an endpoint that returns collected coverage. If you are using Express, you can simply do
+
+```js
+const express = require('express')
+const app = express()
+require('@cypress/code-coverage/middleware')(app)
+```
+
+**Tip:** you can register the endpoint only if there is global code coverage object, and you can exclude the middleware code from the coverage numbers
+
+```js
+// https://github.com/gotwarlost/istanbul/blob/master/ignoring-code-for-coverage.md
+/* istanbul ignore next */
+if (global.__coverage__) {
+  require('@cypress/code-coverage/middleware')(app)
+}
+```
+
+If you use Hapi server, define the endpoint yourself and return the object
+
+```js
+// https://github.com/gotwarlost/istanbul/blob/master/ignoring-code-for-coverage.md
+/* istanbul ignore next */
+if (global.__coverage__) {
+  // https://hapijs.com/tutorials/routing?lang=en_US
+  server.route({
+    method: 'GET',
+    path: '/__coverage__',
+    handler () {
+      return { coverage: global.__coverage__ }
+    }
+  })
+}
+```
+
+3. Save the API coverage endpoint in `cypress.json` file to let the plugin know where to call to receive the code coverage data from the server. Place it in `env.codeCoverage` object:
+
+```json
+{
+  "env": {
+    "codeCoverage": {
+      "url": "http://localhost:3000/__coverage__"
+    }
+  }
+}
+```
+
 ## Examples
 
 - [Cypress code coverage guide](http://on.cypress.io/code-coverage)

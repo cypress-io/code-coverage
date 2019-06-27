@@ -1,17 +1,19 @@
 module.exports = {
   /**
-   * Remove potential Webpack loaders string and query parameters from sourcemap path
+   * Replace source-map's path by the corresponding absolute file path
+   * (coverage report wouldn't work with source-map path being relative
+   * or containing Webpack loaders and query parameters)
    */
-  fixSourcePathes (coverage) {
-    Object.keys(coverage).forEach(file => {
-      const sourcemap = coverage[file].inputSourceMap
-      if (!sourcemap) return
-      sourcemap.sources = sourcemap.sources.map(source => {
-        let cleaned = source
-        if (cleaned.includes('!')) cleaned = cleaned.split('!').pop()
-        if (cleaned.includes('?')) cleaned = cleaned.split('?').shift()
-        return cleaned
-      })
+  fixSourcePathes(coverage) {
+    Object.values(coverage).forEach(file => {
+      const { path: absolutePath, inputSourceMap } = file
+      const fileName = /([^\/\\]+)$/.exec(absolutePath)[1]
+      if (!inputSourceMap || !fileName) return
+
+      if (inputSourceMap.sourceRoot) inputSourceMap.sourceRoot = ''
+      inputSourceMap.sources = inputSourceMap.sources.map(source =>
+        source.includes(fileName) ? absolutePath : source
+      )
     })
   }
 }

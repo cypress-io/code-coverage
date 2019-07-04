@@ -121,13 +121,18 @@ if (global.__coverage__) {
 
 That should be enough - the code coverage from the server will be requested at the end of the test run and merged with the client-side code coverage, producing a combined report
 
-## Examples
+## Links
 
-- [Cypress code coverage guide](http://on.cypress.io/code-coverage)
-- [cypress-example-todomvc-redux](https://github.com/cypress-io/cypress-example-todomvc-redux)
-- Full frontend + backend code coverage in [bahmutov/realworld](https://github.com/bahmutov/realworld) repo
+- Read the [Cypress code coverage guide](http://on.cypress.io/code-coverage)
 - Read ["Code Coverage by Parcel Bundler"](https://glebbahmutov.com/blog/code-coverage-by-parcel/) blog post
 - Read ["Combined End-to-end and Unit Test Coverage"](https://glebbahmutov.com/blog/combined-end-to-end-and-unit-test-coverage/)
+
+## Examples
+
+- [cypress-io/cypress-example-todomvc-redux](https://github.com/cypress-io/cypress-example-todomvc-redux) is a React / Redux application with 100% code coverage.
+- [cypress-io/cypress-example-realworld](https://github.com/cypress-io/cypress-example-realworld) shows how to collect the coverage information from both back and front end code and merge it into a single report.
+- [bahmutov/code-coverage-webpack-dev-server](https://github.com/bahmutov/code-coverage-webpack-dev-server) shows how to collect code coverage from an application that uses webpack-dev-server.
+- [bahmutov/code-coverage-vue-example](https://github.com/bahmutov/code-coverage-vue-example) collects code coverage for Vue.js single file components.
 
 ## Debugging
 

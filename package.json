@@ -46,7 +46,7 @@
     "debug": "4.1.1"
   },
   "devDependencies": {
-    "@babel/core": "7.4.5",
+    "@babel/core": "7.5.0",
     "babel-plugin-istanbul": "5.1.4",
     "cypress": "3.3.2",
     "istanbul-lib-coverage": "2.0.5",

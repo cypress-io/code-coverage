@@ -9,7 +9,8 @@
     "cy:open": "cypress open",
     "dev": "start-test 1234 cy:open",
     "semantic-release": "semantic-release",
-    "test:ci": "start-test 1234"
+    "test:ci": "start-test 1234",
+    "report:coverage": "nyc report --reporter=html"
   },
   "peerDependencies": {
     "cypress": "*",

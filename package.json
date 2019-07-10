@@ -48,7 +48,7 @@
   "devDependencies": {
     "@babel/core": "7.5.0",
     "babel-plugin-istanbul": "5.1.4",
-    "cypress": "3.3.2",
+    "cypress": "3.4.0",
     "istanbul-lib-coverage": "2.0.5",
     "lodash": "4.17.11",
     "nyc": "14.1.1",

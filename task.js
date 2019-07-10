@@ -73,7 +73,7 @@ module.exports = {
       return null
     }
     const command = 'nyc'
-    const args = ['report', '--reporter=html']
+    const args = ['report', '--reporter=lcov']
     debug('saving coverage report using command: %s %s', command, args)
     // should we generate report via NYC module API?
     return execa(command, args, { stdio: 'inherit' })

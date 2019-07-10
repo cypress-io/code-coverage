@@ -31,7 +31,7 @@ module.exports = (on, config) => {
 }
 ```
 
-If your application is loaded Istanbul-instrumented source code, then the coverage information will be automatically saved into `.nyc_output` folder and a report will be generated after the tests finish (even in the interactive mode). Find the HTML report in the `coverage` folder.
+If your application is loaded Istanbul-instrumented source code, then the coverage information will be automatically saved into `.nyc_output` folder and a report will be generated after the tests finish (even in the interactive mode). Find the LCOV and HTML report in the `coverage/lcov-report` folder.
 
 ![Coverage report](images/coverage.jpg)
 

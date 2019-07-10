@@ -121,6 +121,63 @@ if (global.__coverage__) {
 
 That should be enough - the code coverage from the server will be requested at the end of the test run and merged with the client-side code coverage, producing a combined report
 
+## Exclude code
+
+You can exclude parts of the code or entire files from the code coverage report. See [Istanbul guide](https://github.com/gotwarlost/istanbul/blob/master/ignoring-code-for-coverage.md). Common cases:
+
+### Exclude "else" branch
+
+When running code only during Cypress tests, the "else" branch will never be hit. Thus we should exclude it from the branch coverage computation:
+
+```js
+// expose "store" reference during tests
+/* istanbul ignore else */
+if (window.Cypress) {
+  window.store = store
+}
+```
+
+### Exclude next logical statement
+
+Often needed to skip a statement
+
+```js
+/* istanbul ignore next */
+if (global.__coverage__) {
+  require('@cypress/code-coverage/middleware/express')(app)
+}
+```
+
+Or a particular `switch` case
+
+```js
+switch (foo) {
+  case 1: /* some code */; break;
+  /* istanbul ignore next */
+  case 2: // really difficult to hit from tests
+    someCode();
+}
+```
+
+### Exclude files and folders
+
+See [`nyc` configuration](https://github.com/istanbuljs/nyc#common-configuration-options) and [ include and exclude options](https://github.com/istanbuljs/nyc#using-include-and-exclude-arrays). You can include and exclude files using `minimatch` patterns in `.nycrc` file or using "nyc" object inside your `package.json` file.
+
+For example, if you want to only include files in the `app` folder, but exclude `app/util.js` file, you can set in your `package.json`
+
+```json
+{
+  "nyc": {
+    "include": [
+      "app/**/*.js"
+    ],
+    "exclude": [
+      "app/util.js"
+    ]
+  }
+}
+```
+
 ## Links
 
 - Read the [Cypress code coverage guide](http://on.cypress.io/code-coverage)

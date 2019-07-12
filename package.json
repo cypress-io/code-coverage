@@ -15,7 +15,8 @@
   "peerDependencies": {
     "cypress": "*",
     "nyc": "*",
-    "istanbul-lib-coverage": "*"
+    "istanbul-lib-coverage": "*",
+    "@cypress/browserify-preprocessor": "*"
   },
   "repository": {
     "type": "git",
@@ -43,7 +44,6 @@
   },
   "private": false,
   "dependencies": {
-    "@cypress/browserify-preprocessor": "2.1.1",
     "debug": "4.1.1"
   },
   "devDependencies": {

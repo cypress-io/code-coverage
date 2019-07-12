@@ -41,10 +41,10 @@ That should be it!
 
 If you test your application code directly from `specs` you might want to instrument them and combine unit test code coverage with any end-to-end code coverage (from iframe). You can easily instrument spec files using [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul) for example.
 
-Install the plugin
+Install the plugin and the preprocessor
 
 ```
-npm i -D babel-plugin-istanbul
+npm i -D babel-plugin-istanbul @cypress/browserify-preprocessor
 ```
 
 Set your `.babelrc` file

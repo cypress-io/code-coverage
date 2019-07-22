@@ -5,6 +5,8 @@ workflows:
   build:
     jobs:
       - cypress/run:
+          pre-steps:
+            - run: npm install --no-save @cypress/browserify-preprocessor
           # we need to start the web application
           start: npm start
           # there are no jobs to follow this one
@@ -20,4 +22,3 @@ workflows:
             - run: npx nyc report
             # publish new version if necessary
             - run: npm run semantic-release
-

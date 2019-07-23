@@ -6,3 +6,4 @@ coverage/
 dist/
 .cache/
 .vscode/
+cypress-coverage/

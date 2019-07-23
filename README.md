@@ -144,6 +144,24 @@ You can specify custom report folder by adding `nyc` object to the `package.json
 }
 ```
 
+## Custom reporters
+
+You can specify custom coverage reporter(s) to use. For example to output text summary and save JSON report in `cypress-coverage` folder set in your `package.json` folder:
+
+```json
+{
+  "nyc": {
+    "report-dir": "cypress-coverage",
+    "reporter": [
+      "text",
+      "json"
+    ]
+  }
+}
+```
+
+**Tip:** find list of reporters [here](https://istanbul.js.org/docs/advanced/alternative-reporters/)
+
 ## Exclude code
 
 You can exclude parts of the code or entire files from the code coverage report. See [Istanbul guide](https://github.com/gotwarlost/istanbul/blob/master/ignoring-code-for-coverage.md). Common cases:

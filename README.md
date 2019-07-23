@@ -66,6 +66,17 @@ module.exports = (on, config) => {
 
 Now the code coverage from spec files will be combined with end-to-end coverage.
 
+### Alternative
+
+If you cannot use `.babelrc` for some reason (maybe it is used by other tools?), try pushing `babel-plugin-istanbul` directory to browserify plugins list.
+
+```js
+module.exports = (on, config) => {
+  on('task', require('@cypress/code-coverage/task'))
+  on('file:preprocessor', require('@cypress/code-coverage/use-browserify-istanbul'))
+}
+```
+
 ## Instrument backend code
 
 You can also instrument your server-side code and produce combined coverage report that covers both the backend and frontend code.

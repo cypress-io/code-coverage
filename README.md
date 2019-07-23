@@ -132,6 +132,18 @@ if (global.__coverage__) {
 
 That should be enough - the code coverage from the server will be requested at the end of the test run and merged with the client-side code coverage, producing a combined report
 
+## Custom report folder
+
+You can specify custom report folder by adding `nyc` object to the `package.json` file. For example to save reports to `cypress-coverage` folder, use:
+
+```json
+{
+  "nyc": {
+    "report-dir": "cypress-coverage"
+  }
+}
+```
+
 ## Exclude code
 
 You can exclude parts of the code or entire files from the code coverage report. See [Istanbul guide](https://github.com/gotwarlost/istanbul/blob/master/ignoring-code-for-coverage.md). Common cases:

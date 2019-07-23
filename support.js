@@ -23,21 +23,32 @@ afterEach(() => {
 after(() => {
   // there might be server-side code coverage information
   // we should grab it once after all tests finish
-  const url = Cypress._.get(Cypress.env('codeCoverage'), 'url', '/__coverage__')
-  cy.request({
-    url,
-    log: false,
-    failOnStatusCode: false
-  })
-    .then(r => Cypress._.get(r, 'body.coverage', null), { log: false })
-    .then(coverage => {
-      if (!coverage) {
-        // we did not get code coverage - this is the
-        // original failed request
-        return
-      }
-      cy.task('combineCoverage', coverage)
+  const baseUrl = Cypress.config('baseUrl') || cy.state('window').origin
+  const runningEndToEndTests = baseUrl !== Cypress.config('proxyUrl')
+  if (runningEndToEndTests) {
+    // we can only request server-side code coverage
+    // if we are running end-to-end tests,
+    // otherwise where do we send the request?
+    const url = Cypress._.get(
+      Cypress.env('codeCoverage'),
+      'url',
+      '/__coverage__'
+    )
+    cy.request({
+      url,
+      log: false,
+      failOnStatusCode: false
     })
+      .then(r => Cypress._.get(r, 'body.coverage', null), { log: false })
+      .then(coverage => {
+        if (!coverage) {
+          // we did not get code coverage - this is the
+          // original failed request
+          return
+        }
+        cy.task('combineCoverage', coverage)
+      })
+  }
 
   // collect and merge frontend coverage
   const specFolder = Cypress.config('integrationFolder')

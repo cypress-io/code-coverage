@@ -237,7 +237,15 @@ For example, if you want to only include files in the `app` folder, but exclude 
 
 ## Debugging
 
-Run tests with `DEBUG=code-coverage` environment variable to see log messages
+This plugin uses [debug](https://github.com/visionmedia/debug) module to output additional logging messages from its [task.js](task.js) file. This can help with debugging errors while saving code coverage or reporting. In order to see these messages, run Cypress from the terminal with environment variable `DEBUG=code-coverage`. Example using Unix syntax to set the variable:
+
+```shell
+$ DEBUG=code-coverage npm run dev
+...
+  code-coverage reset code coverage in interactive mode +0ms
+  code-coverage wrote coverage file /code-coverage/.nyc_output/out.json +28ms
+  code-coverage saving coverage report using command: "nyc report --report-dir ./coverage --reporter=lcov --reporter=clover --reporter=json" +3ms
+```
 
 ## License
 

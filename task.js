@@ -99,6 +99,7 @@ module.exports = {
       command,
       args.join(' ')
     )
+    debug('current working directory is %s', process.cwd())
     return execa(command, args, { stdio: 'inherit' })
   }
 }

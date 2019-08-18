@@ -11,7 +11,7 @@
     "baseUrl": "http://localhost:3000",
     "env": {
       "codeCoverage": {
-        "url": "/api/__coverage__"
+        "url": "/api/coverage"
       }
     }
   }

@@ -219,6 +219,23 @@ For example, if you want to only include files in the `app` folder, but exclude 
 }
 ```
 
+## Disable plugin
+
+You can skip the client-side code coverage hooks by setting the environment variable `coverage` to `false`.
+
+```shell
+cypress run --env coverage=false
+```
+
+See [Cypress environment variables](https://on.cypress.io/environment-variables) and [support.js](support.js). You can try running without code coverage in this project yourself
+
+```shell
+# run with code coverage
+npm run dev
+# disable code coverage
+npm run dev:no:coverage
+```
+
 ## Links
 
 - Read the [Cypress code coverage guide](http://on.cypress.io/code-coverage)

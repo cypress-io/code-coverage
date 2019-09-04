@@ -8,15 +8,16 @@ const { fixSourcePathes } = require('./utils')
 const debug = require('debug')('code-coverage')
 
 // these are standard folder and file names used by NYC tools
+const processWorkingDirectory = process.cwd()
 const outputFolder = '.nyc_output'
-const coverageFolder = join(process.cwd(), outputFolder)
+const coverageFolder = join(processWorkingDirectory, outputFolder)
 const nycFilename = join(coverageFolder, 'out.json')
 
 // there might be custom "nyc" options in the user package.json
 // see https://github.com/istanbuljs/nyc#configuring-nyc
 // potentially there might be "nyc" options in other configuration files
 // it allows, but for now ignore those options
-const pkgFilename = join(process.cwd(), 'package.json')
+const pkgFilename = join(processWorkingDirectory, 'package.json')
 const pkg = fs.existsSync(pkgFilename)
   ? JSON.parse(fs.readFileSync(pkgFilename, 'utf8'))
   : {}
@@ -93,7 +94,13 @@ module.exports = {
 
     // should we generate report via NYC module API?
     const command = 'nyc'
-    const args = ['report', '--report-dir', reportDir].concat(reporters)
+    const args = [
+      'report',
+      '--report-dir',
+      reportDir,
+      '--temp-dir',
+      processWorkingDirectory
+    ].concat(reporters)
     debug(
       'saving coverage report using command: "%s %s"',
       command,

@@ -99,7 +99,7 @@ module.exports = {
       '--report-dir',
       reportDir,
       '--temp-dir',
-      processWorkingDirectory
+      coverageFolder
     ].concat(reporters)
     debug(
       'saving coverage report using command: "%s %s"',

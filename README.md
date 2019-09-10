@@ -162,6 +162,27 @@ You can specify custom coverage reporter(s) to use. For example to output text s
 
 **Tip:** find list of reporters [here](https://istanbul.js.org/docs/advanced/alternative-reporters/)
 
+## TypeScript users
+
+TypeScript source files are NOT included in the code coverage report by default, even if they are properly instrumented. In order to tell `nyc` to include TS files in the report, you need to:
+
+1. Add these dev dependencies that let Istanbul work with TypeScript
+
+```shell
+npm i -D @istanbuljs/nyc-config-typescript source-map-support ts-node
+```
+
+2. In `package.json` use the following `nyc` configuration object
+
+```json
+{
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "all": true
+  }
+}
+```
+
 ## Exclude code
 
 You can exclude parts of the code or entire files from the code coverage report. See [Istanbul guide](https://github.com/gotwarlost/istanbul/blob/master/ignoring-code-for-coverage.md). Common cases:

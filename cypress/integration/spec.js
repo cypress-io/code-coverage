@@ -3,7 +3,7 @@
 /// <reference types="Cypress" />
 
 import { add } from '../unit'
-const { fixSourcePathes } = require('../../utils')
+const { fixSourcePaths } = require('../../utils')
 
 context('Page test', () => {
   beforeEach(() => {
@@ -30,7 +30,7 @@ context('Unit tests', () => {
     expect(add('foo', 'Bar')).to.equal('fooBar')
   })
 
-  it('fixes webpack loader source-map pathes', () => {
+  it('fixes webpack loader source-map paths', () => {
     const coverage = {
       '/absolute/src/component.vue': {
         path: '/absolute/src/component.vue',
@@ -47,7 +47,7 @@ context('Unit tests', () => {
       }
     }
 
-    fixSourcePathes(coverage)
+    fixSourcePaths(coverage)
 
     expect(coverage).to.deep.eq({
       '/absolute/src/component.vue': {

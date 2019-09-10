@@ -7,6 +7,17 @@
 if (Cypress.env('coverage') === false) {
   console.log('Skipping code coverage hooks')
 } else {
+  const sendCoverageObject = (coverage) => {
+    if (!coverage) {
+      return
+    }
+    cy.task('combineCoverage', coverage).then(response => {
+      cy.log(`**${response.covered.s}**/**${response.total.s}** statements`)
+      cy.log(`**${response.covered.f}**/**${response.total.f}** functions`)
+      cy.log(`**${response.covered.b}**/**${response.total.b}** branches`)
+    })
+  }
+
   before(() => {
     // we need to reset the coverage when running
     // in the interactive mode, otherwise the counters will
@@ -18,13 +29,9 @@ if (Cypress.env('coverage') === false) {
     // save coverage after each test
     // because the entire "window" object is about
     // to be recycled by Cypress before next test
-    cy.window().then(win => {
+    cy.window({log: false}).then(win => {
       // if application code has been instrumented, the app iframe "window" has an object
-      const applicationSourceCoverage = win.__coverage__
-
-      if (applicationSourceCoverage) {
-        cy.task('combineCoverage', applicationSourceCoverage)
-      }
+      sendCoverageObject(win.__coverage__)
     })
   })
 
@@ -48,14 +55,7 @@ if (Cypress.env('coverage') === false) {
         failOnStatusCode: false
       })
         .then(r => Cypress._.get(r, 'body.coverage', null), { log: false })
-        .then(coverage => {
-          if (!coverage) {
-            // we did not get code coverage - this is the
-            // original failed request
-            return
-          }
-          cy.task('combineCoverage', coverage)
-        })
+        .then(sendCoverageObject)
     }
 
     // collect and merge frontend coverage
@@ -75,7 +75,7 @@ if (Cypress.env('coverage') === false) {
         (fileCoverage, filename) =>
           filename.startsWith(specFolder) || filename.startsWith(supportFolder)
       )
-      cy.task('combineCoverage', coverage)
+      sendCoverageObject(coverage)
     }
 
     // when all tests finish, lets generate the coverage report

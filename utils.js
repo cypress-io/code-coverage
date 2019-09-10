@@ -4,7 +4,7 @@ module.exports = {
    * (coverage report wouldn't work with source-map path being relative
    * or containing Webpack loaders and query parameters)
    */
-  fixSourcePathes(coverage) {
+  fixSourcePaths(coverage) {
     Object.values(coverage).forEach(file => {
       const { path: absolutePath, inputSourceMap } = file
       const fileName = /([^\/\\]+)$/.exec(absolutePath)[1]

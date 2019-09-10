@@ -3,7 +3,7 @@ const { join } = require('path')
 const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
 const execa = require('execa')
 const fs = require('fs')
-const { fixSourcePathes } = require('./utils')
+const { fixSourcePaths } = require('./utils')
 
 const debug = require('debug')('code-coverage')
 
@@ -63,7 +63,7 @@ module.exports = {
    * with previously collected coverage.
    */
   combineCoverage (coverage) {
-    fixSourcePathes(coverage)
+    fixSourcePaths(coverage)
     const previous = existsSync(nycFilename)
       ? JSON.parse(readFileSync(nycFilename))
       : istanbul.createCoverageMap({})
@@ -72,7 +72,39 @@ module.exports = {
     saveCoverage(coverageMap)
     debug('wrote coverage file %s', nycFilename)
 
-    return null
+    // count current code coverage
+    const counters = {
+      s: 0,
+      f: 0,
+      b: 0
+    }
+    const coveredCounters = {
+      s: 0,
+      f: 0,
+      b: 0
+    }
+
+    const countProperty = (prop, covered) => {
+      const s = Object.keys(covered[prop])
+      counters[prop] += s.length
+      s.forEach(k => {
+        if (covered[prop][k]) {
+          coveredCounters[prop] += 1
+        }
+      })
+    }
+
+    Object.keys(coverageMap.data).forEach(filename => {
+      const covered =  coverageMap.data[filename]
+      countProperty('s', covered)
+      countProperty('b', covered)
+      countProperty('f', covered)
+    })
+
+    return {
+      total: counters,
+      covered: coveredCounters
+    }
   },
 
   /**

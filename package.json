@@ -55,7 +55,7 @@
     "lodash": "4.17.15",
     "nyc": "14.1.1",
     "parcel-bundler": "1.12.3",
-    "start-server-and-test": "1.10.2",
+    "start-server-and-test": "1.10.4",
     "semantic-release": "15.13.24"
   }
 }

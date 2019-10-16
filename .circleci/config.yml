@@ -4,9 +4,12 @@ orbs:
 workflows:
   build:
     jobs:
+      - cypress/install:
+          # also install peer dependency needed for tests
+          build: npm install --no-save --no-package-lock @cypress/browserify-preprocessor
       - cypress/run:
-          pre-steps:
-            - run: npm install --no-save --no-package-lock @cypress/browserify-preprocessor
+          requires:
+            - cypress/install
           # we need to start the web application
           start: npm start
           # there are no jobs to follow this one

@@ -6,7 +6,7 @@ workflows:
     jobs:
       - cypress/run:
           pre-steps:
-            - run: npm install --no-save @cypress/browserify-preprocessor
+            - run: npm install --no-save --no-package-lock @cypress/browserify-preprocessor
           # we need to start the web application
           start: npm start
           # there are no jobs to follow this one

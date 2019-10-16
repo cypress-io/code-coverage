@@ -66,6 +66,17 @@ module.exports = (on, config) => {
 
 Now the code coverage from spec files will be combined with end-to-end coverage.
 
+### Alternative
+
+If you cannot use `.babelrc` for some reason (maybe it is used by other tools?), try pushing `babel-plugin-istanbul` directory to browserify plugins list.
+
+```js
+module.exports = (on, config) => {
+  on('task', require('@cypress/code-coverage/task'))
+  on('file:preprocessor', require('@cypress/code-coverage/use-browserify-istanbul'))
+}
+```
+
 ## Instrument backend code
 
 You can also instrument your server-side code and produce combined coverage report that covers both the backend and frontend code.
@@ -120,6 +131,57 @@ if (global.__coverage__) {
 ```
 
 That should be enough - the code coverage from the server will be requested at the end of the test run and merged with the client-side code coverage, producing a combined report
+
+## Custom report folder
+
+You can specify custom report folder by adding `nyc` object to the `package.json` file. For example to save reports to `cypress-coverage` folder, use:
+
+```json
+{
+  "nyc": {
+    "report-dir": "cypress-coverage"
+  }
+}
+```
+
+## Custom reporters
+
+You can specify custom coverage reporter(s) to use. For example to output text summary and save JSON report in `cypress-coverage` folder set in your `package.json` folder:
+
+```json
+{
+  "nyc": {
+    "report-dir": "cypress-coverage",
+    "reporter": [
+      "text",
+      "json"
+    ]
+  }
+}
+```
+
+**Tip:** find list of reporters [here](https://istanbul.js.org/docs/advanced/alternative-reporters/)
+
+## TypeScript users
+
+TypeScript source files are NOT included in the code coverage report by default, even if they are properly instrumented. In order to tell `nyc` to include TS files in the report, you need to:
+
+1. Add these dev dependencies that let Istanbul work with TypeScript
+
+```shell
+npm i -D @istanbuljs/nyc-config-typescript source-map-support ts-node
+```
+
+2. In `package.json` use the following `nyc` configuration object
+
+```json
+{
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "all": true
+  }
+}
+```
 
 ## Exclude code
 
@@ -178,6 +240,23 @@ For example, if you want to only include files in the `app` folder, but exclude 
 }
 ```
 
+## Disable plugin
+
+You can skip the client-side code coverage hooks by setting the environment variable `coverage` to `false`.
+
+```shell
+cypress run --env coverage=false
+```
+
+See [Cypress environment variables](https://on.cypress.io/environment-variables) and [support.js](support.js). You can try running without code coverage in this project yourself
+
+```shell
+# run with code coverage
+npm run dev
+# disable code coverage
+npm run dev:no:coverage
+```
+
 ## Links
 
 - Read the [Cypress code coverage guide](http://on.cypress.io/code-coverage)
@@ -191,10 +270,23 @@ For example, if you want to only include files in the `app` folder, but exclude 
 - [bahmutov/code-coverage-webpack-dev-server](https://github.com/bahmutov/code-coverage-webpack-dev-server) shows how to collect code coverage from an application that uses webpack-dev-server.
 - [bahmutov/code-coverage-vue-example](https://github.com/bahmutov/code-coverage-vue-example) collects code coverage for Vue.js single file components.
 - [lluia/cypress-typescript-coverage-example](https://github.com/lluia/cypress-typescript-coverage-example) shows coverage for React App that uses TypeScript. See discussion in issue [#19](https://github.com/cypress-io/code-coverage/issues/19).
+- [bahmutov/cypress-and-jest](https://github.com/bahmutov/cypress-and-jest) shows how to run Jest unit tests and Cypress unit tests, collecting code coverage from both test runners, and then produce merged report.
+- [rootstrap/react-redux-base](https://github.com/rootstrap/react-redux-base) shows an example with a realistic Webpack config. Instruments the source code using `babel-plugin-istanbul` during tests.
+- [skylock/cypress-angular-coverage-example](https://github.com/skylock/cypress-angular-coverage-example) shows Angular 8 + TypeScript application with instrumentation done using [istanbul-instrumenter-loader](https://github.com/webpack-contrib/istanbul-instrumenter-loader).
+- [bahmutov/testing-react](https://github.com/bahmutov/testing-react) shows how to get code coverage for a React application created using [CRA v3](https://github.com/facebook/create-react-app) without ejecting `react-scripts`.
+- [bahmutov/next-and-cypress-example](https://github.com/bahmutov/next-and-cypress-example) shows how to get backend and fronend coverage for a [Next.js](https://nextjs.org) project. Uses [middleware/nextjs.js](middleware/nextjs.js).
 
 ## Debugging
 
-Run tests with `DEBUG=code-coverage` environment variable to see log messages
+This plugin uses [debug](https://github.com/visionmedia/debug) module to output additional logging messages from its [task.js](task.js) file. This can help with debugging errors while saving code coverage or reporting. In order to see these messages, run Cypress from the terminal with environment variable `DEBUG=code-coverage`. Example using Unix syntax to set the variable:
+
+```shell
+$ DEBUG=code-coverage npm run dev
+...
+  code-coverage reset code coverage in interactive mode +0ms
+  code-coverage wrote coverage file /code-coverage/.nyc_output/out.json +28ms
+  code-coverage saving coverage report using command: "nyc report --report-dir ./coverage --reporter=lcov --reporter=clover --reporter=json" +3ms
+```
 
 ## License
 

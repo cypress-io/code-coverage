@@ -61,7 +61,8 @@ module.exports = {
    * Combines coverage information from single test
    * with previously collected coverage.
    */
-  combineCoverage (coverage) {
+  combineCoverage (coverageString) {
+    const coverage = JSON.parse(coverageString)
     fixSourcePathes(coverage)
     const previous = existsSync(nycFilename)
       ? JSON.parse(readFileSync(nycFilename))

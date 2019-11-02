@@ -56,6 +56,6 @@
     "nyc": "14.1.1",
     "parcel-bundler": "1.12.4",
     "start-server-and-test": "1.10.6",
-    "semantic-release": "15.13.28"
+    "semantic-release": "15.13.29"
   }
 }

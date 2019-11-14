@@ -23,7 +23,7 @@ const pkg = fs.existsSync(pkgFilename)
   : {}
 const nycOptions = pkg.nyc || {}
 
-function saveCoverage (coverage) {
+function saveCoverage(coverage) {
   if (!existsSync(coverageFolder)) {
     mkdirSync(coverageFolder)
     debug('created folder %s for output coverage', coverageFolder)
@@ -42,7 +42,7 @@ module.exports = {
    *    - runs EACH spec separately, so we cannot reset the coverage
    *      or we will lose the coverage from previous specs.
    */
-  resetCoverage ({ isInteractive }) {
+  resetCoverage({ isInteractive }) {
     if (isInteractive) {
       debug('reset code coverage in interactive mode')
       const coverageMap = istanbul.createCoverageMap({})
@@ -62,7 +62,7 @@ module.exports = {
    * Combines coverage information from single test
    * with previously collected coverage.
    */
-  combineCoverage (coverage) {
+  combineCoverage(coverage) {
     fixSourcePathes(coverage)
     const previous = existsSync(nycFilename)
       ? JSON.parse(readFileSync(nycFilename))
@@ -79,7 +79,7 @@ module.exports = {
    * Saves coverage information as a JSON file and calls
    * NPM script to generate HTML report
    */
-  coverageReport () {
+  coverageReport() {
     if (!existsSync(nycFilename)) {
       console.warn('Cannot find coverage file %s', nycFilename)
       console.warn('Skipping coverage report')

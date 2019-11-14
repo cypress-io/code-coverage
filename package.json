@@ -11,7 +11,8 @@
     "semantic-release": "semantic-release",
     "test:ci": "start-test 1234",
     "report:coverage": "nyc report --reporter=html",
-    "dev:no:coverage": "start-test 1234 'cypress open --env coverage=false'"
+    "dev:no:coverage": "start-test 1234 'cypress open --env coverage=false'",
+    "format": "prettier --write '*.js'"
   },
   "peerDependencies": {
     "cypress": "*",

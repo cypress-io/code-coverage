@@ -23,7 +23,7 @@ if (Cypress.env('coverage') === false) {
       const applicationSourceCoverage = win.__coverage__
 
       if (applicationSourceCoverage) {
-        cy.task('combineCoverage', applicationSourceCoverage)
+        cy.task('combineCoverage', JSON.stringify(applicationSourceCoverage))
       }
     })
   })
@@ -54,7 +54,7 @@ if (Cypress.env('coverage') === false) {
             // original failed request
             return
           }
-          cy.task('combineCoverage', coverage)
+          cy.task('combineCoverage', JSON.stringify(coverage))
         })
     }
 
@@ -75,7 +75,7 @@ if (Cypress.env('coverage') === false) {
         (fileCoverage, filename) =>
           filename.startsWith(specFolder) || filename.startsWith(supportFolder)
       )
-      cy.task('combineCoverage', coverage)
+      cy.task('combineCoverage', JSON.stringify(coverage))
     }
 
     // when all tests finish, lets generate the coverage report

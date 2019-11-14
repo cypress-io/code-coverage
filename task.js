@@ -61,8 +61,14 @@ module.exports = {
   /**
    * Combines coverage information from single test
    * with previously collected coverage.
+   *
+   * @param {string} sentCoverage Stringified coverage object sent by the test runner
+   * @returns {null} Nothing is returned from this task
    */
-  combineCoverage(coverage) {
+  combineCoverage(sentCoverage) {
+    const coverage = JSON.parse(sentCoverage)
+    debug('parsed sent coverage')
+
     fixSourcePathes(coverage)
     const previous = existsSync(nycFilename)
       ? JSON.parse(readFileSync(nycFilename))

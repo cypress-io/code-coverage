@@ -49,7 +49,7 @@
     "debug": "4.1.1"
   },
   "devDependencies": {
-    "@babel/core": "7.7.4",
+    "@babel/core": "7.7.5",
     "babel-plugin-istanbul": "5.2.0",
     "cypress": "3.7.0",
     "istanbul-lib-coverage": "2.0.5",

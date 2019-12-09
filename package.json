@@ -46,7 +46,8 @@
   "private": false,
   "dependencies": {
     "@cypress/browserify-preprocessor": "2.1.1",
-    "debug": "4.1.1"
+    "debug": "4.1.1",
+    "execa": "3.4.0"
   },
   "devDependencies": {
     "@babel/core": "7.7.5",

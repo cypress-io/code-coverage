@@ -1,5 +1,17 @@
 /// <reference types="cypress" />
 
+/**
+ * Sends collected code coverage object to the backend code
+ * via "cy.task".
+ */
+const sendCoverage = coverage => {
+  cy.log('Saving code coverage')
+  // stringify coverage object for speed
+  cy.task('combineCoverage', JSON.stringify(coverage), {
+    log: false
+  })
+}
+
 // to disable code coverage commands and save time
 // pass environment variable coverage=false
 //  cypress run --env coverage=false
@@ -23,7 +35,7 @@ if (Cypress.env('coverage') === false) {
       const applicationSourceCoverage = win.__coverage__
 
       if (applicationSourceCoverage) {
-        cy.task('combineCoverage', JSON.stringify(applicationSourceCoverage))
+        sendCoverage(applicationSourceCoverage)
       }
     })
   })
@@ -54,7 +66,7 @@ if (Cypress.env('coverage') === false) {
             // original failed request
             return
           }
-          cy.task('combineCoverage', JSON.stringify(coverage))
+          sendCoverage(coverage)
         })
     }
 
@@ -75,7 +87,7 @@ if (Cypress.env('coverage') === false) {
         (fileCoverage, filename) =>
           filename.startsWith(specFolder) || filename.startsWith(supportFolder)
       )
-      cy.task('combineCoverage', JSON.stringify(coverage))
+      sendCoverage(coverage)
     }
 
     // when all tests finish, lets generate the coverage report

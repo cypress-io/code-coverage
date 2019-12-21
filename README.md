@@ -68,7 +68,7 @@ Now the code coverage from spec files will be combined with end-to-end coverage.
 
 ### Alternative
 
-If you cannot use `.babelrc` for some reason (maybe it is used by other tools?), try pushing `babel-plugin-istanbul` directory to browserify plugins list.
+If you cannot use `.babelrc` for some reason (maybe it is used by other tools?), try using the Browserify transformer included with this module in `use-browserify-istanbul` file.
 
 ```js
 module.exports = (on, config) => {

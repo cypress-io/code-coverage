@@ -50,7 +50,7 @@
     "execa": "3.4.0"
   },
   "devDependencies": {
-    "@babel/core": "7.7.5",
+    "@babel/core": "7.7.7",
     "babel-plugin-istanbul": "5.2.0",
     "cypress": "3.8.0",
     "istanbul-lib-coverage": "2.0.5",

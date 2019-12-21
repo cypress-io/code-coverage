@@ -58,7 +58,7 @@
     "nyc": "14.1.1",
     "parcel-bundler": "1.12.4",
     "prettier": "1.19.1",
-    "semantic-release": "15.13.31",
+    "semantic-release": "15.14.0",
     "start-server-and-test": "1.10.6"
   }
 }

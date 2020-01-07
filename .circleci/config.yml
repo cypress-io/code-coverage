@@ -17,7 +17,7 @@ workflows:
             - store_artifacts:
                 path: coverage
             # print code coverage summary to the terminal
-            - run: npx nyc report
+            # and make sure there the coverage is above certain limit
+            - run: npx nyc report --check-coverage true --lines 80
             # publish new version if necessary
             - run: npm run semantic-release
-

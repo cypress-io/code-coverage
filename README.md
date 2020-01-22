@@ -68,12 +68,15 @@ Now the code coverage from spec files will be combined with end-to-end coverage.
 
 ### Alternative
 
-If you cannot use `.babelrc` for some reason (maybe it is used by other tools?), try pushing `babel-plugin-istanbul` directory to browserify plugins list.
+If you cannot use `.babelrc` for some reason (maybe it is used by other tools?), try using the Browserify transformer included with this module in `use-browserify-istanbul` file.
 
 ```js
 module.exports = (on, config) => {
   on('task', require('@cypress/code-coverage/task'))
-  on('file:preprocessor', require('@cypress/code-coverage/use-browserify-istanbul'))
+  on(
+    'file:preprocessor',
+    require('@cypress/code-coverage/use-browserify-istanbul')
+  )
 }
 ```
 
@@ -113,8 +116,7 @@ For any other server, define the endpoint yourself and return the coverage objec
 ```js
 if (global.__coverage__) {
   // add method "GET /__coverage__" and response with JSON
-  onRequest = (response) =>
-    response.sendJSON({coverage: global.__coverage__ })
+  onRequest = response => response.sendJSON({ coverage: global.__coverage__ })
 }
 ```
 
@@ -152,10 +154,7 @@ You can specify custom coverage reporter(s) to use. For example to output text s
 {
   "nyc": {
     "report-dir": "cypress-coverage",
-    "reporter": [
-      "text",
-      "json"
-    ]
+    "reporter": ["text", "json"]
   }
 }
 ```
@@ -214,10 +213,11 @@ Or a particular `switch` case
 
 ```js
 switch (foo) {
-  case 1: /* some code */; break;
+  case 1 /* some code */:
+    break
   /* istanbul ignore next */
   case 2: // really difficult to hit from tests
-    someCode();
+    someCode()
 }
 ```
 
@@ -230,12 +230,8 @@ For example, if you want to only include files in the `app` folder, but exclude 
 ```json
 {
   "nyc": {
-    "include": [
-      "app/**/*.js"
-    ],
-    "exclude": [
-      "app/util.js"
-    ]
+    "include": ["app/**/*.js"],
+    "exclude": ["app/util.js"]
   }
 }
 ```
@@ -266,7 +262,7 @@ npm run dev:no:coverage
 ## Examples
 
 - [cypress-io/cypress-example-todomvc-redux](https://github.com/cypress-io/cypress-example-todomvc-redux) is a React / Redux application with 100% code coverage.
-- [cypress-io/cypress-example-realworld](https://github.com/cypress-io/cypress-example-realworld) shows how to collect the coverage information from both back and front end code and merge it into a single report.
+- [cypress-io/cypress-example-realworld](https://github.com/cypress-io/cypress-example-realworld) shows how to collect the coverage information from both back and front end code and merge it into a single report. The E2E test step runs in parallel in several CI containers, each saving just partial test coverage information. Then a merge job runs taking artifacts and combining coverage into the final report to be sent to an exteral coverage as a service app.
 - [bahmutov/code-coverage-webpack-dev-server](https://github.com/bahmutov/code-coverage-webpack-dev-server) shows how to collect code coverage from an application that uses webpack-dev-server.
 - [bahmutov/code-coverage-vue-example](https://github.com/bahmutov/code-coverage-vue-example) collects code coverage for Vue.js single file components.
 - [lluia/cypress-typescript-coverage-example](https://github.com/lluia/cypress-typescript-coverage-example) shows coverage for React App that uses TypeScript. See discussion in issue [#19](https://github.com/cypress-io/code-coverage/issues/19).
@@ -274,8 +270,9 @@ npm run dev:no:coverage
 - [rootstrap/react-redux-base](https://github.com/rootstrap/react-redux-base) shows an example with a realistic Webpack config. Instruments the source code using `babel-plugin-istanbul` during tests.
 - [skylock/cypress-angular-coverage-example](https://github.com/skylock/cypress-angular-coverage-example) shows Angular 8 + TypeScript application with instrumentation done using [istanbul-instrumenter-loader](https://github.com/webpack-contrib/istanbul-instrumenter-loader).
 - [bahmutov/testing-react](https://github.com/bahmutov/testing-react) shows how to get code coverage for a React application created using [CRA v3](https://github.com/facebook/create-react-app) without ejecting `react-scripts`.
-- [bahmutov/next-and-cypress-example](https://github.com/bahmutov/next-and-cypress-example) shows how to get backend and fronend coverage for a [Next.js](https://nextjs.org) project. Uses [middleware/nextjs.js](middleware/nextjs.js).
+- [bahmutov/next-and-cypress-example](https://github.com/bahmutov/next-and-cypress-example) shows how to get backend and frontend coverage for a [Next.js](https://nextjs.org) project. Uses [middleware/nextjs.js](middleware/nextjs.js).
 - [akoidan/vue-webpack-typescript](https://github.com/akoidan/vue-webpack-typescript) Pure webpack config with vue + typescript with codecov reports. This setup uses babel-loader with TS checker as a separate thread.
+- [bahmutov/code-coverage-subfolder-example](https://github.com/bahmutov/code-coverage-subfolder-example) shows how to instrument `app` folder using `nyc instrument` as a separate step before running E2E tests
 
 ## Debugging
 

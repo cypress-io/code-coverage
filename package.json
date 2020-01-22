@@ -50,15 +50,15 @@
     "execa": "3.4.0"
   },
   "devDependencies": {
-    "@babel/core": "7.7.5",
+    "@babel/core": "7.8.3",
     "babel-plugin-istanbul": "5.2.0",
-    "cypress": "3.7.0",
+    "cypress": "3.8.2",
     "istanbul-lib-coverage": "2.0.5",
     "lodash": "4.17.15",
-    "nyc": "14.1.1",
+    "nyc": "15.0.0",
     "parcel-bundler": "1.12.4",
     "prettier": "1.19.1",
-    "semantic-release": "15.13.31",
+    "semantic-release": "15.14.0",
     "start-server-and-test": "1.10.6"
   }
 }

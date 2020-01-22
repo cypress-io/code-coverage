@@ -262,7 +262,7 @@ npm run dev:no:coverage
 ## Examples
 
 - [cypress-io/cypress-example-todomvc-redux](https://github.com/cypress-io/cypress-example-todomvc-redux) is a React / Redux application with 100% code coverage.
-- [cypress-io/cypress-example-realworld](https://github.com/cypress-io/cypress-example-realworld) shows how to collect the coverage information from both back and front end code and merge it into a single report.
+- [cypress-io/cypress-example-realworld](https://github.com/cypress-io/cypress-example-realworld) shows how to collect the coverage information from both back and front end code and merge it into a single report. The E2E test step runs in parallel in several CI containers, each saving just partial test coverage information. Then a merge job runs taking artifacts and combining coverage into the final report to be sent to an exteral coverage as a service app.
 - [bahmutov/code-coverage-webpack-dev-server](https://github.com/bahmutov/code-coverage-webpack-dev-server) shows how to collect code coverage from an application that uses webpack-dev-server.
 - [bahmutov/code-coverage-vue-example](https://github.com/bahmutov/code-coverage-vue-example) collects code coverage for Vue.js single file components.
 - [lluia/cypress-typescript-coverage-example](https://github.com/lluia/cypress-typescript-coverage-example) shows coverage for React App that uses TypeScript. See discussion in issue [#19](https://github.com/cypress-io/code-coverage/issues/19).

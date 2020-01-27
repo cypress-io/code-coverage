@@ -19,6 +19,8 @@ const sendCoverage = coverage => {
 if (Cypress.env('coverage') === false) {
   console.log('Skipping code coverage hooks')
 } else {
+  let windowCoverageObjects
+
   before(() => {
     // we need to reset the coverage when running
     // in the interactive mode, otherwise the counters will
@@ -26,17 +28,25 @@ if (Cypress.env('coverage') === false) {
     cy.task('resetCoverage', { isInteractive: Cypress.config('isInteractive') })
   })
 
-  afterEach(() => {
-    // save coverage after each test
-    // because the entire "window" object is about
-    // to be recycled by Cypress before next test
-    cy.window().then(win => {
+  beforeEach(() => {
+    windowCoverageObjects = []
+
+    // save reference to coverage for each app window loaded in the test
+    cy.on('window:load', win => {
       // if application code has been instrumented, the app iframe "window" has an object
       const applicationSourceCoverage = win.__coverage__
 
       if (applicationSourceCoverage) {
-        sendCoverage(applicationSourceCoverage)
+        windowCoverageObjects.push(applicationSourceCoverage)
       }
+    })
+  })
+
+  afterEach(() => {
+    // save coverage after the test
+    // because now the window coverage objects have been updated
+    windowCoverageObjects.forEach(coverage => {
+      sendCoverage(coverage)
     })
   })
 

@@ -12,6 +12,8 @@ context('Page test', () => {
         cy.spy(win.console, 'log').as('log')
       }
     })
+
+    cy.contains('About').click()
   })
 
   it('logs names', function () {

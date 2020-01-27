@@ -8,18 +8,23 @@ const { fixSourcePathes } = require('../../utils')
 context('Page test', () => {
   beforeEach(() => {
     cy.visit('/', {
-      onBeforeLoad (win) {
+      onBeforeLoad(win) {
         cy.spy(win.console, 'log').as('log')
       }
     })
-
-    cy.contains('About').click()
   })
 
-  it('logs names', function () {
+  it('logs names', function() {
     cy.get('@log')
       .should('have.been.calledOnce')
       .should('have.been.calledWith', 'just names', ['joe', 'mary'])
+  })
+
+  it('loads About page', () => {
+    cy.contains('About').click()
+    cy.url().should('match', /\/about/)
+    cy.contains('h2', 'About')
+    cy.contains('Est. 2019')
   })
 })
 

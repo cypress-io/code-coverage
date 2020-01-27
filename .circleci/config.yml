@@ -19,5 +19,9 @@ workflows:
             # print code coverage summary to the terminal
             # and make sure there the coverage is above certain limit
             - run: npx nyc report --check-coverage true --lines 80
+            # make sure second page (about.html) has its JavaScript counted and covered
+            - run: npx nyc report --check-coverage true --lines 100 --include cypress/about.js
+            # make sure unit tests are covered
+            - run: npx nyc report --check-coverage true --lines 100 --include cypress/unit.js
             # publish new version if necessary
             - run: npm run semantic-release

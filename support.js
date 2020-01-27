@@ -4,8 +4,8 @@
  * Sends collected code coverage object to the backend code
  * via "cy.task".
  */
-const sendCoverage = coverage => {
-  cy.log('Saving code coverage')
+const sendCoverage = (coverage, pathname = '/') => {
+  cy.log(`Saving code coverage **${pathname}**`)
   // stringify coverage object for speed
   cy.task('combineCoverage', JSON.stringify(coverage), {
     log: false
@@ -29,6 +29,8 @@ if (Cypress.env('coverage') === false) {
   })
 
   beforeEach(() => {
+    // each object will have the coverage and url pathname
+    // to let the user know the coverage has been collected
     windowCoverageObjects = []
 
     // save reference to coverage for each app window loaded in the test
@@ -37,7 +39,10 @@ if (Cypress.env('coverage') === false) {
       const applicationSourceCoverage = win.__coverage__
 
       if (applicationSourceCoverage) {
-        windowCoverageObjects.push(applicationSourceCoverage)
+        windowCoverageObjects.push({
+          coverage: applicationSourceCoverage,
+          pathname: win.location.pathname
+        })
       }
     })
   })
@@ -45,8 +50,8 @@ if (Cypress.env('coverage') === false) {
   afterEach(() => {
     // save coverage after the test
     // because now the window coverage objects have been updated
-    windowCoverageObjects.forEach(coverage => {
-      sendCoverage(coverage)
+    windowCoverageObjects.forEach(cover => {
+      sendCoverage(cover.coverage, cover.pathname)
     })
   })
 
@@ -76,7 +81,7 @@ if (Cypress.env('coverage') === false) {
             // original failed request
             return
           }
-          sendCoverage(coverage)
+          sendCoverage(coverage, 'backend')
         })
     }
 
@@ -97,7 +102,7 @@ if (Cypress.env('coverage') === false) {
         (fileCoverage, filename) =>
           filename.startsWith(specFolder) || filename.startsWith(supportFolder)
       )
-      sendCoverage(coverage)
+      sendCoverage(coverage, 'unit')
     }
 
     // when all tests finish, lets generate the coverage report

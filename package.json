@@ -53,7 +53,7 @@
     "@babel/core": "7.8.4",
     "babel-plugin-istanbul": "6.0.0",
     "cypress": "3.8.3",
-    "istanbul-lib-coverage": "2.0.5",
+    "istanbul-lib-coverage": "3.0.0",
     "lodash": "4.17.15",
     "nyc": "15.0.0",
     "parcel-bundler": "1.12.4",

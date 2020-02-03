@@ -31,7 +31,27 @@ module.exports = (on, config) => {
 }
 ```
 
-If your application is loaded Istanbul-instrumented source code, then the coverage information will be automatically saved into `.nyc_output` folder and a report will be generated after the tests finish (even in the interactive mode). Find the LCOV and HTML report in the `coverage/lcov-report` folder.
+### Instrument your application
+
+This plugin **DOES NOT** instrument your code. You have to instrument it yourself using [Istanbul.js](https://istanbul.js.org/) tool. Luckily it is not difficult. For example, if you are already using Babel to transpile you can add [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul) to your `.babelrc` and instrument on the fly.
+
+```
+{
+  "plugins": ["istanbul"]
+}
+```
+
+Please see the [Examples](#examples) section down below, you can probably find a linked project matching your situation to see how to instrument your application's source code before running end-to-end tests to get the code coverage.
+
+If your application has been instrumented correctly, then you should see additional counters and instructions in the application's JavaScript resources, like the image down below shows.
+
+![Instrumented code](images/instrumented-code.png)
+
+You should see the `window.__coverage__` object in the "Application under test iframe"
+
+![Window coverage object](images/window-coverage-object.png)
+
+If you have instrumented your application's code and see the `window.__coverage__` object, then this plugin will save the coverage into `.nyc_output` folder and will generate reports after the tests finish (even in the interactive mode). Find the LCOV and HTML report in the `coverage/lcov-report` folder.
 
 ![Coverage report](images/coverage.jpg)
 

@@ -286,6 +286,18 @@ $ DEBUG=code-coverage npm run dev
   code-coverage saving coverage report using command: "nyc report --report-dir ./coverage --reporter=lcov --reporter=clover --reporter=json" +3ms
 ```
 
+## Contributing
+
+You can test changes locally by running tests and confirming the code coverage has been calculated and saved.
+
+```shell
+npm run test:ci
+# now check generated coverage numbers
+npx nyc report --check-coverage true --lines 80
+npx nyc report --check-coverage true --lines 100 --include cypress/about.js
+npx nyc report --check-coverage true --lines 100 --include cypress/unit.js
+```
+
 ## License
 
 This project is licensed under the terms of the [MIT license](/LICENSE.md).

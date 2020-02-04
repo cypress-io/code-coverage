@@ -5,11 +5,20 @@
  * via "cy.task".
  */
 const sendCoverage = (coverage, pathname = '/') => {
-  cy.log(`Saving code coverage for **${pathname}**`)
+  logMessage(`Saving code coverage for **${pathname}**`)
   // stringify coverage object for speed
   cy.task('combineCoverage', JSON.stringify(coverage), {
     log: false
   })
+}
+
+/**
+ * Consistently logs the given string to the Command Log
+ * so the user knows the log message is coming from this plugin.
+ * @param {string} s Message to log.
+ */
+const logMessage = s => {
+  cy.log(`${s} \`[@cypress/code-coverage]\``)
 }
 
 // to disable code coverage commands and save time
@@ -60,9 +69,9 @@ if (Cypress.env('coverage') === false) {
 
     if (!hasE2ECoverage()) {
       if (hasUnitTestCoverage()) {
-        cy.log(`👉 Only found unit test code coverage.`)
+        logMessage(`👉 Only found unit test code coverage.`)
       } else {
-        cy.log(`
+        logMessage(`
           ⚠️ Could not find any coverage information in your application
           by looking at the window coverage object.
           Did you forget to instrument your application?

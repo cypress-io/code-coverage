@@ -48,7 +48,7 @@ workflows:
             - cypress/install
 
           start: npm run start:test:backend
-          command: cypress run --config-file cypress-backend.json
+          command: npx cypress run --config-file cypress-backend.json
 
           # there are no jobs to follow this one
           # so no need to save the workspace files (saves time)

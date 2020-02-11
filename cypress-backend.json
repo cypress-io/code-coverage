@@ -1,0 +1,9 @@
+{
+  "baseUrl": "http://localhost:3003",
+  "integrationFolder": "cypress/test-backend",
+  "env": {
+    "codeCoverage": {
+      "url": "http://localhost:3003/__coverage__"
+    }
+  }
+}

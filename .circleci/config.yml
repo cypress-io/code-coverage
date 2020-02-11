@@ -4,7 +4,11 @@ orbs:
 workflows:
   build:
     jobs:
+      - cypress/install
       - cypress/run:
+          name: front-end coverage
+          requires:
+            - cypress/install
           # we need to start the web application
           start: npm start
           # there are no jobs to follow this one

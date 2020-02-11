@@ -11,7 +11,9 @@ if (global.__coverage__) {
   require('../middleware/express')(app)
 }
 
-app.get('/', (req, res) => {
+app.use(express.static(__dirname))
+
+app.get('/hello', (req, res) => {
   console.log('sending hello world')
   res.send('Hello World!')
 })

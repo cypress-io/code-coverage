@@ -140,6 +140,8 @@ if (Cypress.env('coverage') === false) {
 
   after(function generateReport() {
     // when all tests finish, lets generate the coverage report
-    cy.task('coverageReport')
+    cy.task('coverageReport', {
+      timeout: Cypress.moment.duration(3, 'minutes').asMilliseconds()
+    })
   })
 }

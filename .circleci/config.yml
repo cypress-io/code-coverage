@@ -61,7 +61,9 @@ workflows:
                 path: coverage
             # print code coverage summary to the terminal
             # and make sure there the coverage is above certain limit
-            - run: npx nyc report --check-coverage true --lines 100
+            - run: npx nyc report --check-coverage true --lines 85
+            # and look at the server index file - should be fully covered
+            - run: npx nyc report --check-coverage true --lines 100 --include test-backend/index.js
 
       - publish:
           requires:

@@ -12,7 +12,10 @@
     "test:ci": "start-test 1234",
     "report:coverage": "nyc report --reporter=html",
     "dev:no:coverage": "start-test 1234 'cypress open --env coverage=false'",
-    "format": "prettier --write '*.js'"
+    "format": "prettier --write '*.js'",
+    "start:test:backend": "nyc --silent node test-backend",
+    "cy:backend": "cypress open --config-file cypress-backend.json",
+    "dev:backend": "start-test start:test:backend 3003 cy:backend"
   },
   "peerDependencies": {
     "cypress": "*",
@@ -53,6 +56,7 @@
     "@babel/core": "7.8.4",
     "babel-plugin-istanbul": "6.0.0",
     "cypress": "4.0.1",
+    "express": "4.17.1",
     "istanbul-lib-coverage": "3.0.0",
     "lodash": "4.17.15",
     "nyc": "15.0.0",

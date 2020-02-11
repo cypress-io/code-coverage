@@ -81,7 +81,7 @@ if (Cypress.env('coverage') === false) {
     }
   })
 
-  after(() => {
+  after(function collectBackendCoverage() {
     // I wish I could fail the tests if there is no code coverage information
     // but throwing an error here does not fail the test run due to
     // https://github.com/cypress-io/cypress/issues/2296
@@ -114,7 +114,9 @@ if (Cypress.env('coverage') === false) {
           sendCoverage(coverage, 'backend')
         })
     }
+  })
 
+  after(function mergeUnitTestCoverage() {
     // collect and merge frontend coverage
     const specFolder = Cypress.config('integrationFolder')
     const supportFolder = Cypress.config('supportFolder')
@@ -127,14 +129,16 @@ if (Cypress.env('coverage') === false) {
     if (unitTestCoverage) {
       // remove coverage for the spec files themselves,
       // only keep "external" application source file coverage
-      const coverage = Cypress._.omitBy(
-        window.__coverage__,
-        (fileCoverage, filename) =>
-          filename.startsWith(specFolder) || filename.startsWith(supportFolder)
-      )
+
+      // does this handle unset support file?
+      const isTestFile = (fileCoverage, filename) =>
+        filename.startsWith(specFolder) || filename.startsWith(supportFolder)
+      const coverage = Cypress._.omitBy(window.__coverage__, isTestFile)
       sendCoverage(coverage, 'unit')
     }
+  })
 
+  after(function generateReport() {
     // when all tests finish, lets generate the coverage report
     cy.task('coverageReport')
   })

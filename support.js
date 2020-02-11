@@ -5,11 +5,20 @@
  * via "cy.task".
  */
 const sendCoverage = (coverage, pathname = '/') => {
-  cy.log(`Saving code coverage **${pathname}**`)
+  logMessage(`Saving code coverage for **${pathname}**`)
   // stringify coverage object for speed
   cy.task('combineCoverage', JSON.stringify(coverage), {
     log: false
   })
+}
+
+/**
+ * Consistently logs the given string to the Command Log
+ * so the user knows the log message is coming from this plugin.
+ * @param {string} s Message to log.
+ */
+const logMessage = s => {
+  cy.log(`${s} \`[@cypress/code-coverage]\``)
 }
 
 // to disable code coverage commands and save time
@@ -20,6 +29,10 @@ if (Cypress.env('coverage') === false) {
   console.log('Skipping code coverage hooks')
 } else {
   let windowCoverageObjects
+
+  const hasE2ECoverage = () => Boolean(windowCoverageObjects.length)
+
+  const hasUnitTestCoverage = () => Boolean(window.__coverage__)
 
   before(() => {
     // we need to reset the coverage when running
@@ -53,9 +66,26 @@ if (Cypress.env('coverage') === false) {
     windowCoverageObjects.forEach(cover => {
       sendCoverage(cover.coverage, cover.pathname)
     })
+
+    if (!hasE2ECoverage()) {
+      if (hasUnitTestCoverage()) {
+        logMessage(`👉 Only found unit test code coverage.`)
+      } else {
+        logMessage(`
+          ⚠️ Could not find any coverage information in your application
+          by looking at the window coverage object.
+          Did you forget to instrument your application?
+          See [code-coverage#instrument-your-application](https://github.com/cypress-io/code-coverage#instrument-your-application)
+        `)
+      }
+    }
   })
 
-  after(() => {
+  after(function collectBackendCoverage() {
+    // I wish I could fail the tests if there is no code coverage information
+    // but throwing an error here does not fail the test run due to
+    // https://github.com/cypress-io/cypress/issues/2296
+
     // there might be server-side code coverage information
     // we should grab it once after all tests finish
     const baseUrl = Cypress.config('baseUrl') || cy.state('window').origin
@@ -84,7 +114,9 @@ if (Cypress.env('coverage') === false) {
           sendCoverage(coverage, 'backend')
         })
     }
+  })
 
+  after(function mergeUnitTestCoverage() {
     // collect and merge frontend coverage
     const specFolder = Cypress.config('integrationFolder')
     const supportFolder = Cypress.config('supportFolder')
@@ -97,14 +129,16 @@ if (Cypress.env('coverage') === false) {
     if (unitTestCoverage) {
       // remove coverage for the spec files themselves,
       // only keep "external" application source file coverage
-      const coverage = Cypress._.omitBy(
-        window.__coverage__,
-        (fileCoverage, filename) =>
-          filename.startsWith(specFolder) || filename.startsWith(supportFolder)
-      )
+
+      // does this handle unset support file?
+      const isTestFile = (fileCoverage, filename) =>
+        filename.startsWith(specFolder) || filename.startsWith(supportFolder)
+      const coverage = Cypress._.omitBy(window.__coverage__, isTestFile)
       sendCoverage(coverage, 'unit')
     }
+  })
 
+  after(function generateReport() {
     // when all tests finish, lets generate the coverage report
     cy.task('coverageReport')
   })

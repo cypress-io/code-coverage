@@ -319,9 +319,17 @@ npx nyc report --check-coverage true --lines 100 --include cypress/about.js
 npx nyc report --check-coverage true --lines 100 --include cypress/unit.js
 ```
 
+### Markdown
+
+You can validate links in Markdown files in this directory by executing (Linux + Mac only) script
+
+```shell
+npm run check:markdown
+```
+
 ## License
 
-This project is licensed under the terms of the [MIT license](/LICENSE.md).
+This project is licensed under the terms of the [MIT license](LICENSE.md).
 
 [renovate-badge]: https://img.shields.io/badge/renovate-app-blue.svg
 [renovate-app]: https://renovateapp.com/

@@ -18,7 +18,9 @@ jobs:
 workflows:
   build:
     jobs:
-      - cypress/install
+      - cypress/install:
+          post-steps:
+            - run: npm run check:markdown
       - cypress/run:
           name: frontend coverage
           requires:

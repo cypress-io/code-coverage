@@ -6,9 +6,6 @@ orbs:
 
 jobs:
   publish:
-    branches:
-      only:
-        - master
     executor:
       name: node/default
       tag: '12'
@@ -23,6 +20,10 @@ workflows:
   build:
     jobs:
       - cypress/install:
+          filters:
+            branches:
+              only:
+                - master
           post-steps:
             - run: npm run check:markdown
       - cypress/run:

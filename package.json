@@ -15,7 +15,8 @@
     "format": "prettier --write '*.js'",
     "start:test:backend": "nyc --silent node test-backend",
     "cy:backend": "cypress open --config-file cypress-backend.json",
-    "dev:backend": "start-test start:test:backend 3003 cy:backend"
+    "dev:backend": "start-test start:test:backend 3003 cy:backend",
+    "check:markdown": "find *.md -exec npx markdown-link-check {} \\;"
   },
   "peerDependencies": {
     "cypress": "*",
@@ -59,6 +60,7 @@
     "express": "4.17.1",
     "istanbul-lib-coverage": "3.0.0",
     "lodash": "4.17.15",
+    "markdown-link-check": "3.8.0",
     "nyc": "15.0.0",
     "parcel-bundler": "1.12.4",
     "prettier": "1.19.1",

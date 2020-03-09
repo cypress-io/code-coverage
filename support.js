@@ -49,12 +49,6 @@ if (Cypress.env('coverage') === false) {
     const saveCoverageObject = win => {
       // if application code has been instrumented, the app iframe "window" has an object
       const applicationSourceCoverage = win.__coverage__
-      console.log('app code coverage object', applicationSourceCoverage)
-      console.log(
-        'existing %d',
-        windowCoverageObjects.length,
-        windowCoverageObjects
-      )
       if (!applicationSourceCoverage) {
         return
       }

@@ -46,18 +46,34 @@ if (Cypress.env('coverage') === false) {
     // to let the user know the coverage has been collected
     windowCoverageObjects = []
 
-    // save reference to coverage for each app window loaded in the test
-    cy.on('window:load', win => {
+    const saveCoverageObject = win => {
       // if application code has been instrumented, the app iframe "window" has an object
       const applicationSourceCoverage = win.__coverage__
-
-      if (applicationSourceCoverage) {
-        windowCoverageObjects.push({
-          coverage: applicationSourceCoverage,
-          pathname: win.location.pathname
-        })
+      if (!applicationSourceCoverage) {
+        return
       }
-    })
+
+      if (
+        Cypress._.find(windowCoverageObjects, {
+          coverage: applicationSourceCoverage
+        })
+      ) {
+        // this application code coverage object is already known
+        // which can happen when combining `window:load` and `before` callbacks
+        return
+      }
+
+      windowCoverageObjects.push({
+        coverage: applicationSourceCoverage,
+        pathname: win.location.pathname
+      })
+    }
+
+    // save reference to coverage for each app window loaded in the test
+    cy.on('window:load', saveCoverageObject)
+
+    // save reference if visiting a page inside a before() hook
+    cy.window().then(saveCoverageObject)
   })
 
   afterEach(() => {

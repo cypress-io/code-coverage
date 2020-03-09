@@ -68,6 +68,31 @@ workflows:
             # and look at the server index file - should be fully covered
             - run: npx nyc report --check-coverage true --lines 100 --include test-backend/index.js
 
+      - cypress/run:
+          name: example-before-each-visit
+          requires:
+            - cypress/install
+          # install dependencies in the root folder
+          post-install:
+            - run: npm ci
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          working_directory: examples/before-each-visit
+          # store screenshots and videos
+          store_artifacts: true
+          post-steps:
+            - run: cat examples/before-each-visit/.nyc_output/out.json
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/before-each-visit/coverage
+            # make sure the examples captures 100% of code
+            - run:
+                command: npx nyc report --check-coverage true --lines 100
+                working_directory: examples/before-each-visit
+
       - publish:
           filters:
             branches:
@@ -76,3 +101,4 @@ workflows:
           requires:
             - frontend coverage
             - backend coverage
+            - example-before-each-visit

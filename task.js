@@ -22,6 +22,9 @@ const pkg = fs.existsSync(pkgFilename)
   ? JSON.parse(fs.readFileSync(pkgFilename, 'utf8'))
   : {}
 const nycOptions = pkg.nyc || {}
+const scripts = pkg.scripts || {}
+const DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME = 'coverage:report'
+const customNycReportScript = scripts[DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME]
 
 function saveCoverage(coverage) {
   if (!existsSync(coverageFolder)) {
@@ -90,6 +93,18 @@ module.exports = {
       console.warn('Cannot find coverage file %s', nycFilename)
       console.warn('Skipping coverage report')
       return null
+    }
+
+    if (customNycReportScript) {
+      debug(
+        'saving coverage report using script "%s" from package.json, command: %s',
+        DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME,
+        customNycReportScript
+      )
+      debug('current working directory is %s', process.cwd())
+      return execa('npm', ['run', DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME], {
+        stdio: 'inherit'
+      })
     }
 
     const reportDir = nycOptions['report-dir'] || './coverage'

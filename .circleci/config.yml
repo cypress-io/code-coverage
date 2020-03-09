@@ -72,6 +72,9 @@ workflows:
           name: example-before-each-visit
           requires:
             - cypress/install
+          # install dependencies in the root folder
+          post-install:
+            - run: npm ci
           # there are no jobs to follow this one
           # so no need to save the workspace files (saves time)
           no-workspace: true

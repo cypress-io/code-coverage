@@ -322,6 +322,13 @@ npm run dev:no:coverage
 
 ## Examples
 
+### Internal examples
+
+- [examples/before-each-visit](examples/before-each-visit) checks if code coverage correctly keeps track of code when doing `cy.visit` before each test
+- [examples-before-all-visit](examples/before-all-visit) checks if code coverage works when `cy.visit` is made once in the `before` hook
+
+### External examples
+
 - [cypress-io/cypress-example-todomvc-redux](https://github.com/cypress-io/cypress-example-todomvc-redux) is a React / Redux application with 100% code coverage.
 - [cypress-io/cypress-example-realworld](https://github.com/cypress-io/cypress-example-realworld) shows how to collect the coverage information from both back and front end code and merge it into a single report. The E2E test step runs in parallel in several CI containers, each saving just partial test coverage information. Then a merge job runs taking artifacts and combining coverage into the final report to be sent to an exteral coverage as a service app.
 - [bahmutov/code-coverage-webpack-dev-server](https://github.com/bahmutov/code-coverage-webpack-dev-server) shows how to collect code coverage from an application that uses webpack-dev-server.

@@ -101,6 +101,7 @@ module.exports = {
         DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME,
         customNycReportScript
       )
+      debug('current working directory is %s', process.cwd())
       return execa('npm', ['run', DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME], {
         stdio: 'inherit'
       })

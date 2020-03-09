@@ -8,4 +8,6 @@ Code was instrumented with
 npx nyc instrument --compact false main.js > main-instrumented.js
 ```
 
+and then removed absolute folder paths, leaving just relative path `main.js` in the produced file.
+
 The code uses custom coverage report command in [package.json](package.json) to call `nyc`

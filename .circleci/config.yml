@@ -79,7 +79,10 @@ workflows:
           # so no need to save the workspace files (saves time)
           no-workspace: true
           working_directory: examples/before-each-visit
+          # store screenshots and videos
+          store_artifacts: true
           post-steps:
+            - run: cat examples/before-each-visit/.nyc_output/out.json
             # store the created coverage report folder
             # you can click on it in the CircleCI UI
             # to see live static HTML site

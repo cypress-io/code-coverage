@@ -1,7 +1,7 @@
 # https://circleci.com/docs/2.0/configuration-reference/
 version: 2.1
 orbs:
-  cypress: cypress-io/cypress@1.13.0 # used to run e2e tests
+  cypress: cypress-io/cypress@1.17.0 # used to run e2e tests
   node: circleci/node@1.1.6 # used to publish new NPM version
 
 jobs:
@@ -22,6 +22,7 @@ workflows:
       - cypress/install:
           post-steps:
             - run: npm run check:markdown
+
       - cypress/run:
           name: frontend coverage
           requires:
@@ -94,6 +95,7 @@ workflows:
                 working_directory: examples/before-each-visit
 
       - cypress/run:
+          parallel: true
           name: example-before-all-visit
           requires:
             - cypress/install

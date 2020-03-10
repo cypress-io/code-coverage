@@ -1,7 +1,7 @@
 # https://circleci.com/docs/2.0/configuration-reference/
 version: 2.1
 orbs:
-  cypress: cypress-io/cypress@1.13.0 # used to run e2e tests
+  cypress: cypress-io/cypress@1.17.1 # used to run e2e tests
   node: circleci/node@1.1.6 # used to publish new NPM version
 
 jobs:
@@ -22,10 +22,13 @@ workflows:
       - cypress/install:
           post-steps:
             - run: npm run check:markdown
+
       - cypress/run:
           name: frontend coverage
           requires:
             - cypress/install
+          # grab the workspace created by cypress/install job
+          attach-workspace: true
           # we need to start the web application
           start: npm start
           # there are no jobs to follow this one
@@ -50,6 +53,9 @@ workflows:
           requires:
             - cypress/install
 
+          # grab the workspace created by cypress/install job
+          attach-workspace: true
+
           start: npm run start:test:backend
           command: npx cypress run --config-file cypress-backend.json
 
@@ -69,16 +75,14 @@ workflows:
             - run: npx nyc report --check-coverage true --lines 100 --include test-backend/index.js
 
       - cypress/run:
+          attach-workspace: true
           name: example-before-each-visit
           requires:
             - cypress/install
-          # install dependencies in the root folder
-          post-install:
-            - run: npm ci
           # there are no jobs to follow this one
           # so no need to save the workspace files (saves time)
           no-workspace: true
-          working_directory: examples/before-each-visit
+          command: npx cypress run --project examples/before-each-visit
           # store screenshots and videos
           store_artifacts: true
           post-steps:
@@ -94,16 +98,14 @@ workflows:
                 working_directory: examples/before-each-visit
 
       - cypress/run:
+          attach-workspace: true
           name: example-before-all-visit
           requires:
             - cypress/install
-          # install dependencies in the root folder
-          post-install:
-            - run: npm ci
           # there are no jobs to follow this one
           # so no need to save the workspace files (saves time)
           no-workspace: true
-          working_directory: examples/before-all-visit
+          command: npx cypress run --project examples/before-all-visit
           # store screenshots and videos
           store_artifacts: true
           post-steps:

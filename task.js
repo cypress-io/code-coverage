@@ -4,6 +4,7 @@ const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
 const execa = require('execa')
 const fs = require('fs')
 const { fixSourcePathes } = require('./utils')
+const binUp = require('bin-up')
 
 const debug = require('debug')('code-coverage')
 
@@ -114,7 +115,13 @@ module.exports = {
       : `--reporter=${reporter}`
 
     // should we generate report via NYC module API?
-    const command = 'nyc'
+    const foundNyc = binUp('nyc')
+    if (!foundNyc) {
+      console.error('Could not find tool "nyc", have you installed it?')
+      console.error('See https://github.com/cypress-io/code-coverage#install')
+      return null
+    }
+
     const args = [
       'report',
       '--report-dir',
@@ -124,10 +131,10 @@ module.exports = {
     ].concat(reporters)
     debug(
       'saving coverage report using command: "%s %s"',
-      command,
+      foundNyc,
       args.join(' ')
     )
     debug('current working directory is %s', process.cwd())
-    return execa(command, args, { stdio: 'inherit' })
+    return execa(foundNyc, args, { stdio: 'inherit' })
   }
 }

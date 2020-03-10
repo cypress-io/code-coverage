@@ -181,9 +181,20 @@ You can specify custom coverage reporter(s) to use. For example to output text s
 
 **Tip:** find list of reporters [here](https://istanbul.js.org/docs/advanced/alternative-reporters/)
 
+## NYC
+
+This module tries to find the `nyc` tool using [bin-up][bin-up], so it would be found in the current `node_modules/.bin` or folders up the parent chain
+
+```text
+node_modules/.bin/
+../node_modules/.bin/
+../../node_modules/.bin/
+etc
+```
+
 ## Custom NYC command
 
-Sometimes NYC tool might be installed in a different folder, or you might want to customize the report command. In that case, put the custom command into `package.json` in the current folder and this plugin will automatically use it.
+Sometimes NYC tool might be installed in a different folder not in the current or parent folder, or you might want to customize the report command. In that case, put the custom command into `package.json` in the current folder and this plugin will automatically use it.
 
 ```json
 {
@@ -209,7 +220,7 @@ The simplest solution: let `npx` install `nyc` on the fly
 
 ### Find NYC in a parent folder
 
-If you have [bin-up](https://github.com/bahmutov/bin-up) installed globally, you can use it to find `nyc` installed somewhere in the higher folder.
+If you have [bin-up][bin-up] installed globally, you can use it to find `nyc` installed somewhere in the higher folder.
 
 ```json
 {
@@ -381,3 +392,4 @@ This project is licensed under the terms of the [MIT license](LICENSE.md).
 
 [renovate-badge]: https://img.shields.io/badge/renovate-app-blue.svg
 [renovate-app]: https://renovateapp.com/
+[bin-up]: https://github.com/bahmutov/bin-up

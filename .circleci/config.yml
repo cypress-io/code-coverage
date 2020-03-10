@@ -75,16 +75,14 @@ workflows:
             - run: npx nyc report --check-coverage true --lines 100 --include test-backend/index.js
 
       - cypress/run:
+          attach-workspace: true
           name: example-before-each-visit
           requires:
             - cypress/install
-          # install dependencies in the root folder
-          post-install:
-            - run: npm ci
           # there are no jobs to follow this one
           # so no need to save the workspace files (saves time)
           no-workspace: true
-          working_directory: examples/before-each-visit
+          command: npx cypress run --project examples/before-each-visit
           # store screenshots and videos
           store_artifacts: true
           post-steps:

@@ -336,7 +336,7 @@ npm run dev:no:coverage
 ### Internal examples
 
 - [examples/before-each-visit](examples/before-each-visit) checks if code coverage correctly keeps track of code when doing `cy.visit` before each test
-- [examples-before-all-visit](examples/before-all-visit) checks if code coverage works when `cy.visit` is made once in the `before` hook
+- [examples/before-all-visit](examples/before-all-visit) checks if code coverage works when `cy.visit` is made once in the `before` hook
 
 ### External examples
 

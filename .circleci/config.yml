@@ -141,6 +141,7 @@ workflows:
               only:
                 - master
           requires:
+            - unit
             - frontend coverage
             - backend coverage
             - example-before-each-visit

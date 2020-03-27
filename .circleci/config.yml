@@ -5,7 +5,20 @@ orbs:
   node: circleci/node@1.1.6 # used to publish new NPM version
 
 jobs:
+  unit:
+    description: Checks the code formatting
+    executor:
+      name: node/default
+      tag: '12'
+    steps:
+      - checkout
+      - node/with-cache:
+          steps:
+            - run: npm ci
+      - run: npm run format:check
+
   publish:
+    description: Publishes the new version of the plugin to NPM
     executor:
       name: node/default
       tag: '12'
@@ -19,6 +32,8 @@ jobs:
 workflows:
   build:
     jobs:
+      - unit
+
       - cypress/install:
           post-steps:
             - run: npm run check:markdown

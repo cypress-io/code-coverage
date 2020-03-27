@@ -28,6 +28,11 @@ jobs:
     environment:
       # we don't need Cypress to do the release
       CYPRESS_INSTALL_BINARY: '0'
+      # trick semantic-release into thinking this is NOT a pull request
+      # (under the hood env-ci is used)
+      CIRCLE_PR_NUMBER:
+      CIRCLE_PULL_REQUEST:
+      CI_PULL_REQUEST:
     steps:
       - checkout
       - node/with-cache:

@@ -337,6 +337,7 @@ npm run dev:no:coverage
 
 - [examples/before-each-visit](examples/before-each-visit) checks if code coverage correctly keeps track of code when doing `cy.visit` before each test
 - [examples/before-all-visit](examples/before-all-visit) checks if code coverage works when `cy.visit` is made once in the `before` hook
+- [examples/ts-example](examples/ts-example) uses Babel + Parcel to instrument and serve TypeScript file
 
 ### External examples
 

@@ -347,6 +347,7 @@ npm run dev:no:coverage
 - [bahmutov/next-and-cypress-example](https://github.com/bahmutov/next-and-cypress-example) shows how to get backend and frontend coverage for a [Next.js](https://nextjs.org) project. Uses [middleware/nextjs.js](middleware/nextjs.js).
 - [akoidan/vue-webpack-typescript](https://github.com/akoidan/vue-webpack-typescript) Pure webpack config with vue + typescript with codecov reports. This setup uses babel-loader with TS checker as a separate thread.
 - [bahmutov/code-coverage-subfolder-example](https://github.com/bahmutov/code-coverage-subfolder-example) shows how to instrument `app` folder using `nyc instrument` as a separate step before running E2E tests
+- [bahmutov/docker-with-cypress-included-code-coverage-example](https://github.com/bahmutov/docker-with-cypress-included-code-coverage-example) runs tests inside pre-installed Cypress using [cypress/included:x.y.z](https://github.com/cypress-io/cypress-docker-images/tree/master/included) Docker image and reports code coverage.
 
 ## Debugging
 

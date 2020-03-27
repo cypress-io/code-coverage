@@ -11,11 +11,7 @@ This plugin will slow down your tests. There will be more web application JavaSc
 npm install -D @cypress/code-coverage
 ```
 
-and its peer dependencies
-
-```shell
-npm install -D istanbul-lib-coverage cypress
-```
+Note: this plugin assumes `cypress` is a peer dependency already installed in your project.
 
 Add to your `cypress/support/index.js` file
 

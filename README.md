@@ -53,6 +53,40 @@ If you have instrumented your application's code and see the `window.__coverage_
 
 That should be it!
 
+## Reports
+
+The `coverage` folder has results in several formats, and the coverage raw data is stored in `.nyc_output` folder. You can see the coverage numbers yourself. This plugin has `nyc` as a dependency, so it should be available right away. Here are common examples:
+
+```shell
+# see just the coverage summary
+$ npx nyc report --reporter=text-summary
+# see just the coverage file by file
+$ npx nyc report --reporter=text
+# save the HTML report again
+$ npx nyc report --reporter=lcov
+```
+
+It is useful to enforce [minimum coverage](https://github.com/istanbuljs/nyc#common-configuration-options) numbers. For example:
+
+```shell
+$ npx nyc report --check-coverage --lines 80
+----------|---------|----------|---------|---------|-------------------
+File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+----------|---------|----------|---------|---------|-------------------
+All files |     100 |      100 |     100 |     100 |
+ main.js  |     100 |      100 |     100 |     100 |
+----------|---------|----------|---------|---------|-------------------
+
+$ npx nyc report --check-coverage --lines 101
+----------|---------|----------|---------|---------|-------------------
+File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+----------|---------|----------|---------|---------|-------------------
+All files |     100 |      100 |     100 |     100 |
+ main.js  |     100 |      100 |     100 |     100 |
+----------|---------|----------|---------|---------|-------------------
+ERROR: Coverage for lines (100%) does not meet global threshold (101%)
+```
+
 ## Instrument unit tests
 
 If you test your application code directly from `specs` you might want to instrument them and combine unit test code coverage with any end-to-end code coverage (from iframe). You can easily instrument spec files using [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul) for example.

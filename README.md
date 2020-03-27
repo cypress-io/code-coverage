@@ -14,7 +14,7 @@ npm install -D @cypress/code-coverage
 and its peer dependencies
 
 ```shell
-npm install -D nyc istanbul-lib-coverage cypress
+npm install -D istanbul-lib-coverage cypress
 ```
 
 Add to your `cypress/support/index.js` file
@@ -181,17 +181,6 @@ You can specify custom coverage reporter(s) to use. For example to output text s
 
 **Tip:** find list of reporters [here](https://istanbul.js.org/docs/advanced/alternative-reporters/)
 
-## NYC
-
-This module tries to find the `nyc` tool using [bin-up][bin-up], so it would be found in the current `node_modules/.bin` or folders up the parent chain
-
-```text
-node_modules/.bin/
-../node_modules/.bin/
-../../node_modules/.bin/
-etc
-```
-
 ## Custom NYC command
 
 Sometimes NYC tool might be installed in a different folder not in the current or parent folder, or you might want to customize the report command. In that case, put the custom command into `package.json` in the current folder and this plugin will automatically use it.
@@ -204,34 +193,6 @@ Sometimes NYC tool might be installed in a different folder not in the current o
 }
 ```
 
-See examples below.
-
-### Install NYC on the fly
-
-The simplest solution: let `npx` install `nyc` on the fly
-
-```json
-{
-  "scripts": {
-    "coverage:report": "npx nyc report --report-dir ./coverage --temp-dir .nyc_output --reporter=lcov --reporter=clover --reporter=json"
-  }
-}
-```
-
-### Find NYC in a parent folder
-
-If you have [bin-up][bin-up] installed globally, you can use it to find `nyc` installed somewhere in the higher folder.
-
-```json
-{
-  "scripts": {
-    "coverage:report": "bin-up nyc report --report-dir ./coverage --temp-dir .nyc_output --reporter=lcov --reporter=clover --reporter=json"
-  }
-}
-```
-
-**Tip:** finding and running pre-installed tool is always faster than installing it again and again.
-
 ## TypeScript users
 
 TypeScript source files are NOT included in the code coverage report by default, even if they are properly instrumented. In order to tell `nyc` to include TS files in the report, you need to:
@@ -239,7 +200,7 @@ TypeScript source files are NOT included in the code coverage report by default,
 1. Add these dev dependencies that let Istanbul work with TypeScript
 
 ```shell
-npm i -D @istanbuljs/nyc-config-typescript source-map-support ts-node
+npm i -D @istanbuljs/nyc-config-typescript source-map-support
 ```
 
 2. In `package.json` use the following `nyc` configuration object
@@ -252,6 +213,8 @@ npm i -D @istanbuljs/nyc-config-typescript source-map-support ts-node
   }
 }
 ```
+
+See [examples/ts-example](examples/ts-example)
 
 ## Exclude code
 
@@ -393,4 +356,3 @@ This project is licensed under the terms of the [MIT license](LICENSE.md).
 
 [renovate-badge]: https://img.shields.io/badge/renovate-app-blue.svg
 [renovate-app]: https://renovateapp.com/
-[bin-up]: https://github.com/bahmutov/bin-up

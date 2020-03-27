@@ -157,6 +157,7 @@ workflows:
           working_directory: examples/ts-example
           start: npm start
           wait-on: 'http://localhost:1234'
+          command: '../../node_modules/.bin/cypress run'
           post-steps:
             # store the created coverage report folder
             # you can click on it in the CircleCI UI

@@ -10,11 +10,14 @@ jobs:
     executor:
       name: node/default
       tag: '12'
+    environment:
+      # we don't need Cypress to check code style
+      CYPRESS_INSTALL_BINARY: '0'
     steps:
       - checkout
       - node/with-cache:
           steps:
-            - run: npm ci
+            - run: CYPRESS_INSTALL_BINARY=0 npm ci
       - run: npm run format:check
 
   publish:
@@ -22,6 +25,9 @@ jobs:
     executor:
       name: node/default
       tag: '12'
+    environment:
+      # we don't need Cypress to do the release
+      CYPRESS_INSTALL_BINARY: '0'
     steps:
       - checkout
       - node/with-cache:

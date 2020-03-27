@@ -22,7 +22,6 @@
   },
   "peerDependencies": {
     "cypress": "*",
-    "nyc": "*",
     "istanbul-lib-coverage": "*"
   },
   "repository": {

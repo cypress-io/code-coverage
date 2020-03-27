@@ -140,6 +140,7 @@ workflows:
             branches:
               only:
                 - master
+                - beta
           requires:
             - unit
             - frontend coverage

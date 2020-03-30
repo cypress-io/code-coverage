@@ -10,11 +10,14 @@ jobs:
     executor:
       name: node/default
       tag: '12'
+    environment:
+      # we don't need Cypress to check code style
+      CYPRESS_INSTALL_BINARY: '0'
     steps:
       - checkout
       - node/with-cache:
           steps:
-            - run: npm ci
+            - run: CYPRESS_INSTALL_BINARY=0 npm ci
       - run: npm run format:check
 
   publish:
@@ -22,6 +25,14 @@ jobs:
     executor:
       name: node/default
       tag: '12'
+    environment:
+      # we don't need Cypress to do the release
+      CYPRESS_INSTALL_BINARY: '0'
+      # trick semantic-release into thinking this is NOT a pull request
+      # (under the hood the module env-ci is used to check if this is a PR)
+      CIRCLE_PR_NUMBER: ''
+      CIRCLE_PULL_REQUEST: ''
+      CI_PULL_REQUEST: ''
     steps:
       - checkout
       - node/with-cache:
@@ -135,14 +146,38 @@ workflows:
                 command: npx nyc report --check-coverage true --lines 100
                 working_directory: examples/before-all-visit
 
+      - cypress/run:
+          attach-workspace: true
+          name: example-ts-example
+          requires:
+            - cypress/install
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          working_directory: examples/ts-example
+          start: npm start
+          wait-on: 'http://localhost:1234'
+          command: '../../node_modules/.bin/cypress run'
+          post-steps:
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/ts-example/coverage
+            - run:
+                command: npm run coverage:check
+                working_directory: examples/ts-example
+
       - publish:
           filters:
             branches:
               only:
                 - master
+                - beta
           requires:
             - unit
             - frontend coverage
             - backend coverage
             - example-before-each-visit
             - example-before-all-visit
+            - example-ts-example

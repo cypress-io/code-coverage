@@ -11,11 +11,7 @@ This plugin will slow down your tests. There will be more web application JavaSc
 npm install -D @cypress/code-coverage
 ```
 
-and its peer dependencies
-
-```shell
-npm install -D nyc istanbul-lib-coverage cypress
-```
+Note: this plugin assumes `cypress` is a peer dependency already installed in your project.
 
 Add to your `cypress/support/index.js` file
 
@@ -56,6 +52,40 @@ If you have instrumented your application's code and see the `window.__coverage_
 ![Coverage report](images/coverage.jpg)
 
 That should be it!
+
+## Reports
+
+The `coverage` folder has results in several formats, and the coverage raw data is stored in `.nyc_output` folder. You can see the coverage numbers yourself. This plugin has `nyc` as a dependency, so it should be available right away. Here are common examples:
+
+```shell
+# see just the coverage summary
+$ npx nyc report --reporter=text-summary
+# see just the coverage file by file
+$ npx nyc report --reporter=text
+# save the HTML report again
+$ npx nyc report --reporter=lcov
+```
+
+It is useful to enforce [minimum coverage](https://github.com/istanbuljs/nyc#common-configuration-options) numbers. For example:
+
+```shell
+$ npx nyc report --check-coverage --lines 80
+----------|---------|----------|---------|---------|-------------------
+File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+----------|---------|----------|---------|---------|-------------------
+All files |     100 |      100 |     100 |     100 |
+ main.js  |     100 |      100 |     100 |     100 |
+----------|---------|----------|---------|---------|-------------------
+
+$ npx nyc report --check-coverage --lines 101
+----------|---------|----------|---------|---------|-------------------
+File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+----------|---------|----------|---------|---------|-------------------
+All files |     100 |      100 |     100 |     100 |
+ main.js  |     100 |      100 |     100 |     100 |
+----------|---------|----------|---------|---------|-------------------
+ERROR: Coverage for lines (100%) does not meet global threshold (101%)
+```
 
 ## Instrument unit tests
 
@@ -181,17 +211,6 @@ You can specify custom coverage reporter(s) to use. For example to output text s
 
 **Tip:** find list of reporters [here](https://istanbul.js.org/docs/advanced/alternative-reporters/)
 
-## NYC
-
-This module tries to find the `nyc` tool using [bin-up][bin-up], so it would be found in the current `node_modules/.bin` or folders up the parent chain
-
-```text
-node_modules/.bin/
-../node_modules/.bin/
-../../node_modules/.bin/
-etc
-```
-
 ## Custom NYC command
 
 Sometimes NYC tool might be installed in a different folder not in the current or parent folder, or you might want to customize the report command. In that case, put the custom command into `package.json` in the current folder and this plugin will automatically use it.
@@ -204,34 +223,6 @@ Sometimes NYC tool might be installed in a different folder not in the current o
 }
 ```
 
-See examples below.
-
-### Install NYC on the fly
-
-The simplest solution: let `npx` install `nyc` on the fly
-
-```json
-{
-  "scripts": {
-    "coverage:report": "npx nyc report --report-dir ./coverage --temp-dir .nyc_output --reporter=lcov --reporter=clover --reporter=json"
-  }
-}
-```
-
-### Find NYC in a parent folder
-
-If you have [bin-up][bin-up] installed globally, you can use it to find `nyc` installed somewhere in the higher folder.
-
-```json
-{
-  "scripts": {
-    "coverage:report": "bin-up nyc report --report-dir ./coverage --temp-dir .nyc_output --reporter=lcov --reporter=clover --reporter=json"
-  }
-}
-```
-
-**Tip:** finding and running pre-installed tool is always faster than installing it again and again.
-
 ## TypeScript users
 
 TypeScript source files are NOT included in the code coverage report by default, even if they are properly instrumented. In order to tell `nyc` to include TS files in the report, you need to:
@@ -239,7 +230,7 @@ TypeScript source files are NOT included in the code coverage report by default,
 1. Add these dev dependencies that let Istanbul work with TypeScript
 
 ```shell
-npm i -D @istanbuljs/nyc-config-typescript source-map-support ts-node
+npm i -D @istanbuljs/nyc-config-typescript source-map-support
 ```
 
 2. In `package.json` use the following `nyc` configuration object
@@ -252,6 +243,8 @@ npm i -D @istanbuljs/nyc-config-typescript source-map-support ts-node
   }
 }
 ```
+
+See [examples/ts-example](examples/ts-example)
 
 ## Exclude code
 
@@ -337,6 +330,7 @@ npm run dev:no:coverage
 
 - [examples/before-each-visit](examples/before-each-visit) checks if code coverage correctly keeps track of code when doing `cy.visit` before each test
 - [examples/before-all-visit](examples/before-all-visit) checks if code coverage works when `cy.visit` is made once in the `before` hook
+- [examples/ts-example](examples/ts-example) uses Babel + Parcel to instrument and serve TypeScript file
 
 ### External examples
 
@@ -353,6 +347,7 @@ npm run dev:no:coverage
 - [bahmutov/next-and-cypress-example](https://github.com/bahmutov/next-and-cypress-example) shows how to get backend and frontend coverage for a [Next.js](https://nextjs.org) project. Uses [middleware/nextjs.js](middleware/nextjs.js).
 - [akoidan/vue-webpack-typescript](https://github.com/akoidan/vue-webpack-typescript) Pure webpack config with vue + typescript with codecov reports. This setup uses babel-loader with TS checker as a separate thread.
 - [bahmutov/code-coverage-subfolder-example](https://github.com/bahmutov/code-coverage-subfolder-example) shows how to instrument `app` folder using `nyc instrument` as a separate step before running E2E tests
+- [bahmutov/docker-with-cypress-included-code-coverage-example](https://github.com/bahmutov/docker-with-cypress-included-code-coverage-example) runs tests inside pre-installed Cypress using [cypress/included:x.y.z](https://github.com/cypress-io/cypress-docker-images/tree/master/included) Docker image and reports code coverage.
 
 ## Debugging
 
@@ -392,4 +387,3 @@ This project is licensed under the terms of the [MIT license](LICENSE.md).
 
 [renovate-badge]: https://img.shields.io/badge/renovate-app-blue.svg
 [renovate-app]: https://renovateapp.com/
-[bin-up]: https://github.com/bahmutov/bin-up

@@ -1,10 +1,11 @@
+// @ts-check
 const istanbul = require('istanbul-lib-coverage')
-const { join } = require('path')
+const { join, resolve } = require('path')
 const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
 const execa = require('execa')
 const fs = require('fs')
 const { fixSourcePathes } = require('./utils')
-const binUp = require('bin-up')
+const NYC = require('nyc')
 
 const debug = require('debug')('code-coverage')
 
@@ -75,7 +76,7 @@ module.exports = {
 
     fixSourcePathes(coverage)
     const previous = existsSync(nycFilename)
-      ? JSON.parse(readFileSync(nycFilename))
+      ? JSON.parse(readFileSync(nycFilename, 'utf8'))
       : istanbul.createCoverageMap({})
     const coverageMap = istanbul.createCoverageMap(previous)
     coverageMap.merge(coverage)
@@ -108,33 +109,27 @@ module.exports = {
       })
     }
 
-    const reportDir = nycOptions['report-dir'] || './coverage'
+    const reportFolder = nycOptions['report-dir'] || './coverage'
+    const reportDir = resolve(reportFolder)
     const reporter = nycOptions['reporter'] || ['lcov', 'clover', 'json']
-    const reporters = Array.isArray(reporter)
-      ? reporter.map(name => `--reporter=${name}`)
-      : `--reporter=${reporter}`
 
-    // should we generate report via NYC module API?
-    const foundNyc = binUp('nyc')
-    if (!foundNyc) {
-      console.error('Could not find tool "nyc", have you installed it?')
-      console.error('See https://github.com/cypress-io/code-coverage#install')
-      return null
-    }
-
-    const args = [
-      'report',
-      '--report-dir',
+    // TODO we could look at how NYC is parsing its CLI arguments
+    // I am mostly worried about additional NYC options that are stored in
+    // package.json and .nycrc resource files.
+    // for now let's just camel case all options
+    const nycReportOptions = {
       reportDir,
-      '--temp-dir',
-      coverageFolder
-    ].concat(reporters)
-    debug(
-      'saving coverage report using command: "%s %s"',
-      foundNyc,
-      args.join(' ')
-    )
+      tempDir: coverageFolder,
+      reporter: [].concat(reporter) // make sure this is a list
+    }
+    debug('calling NYC reporter with options %o', nycReportOptions)
     debug('current working directory is %s', process.cwd())
-    return execa(foundNyc, args, { stdio: 'inherit' })
+    const nyc = new NYC(nycReportOptions)
+
+    const returnReportFolder = () => {
+      debug('after reporting, returning the report folder name %s', reportDir)
+      return reportDir
+    }
+    return nyc.report().then(returnReportFolder)
   }
 }

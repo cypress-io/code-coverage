@@ -6,8 +6,10 @@
  */
 const sendCoverage = (coverage, pathname = '/') => {
   logMessage(`Saving code coverage for **${pathname}**`)
+
+  const appCoverageOnly = filterSpecsFromCoverage(coverage)
   // stringify coverage object for speed
-  cy.task('combineCoverage', JSON.stringify(coverage), {
+  cy.task('combineCoverage', JSON.stringify(appCoverageOnly), {
     log: false
   })
 }
@@ -19,6 +21,30 @@ const sendCoverage = (coverage, pathname = '/') => {
  */
 const logMessage = s => {
   cy.log(`${s} \`[@cypress/code-coverage]\``)
+}
+
+const filterSpecsFromCoverage = totalCoverage => {
+  // remove coverage for the spec files themselves,
+  // only keep "external" application source file coverage
+  const integrationFolder = Cypress.config('integrationFolder')
+  const supportFile = Cypress.config('supportFile')
+  const testFilePattern = Cypress.config('testFiles')
+  const isUsingDefaultTestPattern = testFilePattern === '**/*.*'
+
+  const isInIntegrationFolder = filename =>
+    filename.startsWith(integrationFolder)
+  const isTestFile = filename => Cypress.minimatch(filename, testFilePattern)
+  const isSupportFile = filename => filename === supportFile
+
+  const isA = (fileCoverge, filename) =>
+    isInIntegrationFolder(filename) || isSupportFile(filename)
+  const isB = (fileCoverge, filename) =>
+    isTestFile(filename) || isSupportFile(filename)
+
+  const isTestFileFilter = isUsingDefaultTestPattern ? isA : isB
+
+  const coverage = Cypress._.omitBy(totalCoverage, isTestFileFilter)
+  return coverage
 }
 
 // to disable code coverage commands and save time
@@ -141,16 +167,7 @@ if (Cypress.env('coverage') === false) {
     // the coverage information only once after all tests have finished
     const unitTestCoverage = window.__coverage__
     if (unitTestCoverage) {
-      // remove coverage for the spec files themselves,
-      // only keep "external" application source file coverage
-      const supportFile = Cypress.config('supportFile')
-      const testFilePattern = Cypress.config('testFiles')
-
-      const isTestFile = (fileCoverage, filename) =>
-        Cypress.minimatch(filename, testFilePattern) || filename === supportFile
-
-      const coverage = Cypress._.omitBy(window.__coverage__, isTestFile)
-      sendCoverage(coverage, 'unit')
+      sendCoverage(unitTestCoverage, 'unit')
     }
   })
 

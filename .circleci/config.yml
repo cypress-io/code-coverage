@@ -168,6 +168,33 @@ workflows:
                 command: npm run coverage:check
                 working_directory: examples/ts-example
 
+      - cypress/run:
+          attach-workspace: true
+          name: example-same-folder
+          requires:
+            - cypress/install
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          command: npx cypress run --project examples/same-folder
+          # store screenshots and videos
+          store_artifacts: true
+          post-steps:
+            - run: cat examples/same-folder/.nyc_output/out.json
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/same-folder/coverage
+            # make sure the examples captures 100% of code
+            - run:
+                command: npx nyc report --check-coverage true --lines 100
+                working_directory: examples/same-folder
+            # how to fail if the specific file coverage is not found?!
+            - run:
+                command: npx nyc report --check-coverage true --lines 100 --include unit-utils.js
+                working_directory: examples/same-folder
+
       - publish:
           filters:
             branches:
@@ -181,3 +208,4 @@ workflows:
             - example-before-each-visit
             - example-before-all-visit
             - example-ts-example
+            - example-same-folder

@@ -134,8 +134,6 @@ if (Cypress.env('coverage') === false) {
 
   after(function mergeUnitTestCoverage() {
     // collect and merge frontend coverage
-    const specFolder = Cypress.config('integrationFolder')
-    const supportFolder = Cypress.config('supportFolder')
 
     // if spec bundle has been instrumented (using Cypress preprocessor)
     // then we will have unit test coverage
@@ -145,10 +143,12 @@ if (Cypress.env('coverage') === false) {
     if (unitTestCoverage) {
       // remove coverage for the spec files themselves,
       // only keep "external" application source file coverage
+      const supportFile = Cypress.config('supportFile')
+      const testFilePattern = Cypress.config('testFiles')
 
-      // does this handle unset support file?
       const isTestFile = (fileCoverage, filename) =>
-        filename.startsWith(specFolder) || filename.startsWith(supportFolder)
+        Cypress.minimatch(filename, testFilePattern) || filename === supportFile
+
       const coverage = Cypress._.omitBy(window.__coverage__, isTestFile)
       sendCoverage(coverage, 'unit')
     }

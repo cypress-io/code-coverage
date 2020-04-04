@@ -180,7 +180,7 @@ workflows:
           # store screenshots and videos
           store_artifacts: true
           post-steps:
-            - run: cat examples/before-all-visit/.nyc_output/out.json
+            - run: cat examples/same-folder/.nyc_output/out.json
             # store the created coverage report folder
             # you can click on it in the CircleCI UI
             # to see live static HTML site

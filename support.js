@@ -7,7 +7,9 @@
 const sendCoverage = (coverage, pathname = '/') => {
   logMessage(`Saving code coverage for **${pathname}**`)
 
-  const appCoverageOnly = filterSpecsFromCoverage(coverage)
+  const withoutSpecs = filterSpecsFromCoverage(coverage)
+  const appCoverageOnly = filterSupportFilesFromCoverage(withoutSpecs)
+
   // stringify coverage object for speed
   cy.task('combineCoverage', JSON.stringify(appCoverageOnly), {
     log: false
@@ -23,23 +25,49 @@ const logMessage = s => {
   cy.log(`${s} \`[@cypress/code-coverage]\``)
 }
 
-const filterSpecsFromCoverage = totalCoverage => {
-  // remove coverage for the spec files themselves,
-  // only keep "external" application source file coverage
+/**
+ * Removes support file from the coverage object.
+ * If there are more files loaded from support folder, also removes them
+ */
+const filterSupportFilesFromCoverage = totalCoverage => {
   const integrationFolder = Cypress.config('integrationFolder')
   const supportFile = Cypress.config('supportFile')
+  const supportFolder = Cypress.config('supportFolder')
+
+  const isSupportFile = filename => filename === supportFile
+
+  let coverage = Cypress._.omitBy(totalCoverage, (fileCoverage, filename) =>
+    isSupportFile(filename)
+  )
+
+  // check the edge case
+  //   if we have files from support folder AND the support folder is not same
+  //   as the integration, or its prefix (this might remove all app source files)
+  //   then remove all files from the support folder
+  if (!integrationFolder.startsWith(supportFolder)) {
+    // remove all covered files from support folder
+    coverage = Cypress._.omitBy(totalCoverage, (fileCoverage, filename) =>
+      filename.startsWith(supportFolder)
+    )
+  }
+  return coverage
+}
+
+/**
+ * remove coverage for the spec files themselves,
+ * only keep "external" application source file coverage
+ */
+const filterSpecsFromCoverage = totalCoverage => {
+  const integrationFolder = Cypress.config('integrationFolder')
   const testFilePattern = Cypress.config('testFiles')
   const isUsingDefaultTestPattern = testFilePattern === '**/*.*'
 
   const isInIntegrationFolder = filename =>
     filename.startsWith(integrationFolder)
   const isTestFile = filename => Cypress.minimatch(filename, testFilePattern)
-  const isSupportFile = filename => filename === supportFile
 
-  const isA = (fileCoverge, filename) =>
-    isInIntegrationFolder(filename) || isSupportFile(filename)
-  const isB = (fileCoverge, filename) =>
-    isTestFile(filename) || isSupportFile(filename)
+  const isA = (fileCoverge, filename) => isInIntegrationFolder(filename)
+  const isB = (fileCoverge, filename) => isTestFile(filename)
 
   const isTestFileFilter = isUsingDefaultTestPattern ? isA : isB
 

@@ -47,3 +47,5 @@ if (covered.length < filenames.length) {
 
   process.exit(1)
 }
+
+console.log('✅ All and only expected files were covered')

@@ -122,6 +122,12 @@ workflows:
             - run:
                 command: npx nyc report --check-coverage true --lines 100
                 working_directory: examples/before-each-visit
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  node ../../scripts/check-coverage main.js
+                  node ../../scripts/only-covered main.js
+                working_directory: examples/before-each-visit
 
       - cypress/run:
           attach-workspace: true
@@ -145,6 +151,12 @@ workflows:
             - run:
                 command: npx nyc report --check-coverage true --lines 100
                 working_directory: examples/before-all-visit
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  node ../../scripts/check-coverage main.js
+                  node ../../scripts/only-covered main.js
+                working_directory: examples/before-all-visit
 
       - cypress/run:
           attach-workspace: true
@@ -166,6 +178,13 @@ workflows:
                 path: examples/ts-example/coverage
             - run:
                 command: npm run coverage:check
+                working_directory: examples/ts-example
+
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  node ../../scripts/check-coverage main.ts
+                  node ../../scripts/only-covered main.ts
                 working_directory: examples/ts-example
 
       - cypress/run:

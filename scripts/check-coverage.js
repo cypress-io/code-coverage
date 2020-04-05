@@ -41,7 +41,7 @@ if (isThereUncoveredStatement) {
 }
 
 console.log(
-  'All statements in file %s (found for %s) were covered',
+  '✅ All statements in file %s (found for %s) were covered',
   fileCoverage.path,
   filename
 )

@@ -196,8 +196,10 @@ workflows:
                 working_directory: examples/same-folder
             - run:
                 command: node ../../scripts/check-coverage main.js
+                working_directory: examples/same-folder
             - run:
                 command: node ../../scripts/check-coverage unit-utils.js
+                working_directory: examples/same-folder
 
       - publish:
           filters:

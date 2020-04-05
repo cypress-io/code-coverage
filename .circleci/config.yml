@@ -194,6 +194,10 @@ workflows:
             - run:
                 command: npx nyc report --check-coverage true --lines 100 --include unit-utils.js
                 working_directory: examples/same-folder
+            - run:
+                command: node ../../scripts/check-coverage main.js
+            - run:
+                command: node ../../scripts/check-coverage unit-utils.js
 
       - publish:
           filters:

@@ -209,7 +209,6 @@ workflows:
             - run:
                 command: npx nyc report --check-coverage true --lines 100
                 working_directory: examples/same-folder
-            # how to fail if the specific file coverage is not found?!
             - run:
                 command: npx nyc report --check-coverage true --lines 100 --include unit-utils.js
                 working_directory: examples/same-folder
@@ -220,6 +219,37 @@ workflows:
                   node ../../scripts/check-coverage unit-utils.js
                   node ../../scripts/only-covered main.js unit-utils.js
                 working_directory: examples/same-folder
+
+      - cypress/run:
+          attach-workspace: true
+          name: example-support-files
+          requires:
+            - cypress/install
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          start: npm start --prefix examples/support-files
+          wait-on: 'http://localhost:1234'
+          command: npx cypress run --project examples/support-files
+          # store screenshots and videos
+          store_artifacts: true
+          post-steps:
+            - run: cat examples/support-files/.nyc_output/out.json
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/support-files/coverage
+            # make sure the examples captures 100% of code
+            - run:
+                command: npx nyc report --check-coverage true --lines 100
+                working_directory: examples/support-files
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  node ../../scripts/check-coverage main.js
+                  node ../../scripts/only-covered main.js
+                working_directory: examples/support-files
 
       - publish:
           filters:
@@ -235,3 +265,4 @@ workflows:
             - example-before-all-visit
             - example-ts-example
             - example-same-folder
+            - example-support-files

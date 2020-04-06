@@ -23,7 +23,10 @@ Register tasks in your `cypress/plugins/index.js` file
 
 ```js
 module.exports = (on, config) => {
-  on('task', require('@cypress/code-coverage/task'))
+  require('@cypress/code-coverage/task')(on, config)
+  // IMPORTANT to return the config object
+  // with the any changed environment variables
+  return config
 }
 ```
 
@@ -109,8 +112,9 @@ Put the following in `cypress/plugins/index.js` file to use `.babelrc` file
 
 ```js
 module.exports = (on, config) => {
-  on('task', require('@cypress/code-coverage/task'))
+  require('@cypress/code-coverage/task')(on, config)
   on('file:preprocessor', require('@cypress/code-coverage/use-babelrc'))
+  return config
 }
 ```
 
@@ -122,11 +126,12 @@ If you cannot use `.babelrc` for some reason (maybe it is used by other tools?),
 
 ```js
 module.exports = (on, config) => {
-  on('task', require('@cypress/code-coverage/task'))
+  require('@cypress/code-coverage/task')(on, config)
   on(
     'file:preprocessor',
     require('@cypress/code-coverage/use-browserify-istanbul')
   )
+  return config
 }
 ```
 
@@ -348,6 +353,37 @@ npm run dev:no:coverage
 - [akoidan/vue-webpack-typescript](https://github.com/akoidan/vue-webpack-typescript) Pure webpack config with vue + typescript with codecov reports. This setup uses babel-loader with TS checker as a separate thread.
 - [bahmutov/code-coverage-subfolder-example](https://github.com/bahmutov/code-coverage-subfolder-example) shows how to instrument `app` folder using `nyc instrument` as a separate step before running E2E tests
 - [bahmutov/docker-with-cypress-included-code-coverage-example](https://github.com/bahmutov/docker-with-cypress-included-code-coverage-example) runs tests inside pre-installed Cypress using [cypress/included:x.y.z](https://github.com/cypress-io/cypress-docker-images/tree/master/included) Docker image and reports code coverage.
+
+## Migrations
+
+### v2 to v3
+
+Change the plugins file `cypress/plugins/index.js`
+
+```js
+// BEFORE
+module.exports = (on, config) => {
+  on('task', require('@cypress/code-coverage/task'))
+}
+// AFTER
+module.exports = (on, config) => {
+  require('@cypress/code-coverage/task')(on, config)
+  // IMPORTANT to return the config object
+  // with the any changed environment variables
+  return config
+}
+```
+
+**Tip:** we include [plugins.js](plugins.js) file you can point at from your code in simple cases. From your `cypress.json` file:
+
+```json
+{
+  "pluginsFile": "node_modules/@cypress/code-coverage/plugins",
+  "supportFile": "node_modules/@cypress/code-coverage/support"
+}
+```
+
+See [examples/use-plugins-and-support](examples/use-plugins-and-support)
 
 ## Debugging
 

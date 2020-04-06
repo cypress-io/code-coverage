@@ -1,3 +1,6 @@
 module.exports = (on, config) => {
-  on('task', require('../../../../task'))
+  require('../../../../task')(on, config)
+  // IMPORTANT to return the config object
+  // with the any changed environment variables
+  return config
 }

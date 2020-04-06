@@ -251,6 +251,35 @@ workflows:
                   node ../../scripts/only-covered main.js
                 working_directory: examples/support-files
 
+      - cypress/run:
+          attach-workspace: true
+          name: example-use-plugins-and-support
+          requires:
+            - cypress/install
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          command: npx cypress run --project examples/use-plugins-and-support
+          # store screenshots and videos
+          store_artifacts: true
+          post-steps:
+            - run: cat examples/use-plugins-and-support/.nyc_output/out.json
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/use-plugins-and-support/coverage
+            # make sure the examples captures 100% of code
+            - run:
+                command: npx nyc report --check-coverage true --lines 100
+                working_directory: examples/use-plugins-and-support
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  node ../../scripts/check-coverage main.js
+                  node ../../scripts/only-covered main.js
+                working_directory: examples/use-plugins-and-support
+
       - publish:
           filters:
             branches:
@@ -266,3 +295,4 @@ workflows:
             - example-ts-example
             - example-same-folder
             - example-support-files
+            - example-use-plugins-and-support

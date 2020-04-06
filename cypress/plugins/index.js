@@ -1,5 +1,5 @@
 module.exports = (on, config) => {
-  on('task', require('../../task'))
+  require('../../task')(on, config)
 
   // also use .babelrc file when bundling spec files
   // to get the code coverage from unit tests
@@ -9,4 +9,7 @@ module.exports = (on, config) => {
   // or use browserify and just push babel-plugin-istanbul
   // directory to the list of babelify plugins
   // on('file:preprocessor', require('../../use-browserify-istanbul'))
+
+  // IMPORTANT to return the config object with changed environment variable
+  return config
 }

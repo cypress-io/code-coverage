@@ -1,3 +1,4 @@
 module.exports = (on, config) => {
-  on('task', require('../../../../task'))
+  require('../../../../task')(on, config)
+  return config
 }

@@ -1,4 +1,5 @@
 module.exports = (on, config) => {
-  on('task', require('../../task'))
+  require('../../task')(on, config)
   on('file:preprocessor', require('../../use-babelrc'))
+  return config
 }

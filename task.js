@@ -37,7 +37,7 @@ function saveCoverage(coverage) {
   writeFileSync(nycFilename, JSON.stringify(coverage, null, 2))
 }
 
-module.exports = {
+const tasks = {
   /**
    * Clears accumulated code coverage information.
    *
@@ -133,3 +133,30 @@ module.exports = {
     return nyc.report().then(returnReportFolder)
   }
 }
+
+/**
+ * Registers code coverage collection and reporting tasks.
+ * Sets an environment variable to tell the browser code that it can
+ * send the coverage.
+ * @example
+  ```
+    // your plugins file
+    module.exports = (on, config) => {
+      require('cypress/code-coverage/task')(on, config)
+      // IMPORTANT to return the config object
+      // with the any changed environment variables
+      return config
+    }
+  ```
+*/
+function registerCodeCoverageTasks(on, config) {
+  on('task', tasks)
+
+  // set a variable to let the hooks running in the browser
+  // know that they can send coverage commands
+  config.env.codeCoverageTasksRegistered = true
+
+  return config
+}
+
+module.exports = registerCodeCoverageTasks

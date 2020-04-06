@@ -75,13 +75,7 @@ const filterSpecsFromCoverage = totalCoverage => {
   return coverage
 }
 
-// to disable code coverage commands and save time
-// pass environment variable coverage=false
-//  cypress run --env coverage=false
-// see https://on.cypress.io/environment-variables
-if (Cypress.env('coverage') === false) {
-  console.log('Skipping code coverage hooks')
-} else {
+const registerHooks = () => {
   let windowCoverageObjects
 
   const hasE2ECoverage = () => Boolean(windowCoverageObjects.length)
@@ -205,4 +199,23 @@ if (Cypress.env('coverage') === false) {
       timeout: Cypress.moment.duration(3, 'minutes').asMilliseconds()
     })
   })
+}
+
+// to disable code coverage commands and save time
+// pass environment variable coverage=false
+//  cypress run --env coverage=false
+// see https://on.cypress.io/environment-variables
+if (Cypress.env('coverage') === false) {
+  console.log('Skipping code coverage hooks')
+} else if (Cypress.env('codeCoverageTasksRegistered') !== true) {
+  // register a hook just to log a message
+  before(() => {
+    logMessage(`
+      ⚠️ Code coverage tasks were not registered by the plugins file.
+      See [support issue](https://github.com/cypress-io/code-coverage/issues/179)
+      for possible workarounds.
+    `)
+  })
+} else {
+  registerHooks()
 }

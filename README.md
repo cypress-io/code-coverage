@@ -374,6 +374,15 @@ module.exports = (on, config) => {
 }
 ```
 
+**Tip:** we include [plugins.js](plugins.js) file you can point at from your code in simple cases. From your `cypress.json` file:
+
+```json
+{
+  "pluginsFile": "node_modules/@cypress/code-coverage/plugins",
+  "supportFile": "node_modules/@cypress/code-coverage/support"
+}
+```
+
 ## Debugging
 
 This plugin uses [debug](https://github.com/visionmedia/debug) module to output additional logging messages from its [task.js](task.js) file. This can help with debugging errors while saving code coverage or reporting. In order to see these messages, run Cypress from the terminal with environment variable `DEBUG=code-coverage`. Example using Unix syntax to set the variable:

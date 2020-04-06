@@ -259,8 +259,6 @@ workflows:
           # there are no jobs to follow this one
           # so no need to save the workspace files (saves time)
           no-workspace: true
-          start: npm start --prefix examples/use-plugins-and-support
-          wait-on: 'http://localhost:1234'
           command: npx cypress run --project examples/use-plugins-and-support
           # store screenshots and videos
           store_artifacts: true

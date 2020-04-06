@@ -2,9 +2,6 @@
 
 > Saves the code coverage collected during Cypress tests
 
-**⚠️ Performance Warning**
-This plugin will slow down your tests. There will be more web application JavaScript code to execute due to instrumentation, and there will be code coverage information to merge and save after each test. Track issue [#26](https://github.com/cypress-io/code-coverage/issues/26) for current progress.
-
 ## Install
 
 ```shell

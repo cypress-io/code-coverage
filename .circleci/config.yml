@@ -98,11 +98,11 @@ workflows:
                 command: npm run coverage:report
                 working_directory: examples/backend
             - run:
-              name: Check code coverage 📈
-              command: |
-                node ../../scripts/check-coverage server.js
-                node ../../scripts/only-covered server.js
-              working_directory: examples/backend
+                name: Check code coverage 📈
+                command: |
+                  node ../../scripts/check-coverage server.js
+                  node ../../scripts/only-covered server.js
+                working_directory: examples/backend
 
       - cypress/run:
           attach-workspace: true

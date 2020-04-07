@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
 it('spec a', () => {
-  cy.visit('/')
+  cy.visit('index.html')
   cy.contains('Page body')
 })

@@ -1,9 +1,0 @@
-{
-  "name": "example-one-spec",
-  "description": "Only running a single spec",
-  "scripts": {
-    "start": "../../node_modules/.bin/parcel serve index.html",
-    "cy:open": "../../node_modules/.bin/cypress open",
-    "dev": "../../node_modules/.bin/start-test 1234 cy:open"
-  }
-}

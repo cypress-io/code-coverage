@@ -6,6 +6,6 @@
     "start": "../../node_modules/.bin/nyc --silent node server/server",
     "cy:open": "../../node_modules/.bin/cypress open",
     "dev": "../../node_modules/.bin/start-test 3003 cy:open",
-    "report": "../../node_modules/.bin/nyc report"
+    "coverage:report": "../../node_modules/.bin/nyc report"
   }
 }

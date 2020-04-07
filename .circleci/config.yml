@@ -75,6 +75,7 @@ workflows:
             - run: npx nyc report --check-coverage true --lines 100 --include cypress/unit.js
 
       - cypress/run:
+          # TODO switch to separate example in "examples/..."
           name: backend coverage
           requires:
             - cypress/install
@@ -96,7 +97,7 @@ workflows:
                 path: coverage
             # print code coverage summary to the terminal
             # and make sure there the coverage is above certain limit
-            - run: npx nyc report --check-coverage true --lines 85
+            - run: npx nyc report --check-coverage true --lines 72
             # and look at the server index file - should be fully covered
             - run: npx nyc report --check-coverage true --lines 100 --include test-backend/index.js
 
@@ -280,6 +281,35 @@ workflows:
                   node ../../scripts/only-covered main.js
                 working_directory: examples/use-plugins-and-support
 
+      - cypress/run:
+          attach-workspace: true
+          name: example-one-spec
+          requires:
+            - cypress/install
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          command: npx cypress run --project examples/one-spec
+          # store screenshots and videos
+          store_artifacts: true
+          post-steps:
+            - run: cat examples/one-spec/.nyc_output/out.json
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/one-spec/coverage
+            # make sure the examples captures 100% of code
+            - run:
+                command: npx nyc report --check-coverage true --lines 100
+                working_directory: examples/one-spec
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  node ../../scripts/check-coverage main.js
+                  node ../../scripts/only-covered main.js
+                working_directory: examples/one-spec
+
       - publish:
           filters:
             branches:
@@ -296,3 +326,4 @@ workflows:
             - example-same-folder
             - example-support-files
             - example-use-plugins-and-support
+            - example-one-spec

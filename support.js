@@ -1,4 +1,7 @@
 /// <reference types="cypress" />
+// @ts-check
+
+const { filterSpecsFromCoverage } = require('./utils')
 
 /**
  * Sends collected code coverage object to the backend code
@@ -50,28 +53,6 @@ const filterSupportFilesFromCoverage = totalCoverage => {
       filename.startsWith(supportFolder)
     )
   }
-  return coverage
-}
-
-/**
- * remove coverage for the spec files themselves,
- * only keep "external" application source file coverage
- */
-const filterSpecsFromCoverage = totalCoverage => {
-  const integrationFolder = Cypress.config('integrationFolder')
-  const testFilePattern = Cypress.config('testFiles')
-  const isUsingDefaultTestPattern = testFilePattern === '**/*.*'
-
-  const isInIntegrationFolder = filename =>
-    filename.startsWith(integrationFolder)
-  const isTestFile = filename => Cypress.minimatch(filename, testFilePattern)
-
-  const isA = (fileCoverge, filename) => isInIntegrationFolder(filename)
-  const isB = (fileCoverge, filename) => isTestFile(filename)
-
-  const isTestFileFilter = isUsingDefaultTestPattern ? isA : isB
-
-  const coverage = Cypress._.omitBy(totalCoverage, isTestFileFilter)
   return coverage
 }
 

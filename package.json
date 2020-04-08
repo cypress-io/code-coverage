@@ -14,9 +14,6 @@
     "dev:no:coverage": "start-test 1234 'cypress open --env coverage=false'",
     "format": "prettier --write '*.js'",
     "format:check": "prettier --check '*.js'",
-    "start:test:backend": "nyc --silent node test-backend",
-    "cy:backend": "cypress open --config-file cypress-backend.json",
-    "dev:backend": "start-test start:test:backend 3003 cy:backend",
     "check:markdown": "find *.md -exec npx markdown-link-check {} \\;",
     "effective:config": "circleci config process .circleci/config.yml | sed /^#/d"
   },

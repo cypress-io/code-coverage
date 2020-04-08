@@ -75,16 +75,15 @@ workflows:
             - run: npx nyc report --check-coverage true --lines 100 --include cypress/unit.js
 
       - cypress/run:
-          # TODO switch to separate example in "examples/..."
           name: backend coverage
           requires:
             - cypress/install
-
           # grab the workspace created by cypress/install job
           attach-workspace: true
-
-          start: npm run start:test:backend
-          command: npx cypress run --config-file cypress-backend.json
+          working_directory: examples/backend
+          start: npm start
+          wait-on: 'http://localhost:3003'
+          command: '../../node_modules/.bin/cypress run'
 
           # there are no jobs to follow this one
           # so no need to save the workspace files (saves time)
@@ -94,12 +93,16 @@ workflows:
             # you can click on it in the CircleCI UI
             # to see live static HTML site
             - store_artifacts:
-                path: coverage
-            # print code coverage summary to the terminal
-            # and make sure there the coverage is above certain limit
-            - run: npx nyc report --check-coverage true --lines 72
-            # and look at the server index file - should be fully covered
-            - run: npx nyc report --check-coverage true --lines 100 --include test-backend/index.js
+                path: examples/backend/coverage
+            - run:
+                command: npm run coverage:report
+                working_directory: examples/backend
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  node ../../scripts/check-coverage server.js
+                  node ../../scripts/only-covered server.js
+                working_directory: examples/backend
 
       - cypress/run:
           attach-workspace: true
@@ -180,7 +183,6 @@ workflows:
             - run:
                 command: npm run coverage:check
                 working_directory: examples/ts-example
-
             - run:
                 name: Check code coverage 📈
                 command: |

@@ -134,7 +134,9 @@ module.exports = (on, config) => {
 
 ## Instrument backend code
 
-You can also instrument your server-side code and produce combined coverage report that covers both the backend and frontend code.
+Example in [examples/backend](examples/backend) folder.
+
+You can also instrument your server-side code and produce combined coverage report that covers both the backend and frontend code
 
 1. Run the server code with instrumentation. The simplest way is to use [nyc](https://github.com/istanbuljs/nyc). If normally you run `node src/server` then to run instrumented version you can do `nyc --silent node src/server`.
 2. Add an endpoint that returns collected coverage. If you are using Express, you can simply do
@@ -184,7 +186,7 @@ if (global.__coverage__) {
 }
 ```
 
-That should be enough - the code coverage from the server will be requested at the end of the test run and merged with the client-side code coverage, producing a combined report
+That should be enough - the code coverage from the server will be requested at the end of the test run and merged with the client-side code coverage, producing a combined report.
 
 ## Custom report folder
 

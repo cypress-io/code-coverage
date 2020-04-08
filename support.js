@@ -135,7 +135,10 @@ const registerHooks = () => {
     // we should grab it once after all tests finish
     const baseUrl = Cypress.config('baseUrl') || cy.state('window').origin
     const runningEndToEndTests = baseUrl !== Cypress.config('proxyUrl')
-    if (runningEndToEndTests) {
+    const specType = Cypress._.get(Cypress.spec, 'specType', 'integration')
+    const isIntegrationSpec = specType === 'integration'
+
+    if (runningEndToEndTests && isIntegrationSpec) {
       // we can only request server-side code coverage
       // if we are running end-to-end tests,
       // otherwise where do we send the request?

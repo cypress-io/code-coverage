@@ -335,6 +335,7 @@ npm run dev:no:coverage
 Full examples we use for testing in this repository:
 
 - [examples/backend](examples/backend) only instruments the backend Node server and saves the coverage report
+- [examples/fullstack](examples/fullstack) instruments and merges backend, e2e and unit test coverage into a single report
 - [examples/before-all-visit](examples/before-all-visit) checks if code coverage works when `cy.visit` is made once in the `before` hook
 - [examples/before-each-visit](examples/before-each-visit) checks if code coverage correctly keeps track of code when doing `cy.visit` before each test
 - [examples/one-spec.js](examples/one-spec.js) confirms that coverage is collected and filtered correctly if the user only executes a single Cypress test

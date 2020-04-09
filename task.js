@@ -44,20 +44,26 @@ function saveCoverage(coverage) {
  */
 function resolvePaths(nycFilename) {
   const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
+  let changed
   Object.keys(nycCoverage).forEach(key => {
     const coverage = nycCoverage[key]
     if (coverage.path && !isAbsolute(coverage.path)) {
       if (existsSync(coverage.path)) {
         debug('resolving path %s', coverage.path)
         coverage.path = resolve(coverage.path)
+        changed = true
       }
     }
   })
-  writeFileSync(
-    nycFilename,
-    JSON.stringify(nycCoverage, null, 2) + '\n',
-    'utf8'
-  )
+
+  if (changed) {
+    debug('saving updated file %s', nycFilename)
+    writeFileSync(
+      nycFilename,
+      JSON.stringify(nycCoverage, null, 2) + '\n',
+      'utf8'
+    )
+  }
 }
 
 const tasks = {

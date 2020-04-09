@@ -130,9 +130,9 @@ workflows:
             - run:
                 name: Check code coverage 📈
                 command: |
-                  node ../../scripts/check-coverage server.js
-                  node ../../scripts/check-coverage main.js
-                  node ../../scripts/check-coverage string-utils.js
+                  node ../../scripts/check-coverage fullstack/server/server.js
+                  node ../../scripts/check-coverage fullstack/main.js
+                  node ../../scripts/check-coverage fullstack/string-utils.js
                   node ../../scripts/only-covered server.js main.js string-utils.js
                 working_directory: examples/fullstack
 

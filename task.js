@@ -1,6 +1,6 @@
 // @ts-check
 const istanbul = require('istanbul-lib-coverage')
-const { join, resolve } = require('path')
+const { join, resolve, isAbsolute } = require('path')
 const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
 const execa = require('execa')
 const fs = require('fs')
@@ -35,6 +35,35 @@ function saveCoverage(coverage) {
   }
 
   writeFileSync(nycFilename, JSON.stringify(coverage, null, 2))
+}
+
+/**
+ * Looks at all coverage objects in the given JSON coverage file
+ * and if the file is relative, and exists, changes its path to
+ * be absolute.
+ */
+function resolvePaths(nycFilename) {
+  const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
+  let changed
+  Object.keys(nycCoverage).forEach(key => {
+    const coverage = nycCoverage[key]
+    if (coverage.path && !isAbsolute(coverage.path)) {
+      if (existsSync(coverage.path)) {
+        debug('resolving path %s', coverage.path)
+        coverage.path = resolve(coverage.path)
+        changed = true
+      }
+    }
+  })
+
+  if (changed) {
+    debug('saving updated file %s', nycFilename)
+    writeFileSync(
+      nycFilename,
+      JSON.stringify(nycCoverage, null, 2) + '\n',
+      'utf8'
+    )
+  }
 }
 
 const tasks = {
@@ -96,6 +125,8 @@ const tasks = {
       console.warn('Skipping coverage report')
       return null
     }
+
+    resolvePaths(nycFilename)
 
     if (customNycReportScript) {
       debug(

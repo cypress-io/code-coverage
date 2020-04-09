@@ -11,6 +11,6 @@ it('uses frontend code and calls backend', () => {
     .invoke('sub', 2, 3)
     .should('equal', -1)
 
-  cy.log('** backend request **')
+  cy.log('**backend request**')
   cy.request('/hello')
 })

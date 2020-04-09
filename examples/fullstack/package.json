@@ -1,0 +1,11 @@
+{
+  "name": "example-fullstack",
+  "description": "Combined code coverage from the backend code, and e2e and unit tests",
+  "devDependencies": {},
+  "scripts": {
+    "start": "../../node_modules/.bin/nyc --silent node server/server",
+    "cy:open": "../../node_modules/.bin/cypress open",
+    "dev": "../../node_modules/.bin/start-test 3003 cy:open",
+    "report": "../../node_modules/.bin/nyc report --reporter text"
+  }
+}

@@ -105,6 +105,38 @@ workflows:
                 working_directory: examples/backend
 
       - cypress/run:
+          name: fullstack coverage
+          requires:
+            - cypress/install
+          # grab the workspace created by cypress/install job
+          attach-workspace: true
+          working_directory: examples/fullstack
+          start: npm start
+          wait-on: 'http://localhost:3003'
+          command: '../../node_modules/.bin/cypress run'
+
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          post-steps:
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/backend/coverage
+            - run:
+                command: npm run report
+                working_directory: examples/fullstack
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  node ../../scripts/check-coverage server.js
+                  node ../../scripts/check-coverage main.js
+                  node ../../scripts/check-coverage string-utils.js
+                  node ../../scripts/only-covered server.js main.js string-utils.js
+                working_directory: examples/fullstack
+
+      - cypress/run:
           attach-workspace: true
           name: example-before-each-visit
           requires:
@@ -322,6 +354,7 @@ workflows:
             - unit
             - frontend coverage
             - backend coverage
+            - fullstack coverage
             - example-before-each-visit
             - example-before-all-visit
             - example-ts-example

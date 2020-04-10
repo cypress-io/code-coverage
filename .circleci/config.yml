@@ -100,8 +100,8 @@ workflows:
             - run:
                 name: Check code coverage 📈
                 command: |
-                  node ../../scripts/check-coverage server.js
-                  node ../../scripts/only-covered server.js
+                  ../../node_modules/.bin/check-coverage server.js
+                  ../../node_modules/.bin/only-covered server.js
                 working_directory: examples/backend
 
       - cypress/run:
@@ -130,10 +130,10 @@ workflows:
             - run:
                 name: Check code coverage 📈
                 command: |
-                  node ../../scripts/check-coverage fullstack/server/server.js
-                  node ../../scripts/check-coverage fullstack/main.js
-                  node ../../scripts/check-coverage fullstack/string-utils.js
-                  node ../../scripts/only-covered server.js main.js string-utils.js
+                  ../../node_modules/.bin/check-coverage fullstack/server/server.js
+                  ../../node_modules/.bin/check-coverage fullstack/main.js
+                  ../../node_modules/.bin/check-coverage fullstack/string-utils.js
+                  ../../node_modules/.bin/only-covered server.js main.js string-utils.js
                 working_directory: examples/fullstack
 
       - cypress/run:
@@ -161,8 +161,8 @@ workflows:
             - run:
                 name: Check code coverage 📈
                 command: |
-                  node ../../scripts/check-coverage main.js
-                  node ../../scripts/only-covered main.js
+                  ../../node_modules/.bin/check-coverage main.js
+                  ../../node_modules/.bin/only-covered main.js
                 working_directory: examples/before-each-visit
 
       - cypress/run:
@@ -190,8 +190,8 @@ workflows:
             - run:
                 name: Check code coverage 📈
                 command: |
-                  node ../../scripts/check-coverage main.js
-                  node ../../scripts/only-covered main.js
+                  ../../node_modules/.bin/check-coverage main.js
+                  ../../node_modules/.bin/only-covered main.js
                 working_directory: examples/before-all-visit
 
       - cypress/run:
@@ -218,8 +218,8 @@ workflows:
             - run:
                 name: Check code coverage 📈
                 command: |
-                  node ../../scripts/check-coverage main.ts
-                  node ../../scripts/only-covered main.ts
+                  ../../node_modules/.bin/check-coverage main.ts
+                  ../../node_modules/.bin/only-covered main.ts
                 working_directory: examples/ts-example
 
       - cypress/run:
@@ -250,9 +250,9 @@ workflows:
             - run:
                 name: Check code coverage 📈
                 command: |
-                  node ../../scripts/check-coverage main.js
-                  node ../../scripts/check-coverage unit-utils.js
-                  node ../../scripts/only-covered main.js unit-utils.js
+                  ../../node_modules/.bin/check-coverage main.js
+                  ../../node_modules/.bin/check-coverage unit-utils.js
+                  ../../node_modules/.bin/only-covered main.js unit-utils.js
                 working_directory: examples/same-folder
 
       - cypress/run:
@@ -282,8 +282,8 @@ workflows:
             - run:
                 name: Check code coverage 📈
                 command: |
-                  node ../../scripts/check-coverage main.js
-                  node ../../scripts/only-covered main.js
+                  ../../node_modules/.bin/check-coverage main.js
+                  ../../node_modules/.bin/only-covered main.js
                 working_directory: examples/support-files
 
       - cypress/run:
@@ -311,8 +311,8 @@ workflows:
             - run:
                 name: Check code coverage 📈
                 command: |
-                  node ../../scripts/check-coverage main.js
-                  node ../../scripts/only-covered main.js
+                  ../../node_modules/.bin/check-coverage main.js
+                  ../../node_modules/.bin/only-covered main.js
                 working_directory: examples/use-plugins-and-support
 
       - cypress/run:
@@ -340,8 +340,8 @@ workflows:
             - run:
                 name: Check code coverage 📈
                 command: |
-                  node ../../scripts/check-coverage main.js
-                  node ../../scripts/only-covered main.js
+                  ../../node_modules/.bin/check-coverage main.js
+                  ../../node_modules/.bin/only-covered main.js
                 working_directory: examples/one-spec
 
       - publish:

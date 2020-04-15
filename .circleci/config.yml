@@ -288,6 +288,37 @@ workflows:
 
       - cypress/run:
           attach-workspace: true
+          name: example-exclude-files
+          requires:
+            - cypress/install
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          start: npm start --prefix examples/exclude-files
+          wait-on: 'http://localhost:1234'
+          command: npx cypress run --project examples/exclude-files
+          # store screenshots and videos
+          store_artifacts: true
+          post-steps:
+            - run: cat examples/exclude-files/.nyc_output/out.json
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/exclude-files/coverage
+            # make sure the examples captures 100% of code
+            - run:
+                command: npx nyc report --check-coverage true --lines 100
+                working_directory: examples/exclude-files
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  ../../node_modules/.bin/check-coverage main.js
+                  ../../node_modules/.bin/only-covered main.js
+                working_directory: examples/exclude-files
+
+      - cypress/run:
+          attach-workspace: true
           name: example-use-plugins-and-support
           requires:
             - cypress/install
@@ -362,3 +393,4 @@ workflows:
             - example-support-files
             - example-use-plugins-and-support
             - example-one-spec
+            - example-exclude-files

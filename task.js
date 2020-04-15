@@ -151,8 +151,11 @@ const tasks = {
     const nycReportOptions = {
       reportDir,
       tempDir: coverageFolder,
-      reporter: [].concat(reporter) // make sure this is a list
+      reporter: [].concat(reporter), // make sure this is a list
+      include: nycOptions.include,
+      exclude: nycOptions.exclude
     }
+
     debug('calling NYC reporter with options %o', nycReportOptions)
     debug('current working directory is %s', process.cwd())
     const nyc = new NYC(nycReportOptions)

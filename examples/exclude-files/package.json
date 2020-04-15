@@ -1,0 +1,15 @@
+{
+  "name": "example-exclude-files",
+  "description": "Exclude some files from final coverage report",
+  "scripts": {
+    "start": "../../node_modules/.bin/parcel serve index.html",
+    "cy:open": "../../node_modules/.bin/cypress open",
+    "dev": "../../node_modules/.bin/start-test 1234 cy:open"
+  },
+  "nyc": {
+    "exclude": ["second.js"]
+  },
+  "devDependencies": {
+    "@babel/core": "7.9.0"
+  }
+}

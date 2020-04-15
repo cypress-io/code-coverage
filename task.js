@@ -153,7 +153,10 @@ const tasks = {
       tempDir: coverageFolder,
       reporter: [].concat(reporter), // make sure this is a list
       include: nycOptions.include,
-      exclude: nycOptions.exclude
+      exclude: nycOptions.exclude,
+      // from working with TypeScript code seems we need these settings too
+      excludeAfterRemap: true,
+      extension: ['.js', '.cjs', '.mjs', '.ts', '.tsx', '.jsx']
     }
 
     debug('calling NYC reporter with options %o', nycReportOptions)

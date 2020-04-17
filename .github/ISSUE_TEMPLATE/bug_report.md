@@ -5,6 +5,7 @@ title: ''
 labels: ''
 assignees: ''
 ---
+
 **Versions**
 
 - What is this plugin's version?
@@ -12,6 +13,9 @@ assignees: ''
 - What is your operating system?
 - What is the Node version?
 - What is the NPM version?
+- Is there `.nyc_output` folder? Is there `.nyc_output/out.json` file. Is it empty?
+- Do you have any custom NYC settings in `package.json` (`nyc` object) or in other [NYC config files](https://github.com/istanbuljs/nyc#configuration-files)
+- Do you run Cypress tests in a Docker container?
 
 **Describe the bug**
 A clear and concise description of what the bug is.

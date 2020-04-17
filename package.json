@@ -66,5 +66,8 @@
     "serve": "11.3.0",
     "start-server-and-test": "1.10.11",
     "typescript": "3.8.3"
+  },
+  "nyc": {
+    "exclude": ["utils.js"]
   }
 }

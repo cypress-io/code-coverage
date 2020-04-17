@@ -1,10 +1,15 @@
 // @ts-check
 const istanbul = require('istanbul-lib-coverage')
-const { join, resolve, isAbsolute } = require('path')
+const { join, resolve } = require('path')
 const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
 const execa = require('execa')
-const fs = require('fs')
-const { fixSourcePathes } = require('./utils')
+const {
+  fixSourcePathes,
+  showNycInfo,
+  resolveRelativePaths,
+  checkAllPathsNotFound,
+  tryFindingLocalFiles
+} = require('./utils')
 const NYC = require('nyc')
 
 const debug = require('debug')('code-coverage')
@@ -20,8 +25,8 @@ const nycFilename = join(coverageFolder, 'out.json')
 // potentially there might be "nyc" options in other configuration files
 // it allows, but for now ignore those options
 const pkgFilename = join(processWorkingDirectory, 'package.json')
-const pkg = fs.existsSync(pkgFilename)
-  ? JSON.parse(fs.readFileSync(pkgFilename, 'utf8'))
+const pkg = existsSync(pkgFilename)
+  ? JSON.parse(readFileSync(pkgFilename, 'utf8'))
   : {}
 const nycOptions = pkg.nyc || {}
 const scripts = pkg.scripts || {}
@@ -35,52 +40,6 @@ function saveCoverage(coverage) {
   }
 
   writeFileSync(nycFilename, JSON.stringify(coverage, null, 2))
-}
-
-/**
- * Looks at all coverage objects in the given JSON coverage file
- * and if the file is relative, and exists, changes its path to
- * be absolute.
- */
-function resolvePaths(nycFilename) {
-  const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
-
-  const coverageKeys = Object.keys(nycCoverage)
-  if (!coverageKeys.length) {
-    console.error('⚠️ file %s has no coverage information', nycFilename)
-    return
-  }
-  debug('NYC file %s has %d key(s)', nycFilename, coverageKeys.length)
-
-  let changed
-  const maxPrintKeys = 3
-
-  Object.keys(nycCoverage).forEach((key, k) => {
-    const coverage = nycCoverage[key]
-
-    // printing a few found keys and file paths from the coverage file
-    // will make debugging any problems much much easier
-    if (k < maxPrintKeys) {
-      debug('%d key %s file path %s', k + 1, key, coverage.path)
-    }
-
-    if (coverage.path && !isAbsolute(coverage.path)) {
-      if (existsSync(coverage.path)) {
-        debug('resolving path %s', coverage.path)
-        coverage.path = resolve(coverage.path)
-        changed = true
-      }
-    }
-  })
-
-  if (changed) {
-    debug('saving updated file %s', nycFilename)
-    writeFileSync(
-      nycFilename,
-      JSON.stringify(nycCoverage, null, 2) + '\n',
-      'utf8'
-    )
-  }
 }
 
 const tasks = {
@@ -143,7 +102,13 @@ const tasks = {
       return null
     }
 
-    resolvePaths(nycFilename)
+    showNycInfo(nycFilename)
+    const allSourceFilesMissing = checkAllPathsNotFound(nycFilename)
+    if (allSourceFilesMissing) {
+      tryFindingLocalFiles(nycFilename)
+    }
+
+    resolveRelativePaths(nycFilename)
 
     if (customNycReportScript) {
       debug(

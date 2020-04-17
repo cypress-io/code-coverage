@@ -11,9 +11,10 @@ assignees: ''
 - What is this plugin's version?
 - What is Cypress version?
 - What is your operating system?
+- What is the shell?
 - What is the Node version?
 - What is the NPM version?
-- Is there `.nyc_output` folder? Is there `.nyc_output/out.json` file. Is it empty?
+- Is there `.nyc_output` folder? Is there `.nyc_output/out.json` file. Is it empty? Can you paste at least part of it so we can see the keys and file paths?
 - Do you have any custom NYC settings in `package.json` (`nyc` object) or in other [NYC config files](https://github.com/istanbuljs/nyc#configuration-files)
 - Do you run Cypress tests in a Docker container?
 

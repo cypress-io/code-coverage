@@ -156,7 +156,8 @@ const tasks = {
       exclude: nycOptions.exclude,
       // from working with TypeScript code seems we need these settings too
       excludeAfterRemap: true,
-      extension: ['.js', '.cjs', '.mjs', '.ts', '.tsx', '.jsx']
+      extension: ['.js', '.cjs', '.mjs', '.ts', '.tsx', '.jsx'],
+      all: nycOptions.all
     }
 
     debug('calling NYC reporter with options %o', nycReportOptions)

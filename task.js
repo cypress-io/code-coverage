@@ -3,8 +3,8 @@ const istanbul = require('istanbul-lib-coverage')
 const { join, resolve, isAbsolute } = require('path')
 const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
 const execa = require('execa')
-const fs = require('fs')
-const { fixSourcePathes } = require('./utils')
+const path = require('path')
+const { fixSourcePathes, showNycInfo } = require('./utils')
 const NYC = require('nyc')
 
 const debug = require('debug')('code-coverage')
@@ -20,8 +20,8 @@ const nycFilename = join(coverageFolder, 'out.json')
 // potentially there might be "nyc" options in other configuration files
 // it allows, but for now ignore those options
 const pkgFilename = join(processWorkingDirectory, 'package.json')
-const pkg = fs.existsSync(pkgFilename)
-  ? JSON.parse(fs.readFileSync(pkgFilename, 'utf8'))
+const pkg = existsSync(pkgFilename)
+  ? JSON.parse(readFileSync(pkgFilename, 'utf8'))
   : {}
 const nycOptions = pkg.nyc || {}
 const scripts = pkg.scripts || {}
@@ -38,9 +38,94 @@ function saveCoverage(coverage) {
 }
 
 /**
- * A small debug utility to inspect paths saved in NYC output JSON file
+ * @param {string[]} filepaths
+ * @returns {string | undefined} common prefix that corresponds to current folder
  */
-function showNycInfo(nycFilename) {
+function findCommonRoot(filepaths) {
+  if (!filepaths.length) {
+    debug('cannot find common root without any files')
+    return
+  }
+
+  // assuming / as file separator
+  const splitParts = filepaths.map(name => name.split('/'))
+  const lengths = splitParts.map(arr => arr.length)
+  const shortestLength = Math.min.apply(null, lengths)
+  debug('shorted file path has %d parts', shortestLength)
+
+  const cwd = process.cwd()
+  let commonPrefix = []
+  let foundCurrentFolder
+
+  for (let k = 0; k < shortestLength; k += 1) {
+    const part = splitParts[0][k]
+    const prefix = commonPrefix.concat(part).join('/')
+    debug('testing prefix %o', prefix)
+    const allFilesStart = filepaths.every(name => name.startsWith(prefix))
+    if (!allFilesStart) {
+      debug('stopped at non-common prefix %s', prefix)
+      break
+    }
+
+    commonPrefix.push(part)
+
+    const removedPrefixNames = filepaths.map(filepath =>
+      filepath.slice(prefix.length)
+    )
+    debug('removedPrefix %o', removedPrefixNames)
+    const foundAllPaths = removedPrefixNames.every(filepath =>
+      existsSync(path.join(cwd, filepath))
+    )
+    debug('all files found at %s? %o', prefix, foundAllPaths)
+    if (foundAllPaths) {
+      debug('found prefix that matches current folder: %s', prefix)
+      foundCurrentFolder = prefix
+      break
+    }
+  }
+
+  return foundCurrentFolder
+}
+
+function tryFindingLocalFiles(nycFilename) {
+  const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
+  const coverageKeys = Object.keys(nycCoverage)
+  const filenames = coverageKeys.map(key => nycCoverage[key].path)
+  const commonFolder = findCommonRoot(filenames)
+  if (!commonFolder) {
+    debug('could not find common folder %s', commonFolder)
+    return
+  }
+  const cwd = process.cwd()
+  debug(
+    'found common folder %s that matches current working directory %s',
+    commonFolder,
+    cwd
+  )
+  const length = commonFolder.length
+  let changed
+
+  coverageKeys.forEach(key => {
+    const from = nycCoverage[key].path
+    if (from.startsWith(commonFolder)) {
+      const to = path.join(cwd, from.slice(length))
+      nycCoverage[key].path = to
+      debug('replaced %s -> %s', from, to)
+      changed = true
+    }
+  })
+
+  if (changed) {
+    debug('saving updated file %s', nycFilename)
+    writeFileSync(
+      nycFilename,
+      JSON.stringify(nycCoverage, null, 2) + '\n',
+      'utf8'
+    )
+  }
+}
+
+function checkAllPathsNotFound(nycFilename) {
   const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
 
   const coverageKeys = Object.keys(nycCoverage)
@@ -48,20 +133,18 @@ function showNycInfo(nycFilename) {
     console.error('⚠️ file %s has no coverage information', nycFilename)
     return
   }
-  debug('NYC file %s has %d key(s)', nycFilename, coverageKeys.length)
 
-  const maxPrintKeys = 3
-  const showKeys = coverageKeys.slice(0, maxPrintKeys)
-
-  showKeys.forEach((key, k) => {
+  const allFilesAreMissing = coverageKeys.every((key, k) => {
     const coverage = nycCoverage[key]
-
-    // printing a few found keys and file paths from the coverage file
-    // will make debugging any problems much much easier
-    if (k < maxPrintKeys) {
-      debug('%d key %s file path %s', k + 1, key, coverage.path)
-    }
+    return !existsSync(coverage.path)
   })
+
+  debug(
+    'in file %s all files are not found? %o',
+    nycFilename,
+    allFilesAreMissing
+  )
+  return allFilesAreMissing
 }
 
 /**
@@ -69,7 +152,7 @@ function showNycInfo(nycFilename) {
  * and if the file is relative, and exists, changes its path to
  * be absolute.
  */
-function resolvePaths(nycFilename) {
+function resolveRelativePaths(nycFilename) {
   const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
 
   const coverageKeys = Object.keys(nycCoverage)
@@ -84,12 +167,23 @@ function resolvePaths(nycFilename) {
   coverageKeys.forEach((key, k) => {
     const coverage = nycCoverage[key]
 
-    if (coverage.path && !isAbsolute(coverage.path)) {
+    if (!coverage.path) {
+      debug('key %s does not have path', key)
+      return
+    }
+
+    if (!isAbsolute(coverage.path)) {
       if (existsSync(coverage.path)) {
         debug('resolving path %s', coverage.path)
         coverage.path = resolve(coverage.path)
         changed = true
       }
+      return
+    }
+
+    // path is absolute, let's check if it exists
+    if (!existsSync(coverage.path)) {
+      debug('⚠️ cannot find file %s with hash %s', coverage.path, coverage.hash)
     }
   })
 
@@ -164,7 +258,12 @@ const tasks = {
     }
 
     showNycInfo(nycFilename)
-    resolvePaths(nycFilename)
+    const allSourceFilesMissing = checkAllPathsNotFound(nycFilename)
+    if (allSourceFilesMissing) {
+      tryFindingLocalFiles(nycFilename)
+    }
+
+    resolveRelativePaths(nycFilename)
 
     if (customNycReportScript) {
       debug(

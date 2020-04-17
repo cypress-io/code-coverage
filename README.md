@@ -229,24 +229,7 @@ Sometimes NYC tool might be installed in a different folder not in the current o
 
 ## TypeScript users
 
-TypeScript source files are NOT included in the code coverage report by default, even if they are properly instrumented. In order to tell `nyc` to include TS files in the report, you need to:
-
-1. Add these dev dependencies that let Istanbul work with TypeScript
-
-```shell
-npm i -D @istanbuljs/nyc-config-typescript source-map-support
-```
-
-2. In `package.json` use the following `nyc` configuration object
-
-```json
-{
-  "nyc": {
-    "extends": "@istanbuljs/nyc-config-typescript",
-    "all": true
-  }
-}
-```
+TypeScript source files should be automatically included in the report, if they are instrumented.
 
 See [examples/ts-example](examples/ts-example)
 

@@ -4,10 +4,6 @@
   "devDependencies": {
     "@babel/core": "7.9.0"
   },
-  "nyc": {
-    "extends": "@istanbuljs/nyc-config-typescript",
-    "all": true
-  },
   "scripts": {
     "start": "../../node_modules/.bin/parcel serve index.html",
     "build": "../../node_modules/.bin/parcel build index.html",

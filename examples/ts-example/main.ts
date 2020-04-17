@@ -1,6 +1,4 @@
-const add = (a: number, b: number) => {
-  return a + b
-}
+import { add } from './calc'
 
 const sub = (a: number, b: number) => {
   return a - b

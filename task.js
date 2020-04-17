@@ -3,7 +3,6 @@ const istanbul = require('istanbul-lib-coverage')
 const { join, resolve } = require('path')
 const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
 const execa = require('execa')
-const path = require('path')
 const {
   fixSourcePathes,
   showNycInfo,

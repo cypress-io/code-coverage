@@ -38,6 +38,33 @@ function saveCoverage(coverage) {
 }
 
 /**
+ * A small debug utility to inspect paths saved in NYC output JSON file
+ */
+function showNycInfo(nycFilename) {
+  const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
+
+  const coverageKeys = Object.keys(nycCoverage)
+  if (!coverageKeys.length) {
+    console.error('⚠️ file %s has no coverage information', nycFilename)
+    return
+  }
+  debug('NYC file %s has %d key(s)', nycFilename, coverageKeys.length)
+
+  const maxPrintKeys = 3
+  const showKeys = coverageKeys.slice(0, maxPrintKeys)
+
+  showKeys.forEach((key, k) => {
+    const coverage = nycCoverage[key]
+
+    // printing a few found keys and file paths from the coverage file
+    // will make debugging any problems much much easier
+    if (k < maxPrintKeys) {
+      debug('%d key %s file path %s', k + 1, key, coverage.path)
+    }
+  })
+}
+
+/**
  * Looks at all coverage objects in the given JSON coverage file
  * and if the file is relative, and exists, changes its path to
  * be absolute.
@@ -53,16 +80,9 @@ function resolvePaths(nycFilename) {
   debug('NYC file %s has %d key(s)', nycFilename, coverageKeys.length)
 
   let changed
-  const maxPrintKeys = 3
 
-  Object.keys(nycCoverage).forEach((key, k) => {
+  coverageKeys.forEach((key, k) => {
     const coverage = nycCoverage[key]
-
-    // printing a few found keys and file paths from the coverage file
-    // will make debugging any problems much much easier
-    if (k < maxPrintKeys) {
-      debug('%d key %s file path %s', k + 1, key, coverage.path)
-    }
 
     if (coverage.path && !isAbsolute(coverage.path)) {
       if (existsSync(coverage.path)) {
@@ -143,6 +163,7 @@ const tasks = {
       return null
     }
 
+    showNycInfo(nycFilename)
     resolvePaths(nycFilename)
 
     if (customNycReportScript) {

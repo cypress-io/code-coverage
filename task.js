@@ -44,9 +44,26 @@ function saveCoverage(coverage) {
  */
 function resolvePaths(nycFilename) {
   const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
+
+  const coverageKeys = Object.keys(nycCoverage)
+  if (!coverageKeys.length) {
+    console.error('⚠️ file %s has no coverage information', nycFilename)
+    return
+  }
+  debug('NYC file %s has %d key(s)', nycFilename, coverageKeys.length)
+
   let changed
-  Object.keys(nycCoverage).forEach(key => {
+  const maxPrintKeys = 3
+
+  Object.keys(nycCoverage).forEach((key, k) => {
     const coverage = nycCoverage[key]
+
+    // printing a few found keys and file paths from the coverage file
+    // will make debugging any problems much much easier
+    if (k < maxPrintKeys) {
+      debug('%d key %s file path %s', k + 1, key, coverage.path)
+    }
+
     if (coverage.path && !isAbsolute(coverage.path)) {
       if (existsSync(coverage.path)) {
         debug('resolving path %s', coverage.path)

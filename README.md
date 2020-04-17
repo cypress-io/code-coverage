@@ -396,6 +396,8 @@ npx nyc report --check-coverage true --lines 100 --include cypress/about.js
 npx nyc report --check-coverage true --lines 100 --include cypress/unit.js
 ```
 
+**Tip:** use [check-code-coverage](https://github.com/bahmutov/check-code-coverage) for stricter code coverage checks than `nyc report --check-coverage` allows.
+
 ### Markdown
 
 You can validate links in Markdown files in this directory by executing (Linux + Mac only) script

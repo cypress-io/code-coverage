@@ -148,6 +148,7 @@ const tasks = {
     // I am mostly worried about additional NYC options that are stored in
     // package.json and .nycrc resource files.
     // for now let's just camel case all options
+    // https://github.com/istanbuljs/nyc#common-configuration-options
     const nycReportOptions = {
       reportDir,
       tempDir: coverageFolder,
@@ -156,7 +157,14 @@ const tasks = {
       exclude: nycOptions.exclude,
       // from working with TypeScript code seems we need these settings too
       excludeAfterRemap: true,
-      extension: ['.js', '.cjs', '.mjs', '.ts', '.tsx', '.jsx'],
+      extension: nycOptions.extension || [
+        '.js',
+        '.cjs',
+        '.mjs',
+        '.ts',
+        '.tsx',
+        '.jsx'
+      ],
       all: nycOptions.all
     }
 

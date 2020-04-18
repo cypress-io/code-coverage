@@ -342,6 +342,7 @@ Look up the list of examples under GitHub topic [cypress-code-coverage-example](
 - [akoidan/vue-webpack-typescript](https://github.com/akoidan/vue-webpack-typescript) Pure webpack config with vue + typescript with codecov reports. This setup uses babel-loader with TS checker as a separate thread.
 - [bahmutov/code-coverage-subfolder-example](https://github.com/bahmutov/code-coverage-subfolder-example) shows how to instrument `app` folder using `nyc instrument` as a separate step before running E2E tests
 - [bahmutov/docker-with-cypress-included-code-coverage-example](https://github.com/bahmutov/docker-with-cypress-included-code-coverage-example) runs tests inside pre-installed Cypress using [cypress/included:x.y.z](https://github.com/cypress-io/cypress-docker-images/tree/master/included) Docker image and reports code coverage.
+- [bahmutov/app-in-docker-coverage-example](https://github.com/bahmutov/app-in-docker-coverage-example) shows an app running inside a Docker container, while Cypress runs on the local machine. Cypress can still [discover the source files](https://github.com/cypress-io/code-coverage/pull/197) before generating the report.
 
 ## Migrations
 

@@ -62,7 +62,7 @@
     "markdown-link-check": "3.8.1",
     "parcel-bundler": "1.12.4",
     "prettier": "1.19.1",
-    "semantic-release": "17.0.4",
+    "semantic-release": "17.0.6",
     "serve": "11.3.0",
     "start-server-and-test": "1.10.11",
     "typescript": "3.8.3"

@@ -123,14 +123,6 @@ const tasks = {
       })
     }
 
-    const reportFolder = nycOptions['report-dir'] || './coverage'
-    const reportDir = resolve(reportFolder)
-    const reporter = nycOptions['reporter'] || ['lcov', 'clover', 'json']
-
-    // TODO we could look at how NYC is parsing its CLI arguments
-    // I am mostly worried about additional NYC options that are stored in
-    // package.json and .nycrc resource files.
-    // for now let's just camel case all options
     // https://github.com/istanbuljs/nyc#common-configuration-options
     const nycReportOptions = readNycOptions(processWorkingDirectory)
 
@@ -145,8 +137,11 @@ const tasks = {
     const nyc = new NYC(nycReportOptions)
 
     const returnReportFolder = () => {
-      debug('after reporting, returning the report folder name %s', reportDir)
-      return reportDir
+      debug(
+        'after reporting, returning the report folder name %s',
+        nycReportOptions['report-dir']
+      )
+      return nycReportOptions['report-dir']
     }
     return nyc.report().then(returnReportFolder)
   }

@@ -7,11 +7,26 @@ const { readFileSync, writeFileSync, existsSync } = require('fs')
 const { isAbsolute, resolve, join } = require('path')
 const debug = require('debug')('code-coverage')
 
-function combineNycOptions({ pkgNycOptions, defaultNycOptions }) {
-  const nycOptions = Object.assign({}, defaultNycOptions, pkgNycOptions)
+function combineNycOptions({
+  pkgNycOptions,
+  nycrc,
+  nycrcJson,
+  defaultNycOptions
+}) {
+  // last option wins
+  const nycOptions = Object.assign(
+    {},
+    defaultNycOptions,
+    nycrc,
+    nycrcJson,
+    pkgNycOptions
+  )
 
   if (typeof nycOptions.reporter === 'string') {
     nycOptions.reporter = [nycOptions.reporter]
+  }
+  if (typeof nycOptions.extension === 'string') {
+    nycOptions.extension = [nycOptions.extension]
   }
 
   return nycOptions
@@ -31,8 +46,20 @@ function readNycOptions(workingDirectory) {
     : {}
   const pkgNycOptions = pkg.nyc || {}
 
+  const nycrcFilename = join(workingDirectory, '.nycrc')
+  const nycrc = existsSync(nycrcFilename)
+    ? JSON.parse(readFileSync(nycrcFilename, 'utf8'))
+    : {}
+
+  const nycrcJsonFilename = join(workingDirectory, '.nycrc.json')
+  const nycrcJson = existsSync(nycrcJsonFilename)
+    ? JSON.parse(readFileSync(nycrcJsonFilename, 'utf8'))
+    : {}
+
   const nycOptions = combineNycOptions({
     pkgNycOptions,
+    nycrc,
+    nycrcJson,
     defaultNycOptions
   })
   debug('combined NYC options %o', nycOptions)

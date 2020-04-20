@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 // @ts-check
 
-const { filterSpecsFromCoverage } = require('./utils')
+const { filterSpecsFromCoverage } = require('./support-utils')
 
 /**
  * Sends collected code coverage object to the backend code
@@ -35,6 +35,7 @@ const logMessage = s => {
 const filterSupportFilesFromCoverage = totalCoverage => {
   const integrationFolder = Cypress.config('integrationFolder')
   const supportFile = Cypress.config('supportFile')
+  // @ts-ignore
   const supportFolder = Cypress.config('supportFolder')
 
   const isSupportFile = filename => filename === supportFile
@@ -61,12 +62,14 @@ const registerHooks = () => {
 
   const hasE2ECoverage = () => Boolean(windowCoverageObjects.length)
 
+  // @ts-ignore
   const hasUnitTestCoverage = () => Boolean(window.__coverage__)
 
   before(() => {
     // we need to reset the coverage when running
     // in the interactive mode, otherwise the counters will
     // keep increasing every time we rerun the tests
+    // @ts-ignore
     cy.task('resetCoverage', { isInteractive: Cypress.config('isInteractive') })
   })
 
@@ -133,7 +136,9 @@ const registerHooks = () => {
 
     // there might be server-side code coverage information
     // we should grab it once after all tests finish
+    // @ts-ignore
     const baseUrl = Cypress.config('baseUrl') || cy.state('window').origin
+    // @ts-ignore
     const runningEndToEndTests = baseUrl !== Cypress.config('proxyUrl')
     const specType = Cypress._.get(Cypress.spec, 'specType', 'integration')
     const isIntegrationSpec = specType === 'integration'
@@ -152,7 +157,9 @@ const registerHooks = () => {
         log: false,
         failOnStatusCode: false
       })
-        .then(r => Cypress._.get(r, 'body.coverage', null), { log: false })
+        .then(r => {
+          return Cypress._.get(r, 'body.coverage', null)
+        })
         .then(coverage => {
           if (!coverage) {
             // we did not get code coverage - this is the
@@ -171,6 +178,7 @@ const registerHooks = () => {
     // then we will have unit test coverage
     // NOTE: spec iframe is NOT reset between the tests, so we can grab
     // the coverage information only once after all tests have finished
+    // @ts-ignore
     const unitTestCoverage = window.__coverage__
     if (unitTestCoverage) {
       sendCoverage(unitTestCoverage, 'unit')

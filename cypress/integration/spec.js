@@ -3,7 +3,7 @@
 /// <reference types="Cypress" />
 
 import { add } from '../unit'
-const { fixSourcePathes } = require('../../utils')
+const { fixSourcePaths } = require('../../support-utils')
 
 context('Page test', () => {
   beforeEach(() => {
@@ -54,7 +54,7 @@ context('Unit tests', () => {
       }
     }
 
-    fixSourcePathes(coverage)
+    fixSourcePaths(coverage)
 
     expect(coverage).to.deep.eq({
       '/absolute/src/component.vue': {

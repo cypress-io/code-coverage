@@ -1,4 +1,4 @@
-const { filterSpecsFromCoverage } = require('../../utils')
+const { filterSpecsFromCoverage } = require('../../support-utils')
 
 describe('minimatch', () => {
   it('string matches', () => {

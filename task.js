@@ -4,12 +4,12 @@ const { join, resolve } = require('path')
 const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
 const execa = require('execa')
 const {
-  fixSourcePathes,
   showNycInfo,
   resolveRelativePaths,
   checkAllPathsNotFound,
   tryFindingLocalFiles
-} = require('./utils')
+} = require('./task-utils')
+const { fixSourcePaths } = require('./support-utils')
 const NYC = require('nyc')
 
 const debug = require('debug')('code-coverage')
@@ -79,7 +79,7 @@ const tasks = {
     const coverage = JSON.parse(sentCoverage)
     debug('parsed sent coverage')
 
-    fixSourcePathes(coverage)
+    fixSourcePaths(coverage)
     const previous = existsSync(nycFilename)
       ? JSON.parse(readFileSync(nycFilename, 'utf8'))
       : istanbul.createCoverageMap({})

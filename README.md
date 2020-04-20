@@ -27,7 +27,7 @@ module.exports = (on, config) => {
 }
 ```
 
-### Instrument your application
+## Instrument your application
 
 This plugin **DOES NOT** instrument your code. You have to instrument it yourself using [Istanbul.js](https://istanbul.js.org/) tool. Luckily it is not difficult. For example, if you are already using Babel to transpile you can add [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul) to your `.babelrc` and instrument on the fly.
 
@@ -52,6 +52,12 @@ If you have instrumented your application's code and see the `window.__coverage_
 ![Coverage report](images/coverage.jpg)
 
 That should be it!
+
+### App vs unit tests
+
+You need to instrument your web application. This means that when the test does `cy.visit('localhost:3000')` any code the `index.html` requests should be instrumented by YOU. See [Examples](#examples) section for advice, usually you need to stick `babel-plugin-istanbul` into your pipeline somewhere.
+
+If you are testing individual functions from your application code by importing them directly into Cypress spec files, this is called "unit tests" and Cypress can instrument this scenario for you. See [Instrument unit tests](#instrument-unit-tests) section.
 
 ## Reports
 
@@ -117,7 +123,7 @@ module.exports = (on, config) => {
 
 Now the code coverage from spec files will be combined with end-to-end coverage.
 
-### Alternative
+### Alternative for unit tests
 
 If you cannot use `.babelrc` for some reason (maybe it is used by other tools?), try using the Browserify transformer included with this module in `use-browserify-istanbul` file.
 

@@ -29,7 +29,6 @@ const pkgFilename = join(processWorkingDirectory, 'package.json')
 const pkg = existsSync(pkgFilename)
   ? JSON.parse(readFileSync(pkgFilename, 'utf8'))
   : {}
-const nycOptions = pkg.nyc || {}
 const scripts = pkg.scripts || {}
 const DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME = 'coverage:report'
 const customNycReportScript = scripts[DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME]
@@ -41,6 +40,37 @@ function saveCoverage(coverage) {
   }
 
   writeFileSync(nycFilename, JSON.stringify(coverage, null, 2))
+}
+
+function maybePrintFinalCoverageFiles(folder) {
+  const jsonReportFilename = join(folder, 'coverage-final.json')
+  if (!existsSync) {
+    debug('Did not find final coverage file %s', jsonReportFilename)
+    return
+  }
+
+  debug('Final coverage in %s', jsonReportFilename)
+  const finalCoverage = JSON.parse(readFileSync(jsonReportFilename, 'utf8'))
+  Object.keys(finalCoverage).forEach(key => {
+    const s = finalCoverage[key].s || {}
+    const statements = Object.keys(s)
+    const totalStatements = statements.length
+    let coveredStatements = 0
+    statements.forEach(statementKey => {
+      if (s[statementKey]) {
+        coveredStatements += 1
+      }
+    })
+
+    const allCovered = coveredStatements === totalStatements
+    debug(
+      '%s %s statements covered %d/%d',
+      allCovered ? '✅' : '⚠️',
+      key,
+      coveredStatements,
+      totalStatements
+    )
+  })
 }
 
 const tasks = {
@@ -137,11 +167,15 @@ const tasks = {
     const nyc = new NYC(nycReportOptions)
 
     const returnReportFolder = () => {
+      const reportFolder = nycReportOptions['report-dir']
       debug(
         'after reporting, returning the report folder name %s',
-        nycReportOptions['report-dir']
+        reportFolder
       )
-      return nycReportOptions['report-dir']
+
+      maybePrintFinalCoverageFiles(reportFolder)
+
+      return reportFolder
     }
     return nyc.report().then(returnReportFolder)
   }

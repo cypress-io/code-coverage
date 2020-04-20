@@ -268,9 +268,15 @@ workflows:
           start: npm start
           wait-on: 'http://localhost:5000'
           command: '../../node_modules/.bin/cypress run'
+          # wrong path when using working_directory
+          # https://github.com/cypress-io/circleci-orb/issues/265
           # store screenshots and videos
-          store_artifacts: true
+          # store_artifacts: true
           post-steps:
+            - store_artifacts:
+                path: examples/use-webpack/cypress/videos
+            - store_artifacts:
+                path: examples/use-webpack/cypress/screenshots
             # store the created coverage report folder
             # you can click on it in the CircleCI UI
             # to see live static HTML site

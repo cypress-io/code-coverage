@@ -1,3 +1,4 @@
+// @ts-check
 // helper functions that are safe to use in the browser
 // from support.js file - no file system access
 
@@ -40,6 +41,24 @@ const filterSpecsFromCoverage = (totalCoverage, config = Cypress.config) => {
 
   const coverage = Cypress._.omitBy(totalCoverage, isTestFileFilter)
   return coverage
+}
+
+/**
+ * Replace source-map's path by the corresponding absolute file path
+ * (coverage report wouldn't work with source-map path being relative
+ * or containing Webpack loaders and query parameters)
+ */
+function fixSourcePaths(coverage) {
+  Object.values(coverage).forEach(file => {
+    const { path: absolutePath, inputSourceMap } = file
+    const fileName = /([^\/\\]+)$/.exec(absolutePath)[1]
+    if (!inputSourceMap || !fileName) return
+
+    if (inputSourceMap.sourceRoot) inputSourceMap.sourceRoot = ''
+    inputSourceMap.sources = inputSourceMap.sources.map(source =>
+      source.includes(fileName) ? absolutePath : source
+    )
+  })
 }
 
 module.exports = {

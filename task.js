@@ -4,12 +4,12 @@ const { join, resolve } = require('path')
 const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
 const execa = require('execa')
 const {
-  fixSourcePaths,
   showNycInfo,
   resolveRelativePaths,
   checkAllPathsNotFound,
   tryFindingLocalFiles
 } = require('./task-utils')
+const { fixSourcePaths } = require('./support-utils')
 const NYC = require('nyc')
 
 const debug = require('debug')('code-coverage')

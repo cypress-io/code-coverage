@@ -3,7 +3,7 @@
 /// <reference types="Cypress" />
 
 import { add } from '../unit'
-const { fixSourcePaths } = require('../../task-utils')
+const { fixSourcePaths } = require('../../support-utils')
 
 context('Page test', () => {
   beforeEach(() => {

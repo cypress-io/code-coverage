@@ -4,11 +4,10 @@
   "description": "Code coverage from webpack",
   "private": true,
   "scripts": {
-    "start": "../../node_modules/.bin/parcel serve index.html",
     "cy:open": "../../node_modules/.bin/cypress open",
-    "dev": "../../node_modules/.bin/start-test serve 5000 cy:open",
+    "dev": "../../node_modules/.bin/start-test 5000 cy:open",
     "build": "../../node_modules/.bin/webpack",
-    "serve": "../../node_modules/.bin/serve dist"
+    "start": "../../node_modules/.bin/serve dist"
   },
   "keywords": [],
   "author": "",

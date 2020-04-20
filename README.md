@@ -388,6 +388,8 @@ $ DEBUG=code-coverage npm run dev
   code-coverage saving coverage report using command: "nyc report --report-dir ./coverage --reporter=lcov --reporter=clover --reporter=json" +3ms
 ```
 
+Common issue: [not instrumenting your application when running Cypress](#instrument-your-application).
+
 ## Contributing
 
 You can test changes locally by running tests and confirming the code coverage has been calculated and saved.

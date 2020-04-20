@@ -79,7 +79,7 @@ const tasks = {
     const coverage = JSON.parse(sentCoverage)
     debug('parsed sent coverage')
 
-    fixSourcePathes(coverage)
+    fixSourcePaths(coverage)
     const previous = existsSync(nycFilename)
       ? JSON.parse(readFileSync(nycFilename, 'utf8'))
       : istanbul.createCoverageMap({})

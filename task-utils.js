@@ -6,6 +6,7 @@
 const { readFileSync, writeFileSync, existsSync } = require('fs')
 const { isAbsolute, resolve, join } = require('path')
 const debug = require('debug')('code-coverage')
+const chalk = require('chalk')
 
 function combineNycOptions({
   pkgNycOptions,
@@ -72,7 +73,7 @@ function checkAllPathsNotFound(nycFilename) {
 
   const coverageKeys = Object.keys(nycCoverage)
   if (!coverageKeys.length) {
-    console.error('⚠️ file %s has no coverage information', nycFilename)
+    debug('⚠️ file %s has no coverage information', nycFilename)
     return
   }
 
@@ -97,7 +98,16 @@ function showNycInfo(nycFilename) {
 
   const coverageKeys = Object.keys(nycCoverage)
   if (!coverageKeys.length) {
-    console.error('⚠️ file %s has no coverage information', nycFilename)
+    console.error(
+      '⚠️ file %s has no coverage information',
+      chalk.yellow(nycFilename)
+    )
+    console.error(
+      'Did you forget to instrument your web application? Read %s',
+      chalk.blue(
+        'https://github.com/cypress-io/code-coverage#instrument-your-application'
+      )
+    )
     return
   }
   debug('NYC file %s has %d key(s)', nycFilename, coverageKeys.length)
@@ -126,7 +136,7 @@ function resolveRelativePaths(nycFilename) {
 
   const coverageKeys = Object.keys(nycCoverage)
   if (!coverageKeys.length) {
-    console.error('⚠️ file %s has no coverage information', nycFilename)
+    debug('⚠️ file %s has no coverage information', nycFilename)
     return
   }
   debug('NYC file %s has %d key(s)', nycFilename, coverageKeys.length)

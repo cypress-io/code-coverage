@@ -53,6 +53,11 @@ If you have instrumented your application's code and see the `window.__coverage_
 
 That should be it!
 
+### More information
+
+- Read [Cypress Code Coverage: Instrumenting code](https://on.cypress.io/code-coverage#Instrumenting-code) guide
+- Watch [Code coverage](https://youtu.be/C8g5X4vCZJA) webinar
+
 ### App vs unit tests
 
 You need to instrument your web application. This means that when the test does `cy.visit('localhost:3000')` any code the `index.html` requests should be instrumented by YOU. See [Examples](#examples) section for advice, usually you need to stick `babel-plugin-istanbul` into your pipeline somewhere.

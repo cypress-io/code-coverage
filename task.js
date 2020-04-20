@@ -134,6 +134,7 @@ const tasks = {
     }
 
     showNycInfo(nycFilename)
+
     const allSourceFilesMissing = checkAllPathsNotFound(nycFilename)
     if (allSourceFilesMissing) {
       tryFindingLocalFiles(nycFilename)

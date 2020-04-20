@@ -17,6 +17,8 @@ Please provide debug logs by running Cypress from the terminal with `DEBUG=code-
 - What is the shell?
 - What is the Node version?
 - What is the NPM version?
+- How do you instrument your application? Cypress [does not instrument web application code](https://github.com/cypress-io/code-coverage#instrument-your-application), so you need to do it yourself.
+- When running tests, if you open the web application in regular browser, and open DevTools, do you see `window.__coverage__` object? Can you paste a screenshot?
 - Is there `.nyc_output` folder? Is there `.nyc_output/out.json` file. Is it empty? Can you paste at least part of it so we can see the keys and file paths?
 - Do you have any custom NYC settings in `package.json` (`nyc` object) or in other [NYC config files](https://github.com/istanbuljs/nyc#configuration-files)
 - Do you run Cypress tests in a Docker container?

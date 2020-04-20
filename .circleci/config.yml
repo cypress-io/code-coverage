@@ -17,8 +17,16 @@ jobs:
       - checkout
       - node/with-cache:
           steps:
-            - run: CYPRESS_INSTALL_BINARY=0 npm ci
-      - run: npm run format:check
+            - run:
+                name: Install dependencies 📦
+                # installs NPM dependencies but skips Cypress
+                command: CYPRESS_INSTALL_BINARY=0 npm ci
+      - run:
+          name: Code style check 🧹
+          command: npm run format:check
+      - run:
+          name: Types lint 🧹
+          command: npm run types
 
   publish:
     description: Publishes the new version of the plugin to NPM

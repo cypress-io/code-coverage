@@ -15,7 +15,8 @@
     "format": "prettier --write '*.js'",
     "format:check": "prettier --check '*.js'",
     "check:markdown": "find *.md -exec npx markdown-link-check {} \\;",
-    "effective:config": "circleci config process .circleci/config.yml | sed /^#/d"
+    "effective:config": "circleci config process .circleci/config.yml | sed /^#/d",
+    "types": "tsc --noEmit --allowJs *.js cypress/integration/*.js"
   },
   "peerDependencies": {
     "cypress": "*"

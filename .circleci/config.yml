@@ -257,6 +257,33 @@ workflows:
 
       - cypress/run:
           attach-workspace: true
+          name: example-use-webpack
+          requires:
+            - cypress/install
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          working_directory: examples/use-webpack
+          build: npm run build
+          start: npm start
+          wait-on: 'http://localhost:5000'
+          command: '../../node_modules/.bin/cypress run'
+          post-steps:
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/use-webpack/coverage
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  ../../node_modules/.bin/check-coverage src/index.js
+                  ../../node_modules/.bin/check-coverage src/calc.js
+                  ../../node_modules/.bin/only-covered src/index.js src/calc.js
+                working_directory: examples/use-webpack
+
+      - cypress/run:
+          attach-workspace: true
           name: example-same-folder
           requires:
             - cypress/install
@@ -428,3 +455,4 @@ workflows:
             - example-one-spec
             - example-exclude-files
             - example-docker-paths
+            - example-use-webpack

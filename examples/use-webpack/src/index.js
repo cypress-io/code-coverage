@@ -7,7 +7,7 @@ if (window.Cypress) {
 
 document.getElementById('user-input').addEventListener('change', e => {
   const s = e.target.value
-  console.log(`input string "s"`)
+  console.log(`input string "${s}"`)
   const reversed = reverse(s)
   document.getElementById('reversed').innerText = reversed
 })

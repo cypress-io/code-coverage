@@ -4,6 +4,7 @@ import { add } from '../../src/calc'
 describe('Webpack example', () => {
   it('loads', () => {
     cy.visit('/')
+    cy.contains('Webpack page').should('be.visible')
     cy.get('#user-input').type('Hello{enter}')
     cy.contains('olleH').should('be.visible')
   })

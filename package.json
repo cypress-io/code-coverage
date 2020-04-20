@@ -55,8 +55,11 @@
   },
   "devDependencies": {
     "@babel/core": "7.9.0",
+    "@cypress/webpack-preprocessor": "5.1.2",
+    "babel-loader": "8.1.0",
     "babel-plugin-istanbul": "6.0.0",
     "check-code-coverage": "1.0.1",
+    "console-log-div": "0.6.3",
     "cypress": "4.4.0",
     "express": "4.17.1",
     "lodash": "4.17.15",
@@ -66,9 +69,13 @@
     "semantic-release": "17.0.6",
     "serve": "11.3.0",
     "start-server-and-test": "1.11.0",
-    "typescript": "3.8.3"
+    "typescript": "3.8.3",
+    "webpack": "4.42.1",
+    "webpack-cli": "3.3.11"
   },
   "nyc": {
-    "exclude": ["utils.js"]
+    "exclude": [
+      "utils.js"
+    ]
   }
 }

@@ -323,6 +323,7 @@ Full examples we use for testing in this repository:
 - [examples/before-each-visit](examples/before-each-visit) checks if code coverage correctly keeps track of code when doing `cy.visit` before each test
 - [examples/one-spec.js](examples/one-spec.js) confirms that coverage is collected and filtered correctly if the user only executes a single Cypress test
 - [examples/ts-example](examples/ts-example) uses Babel + Parcel to instrument and serve TypeScript file
+- [examples/use-webpack](examples/use-webpack) shows Webpack build with source maps and Babel
 
 ### External examples
 

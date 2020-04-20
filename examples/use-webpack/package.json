@@ -5,9 +5,11 @@
   "private": true,
   "scripts": {
     "cy:open": "../../node_modules/.bin/cypress open",
+    "cy:run": "../../node_modules/.bin/cypress run",
     "dev": "../../node_modules/.bin/start-test 5000 cy:open",
     "build": "../../node_modules/.bin/webpack",
-    "start": "../../node_modules/.bin/serve dist"
+    "start": "../../node_modules/.bin/serve dist",
+    "test:ci": "../../node_modules/.bin/start-test 5000 cy:run"
   },
   "keywords": [],
   "author": "",

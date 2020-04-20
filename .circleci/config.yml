@@ -268,6 +268,8 @@ workflows:
           start: npm start
           wait-on: 'http://localhost:5000'
           command: '../../node_modules/.bin/cypress run'
+          # store screenshots and videos
+          store_artifacts: true
           post-steps:
             # store the created coverage report folder
             # you can click on it in the CircleCI UI

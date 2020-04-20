@@ -8,5 +8,21 @@ module.exports = {
   output: {
     filename: 'main.js',
     path: path.resolve(__dirname, 'dist')
+  },
+  module: {
+    rules: [
+      {
+        // when bundling application's own source code
+        // transpile using Babel which uses .babelrc file
+        // and instruments code using babel-plugin-istanbul
+        test: /\.js/,
+        exclude: /(node_modules|bower_components)/,
+        use: [
+          {
+            loader: 'babel-loader'
+          }
+        ]
+      }
+    ]
   }
 }

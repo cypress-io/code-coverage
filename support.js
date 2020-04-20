@@ -158,7 +158,7 @@ const registerHooks = () => {
         failOnStatusCode: false
       })
         .then(r => {
-          return Cypress._.get(r, 'body.coverage', null), { log: false }
+          return Cypress._.get(r, 'body.coverage', null)
         })
         .then(coverage => {
           if (!coverage) {

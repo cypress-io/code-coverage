@@ -7,6 +7,39 @@ const { readFileSync, writeFileSync, existsSync } = require('fs')
 const { isAbsolute, resolve, join } = require('path')
 const debug = require('debug')('code-coverage')
 
+function combineNycOptions({ pkgNycOptions, defaultNycOptions }) {
+  const nycOptions = Object.assign({}, defaultNycOptions, pkgNycOptions)
+
+  if (typeof nycOptions.reporter === 'string') {
+    nycOptions.reporter = [nycOptions.reporter]
+  }
+
+  return nycOptions
+}
+
+const defaultNycOptions = {
+  'report-dir': './coverage',
+  reporter: ['lcov', 'clover', 'json'],
+  extension: ['.js', '.cjs', '.mjs', '.ts', '.tsx', '.jsx'],
+  excludeAfterRemap: true
+}
+
+function readNycOptions(workingDirectory) {
+  const pkgFilename = join(workingDirectory, 'package.json')
+  const pkg = existsSync(pkgFilename)
+    ? JSON.parse(readFileSync(pkgFilename, 'utf8'))
+    : {}
+  const pkgNycOptions = pkg.nyc || {}
+
+  const nycOptions = combineNycOptions({
+    pkgNycOptions,
+    defaultNycOptions
+  })
+  debug('combined NYC options %o', nycOptions)
+
+  return nycOptions
+}
+
 function checkAllPathsNotFound(nycFilename) {
   const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
 
@@ -198,5 +231,8 @@ module.exports = {
   showNycInfo,
   resolveRelativePaths,
   checkAllPathsNotFound,
-  tryFindingLocalFiles
+  tryFindingLocalFiles,
+  readNycOptions,
+  combineNycOptions,
+  defaultNycOptions
 }

@@ -7,7 +7,8 @@ const {
   showNycInfo,
   resolveRelativePaths,
   checkAllPathsNotFound,
-  tryFindingLocalFiles
+  tryFindingLocalFiles,
+  readNycOptions
 } = require('./task-utils')
 const { fixSourcePaths } = require('./support-utils')
 const NYC = require('nyc')
@@ -131,23 +132,12 @@ const tasks = {
     // package.json and .nycrc resource files.
     // for now let's just camel case all options
     // https://github.com/istanbuljs/nyc#common-configuration-options
-    const nycReportOptions = {
-      reportDir,
-      tempDir: coverageFolder,
-      reporter: [].concat(reporter), // make sure this is a list
-      include: nycOptions.include,
-      exclude: nycOptions.exclude,
-      // from working with TypeScript code seems we need these settings too
-      excludeAfterRemap: true,
-      extension: nycOptions.extension || [
-        '.js',
-        '.cjs',
-        '.mjs',
-        '.ts',
-        '.tsx',
-        '.jsx'
-      ],
-      all: nycOptions.all
+    const nycReportOptions = readNycOptions(processWorkingDirectory)
+
+    // override a couple of options
+    nycReportOptions.tempDir = coverageFolder
+    if (nycReportOptions['report-dir']) {
+      nycReportOptions['report-dir'] = resolve(nycReportOptions['report-dir'])
     }
 
     debug('calling NYC reporter with options %o', nycReportOptions)

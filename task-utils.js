@@ -7,6 +7,66 @@ const { readFileSync, writeFileSync, existsSync } = require('fs')
 const { isAbsolute, resolve, join } = require('path')
 const debug = require('debug')('code-coverage')
 
+function combineNycOptions({
+  pkgNycOptions,
+  nycrc,
+  nycrcJson,
+  defaultNycOptions
+}) {
+  // last option wins
+  const nycOptions = Object.assign(
+    {},
+    defaultNycOptions,
+    nycrc,
+    nycrcJson,
+    pkgNycOptions
+  )
+
+  if (typeof nycOptions.reporter === 'string') {
+    nycOptions.reporter = [nycOptions.reporter]
+  }
+  if (typeof nycOptions.extension === 'string') {
+    nycOptions.extension = [nycOptions.extension]
+  }
+
+  return nycOptions
+}
+
+const defaultNycOptions = {
+  'report-dir': './coverage',
+  reporter: ['lcov', 'clover', 'json'],
+  extension: ['.js', '.cjs', '.mjs', '.ts', '.tsx', '.jsx'],
+  excludeAfterRemap: true
+}
+
+function readNycOptions(workingDirectory) {
+  const pkgFilename = join(workingDirectory, 'package.json')
+  const pkg = existsSync(pkgFilename)
+    ? JSON.parse(readFileSync(pkgFilename, 'utf8'))
+    : {}
+  const pkgNycOptions = pkg.nyc || {}
+
+  const nycrcFilename = join(workingDirectory, '.nycrc')
+  const nycrc = existsSync(nycrcFilename)
+    ? JSON.parse(readFileSync(nycrcFilename, 'utf8'))
+    : {}
+
+  const nycrcJsonFilename = join(workingDirectory, '.nycrc.json')
+  const nycrcJson = existsSync(nycrcJsonFilename)
+    ? JSON.parse(readFileSync(nycrcJsonFilename, 'utf8'))
+    : {}
+
+  const nycOptions = combineNycOptions({
+    pkgNycOptions,
+    nycrc,
+    nycrcJson,
+    defaultNycOptions
+  })
+  debug('combined NYC options %o', nycOptions)
+
+  return nycOptions
+}
+
 function checkAllPathsNotFound(nycFilename) {
   const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
 
@@ -198,5 +258,8 @@ module.exports = {
   showNycInfo,
   resolveRelativePaths,
   checkAllPathsNotFound,
-  tryFindingLocalFiles
+  tryFindingLocalFiles,
+  readNycOptions,
+  combineNycOptions,
+  defaultNycOptions
 }

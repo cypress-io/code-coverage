@@ -7,7 +7,8 @@ const {
   showNycInfo,
   resolveRelativePaths,
   checkAllPathsNotFound,
-  tryFindingLocalFiles
+  tryFindingLocalFiles,
+  readNycOptions
 } = require('./task-utils')
 const { fixSourcePaths } = require('./support-utils')
 const NYC = require('nyc')
@@ -28,7 +29,6 @@ const pkgFilename = join(processWorkingDirectory, 'package.json')
 const pkg = existsSync(pkgFilename)
   ? JSON.parse(readFileSync(pkgFilename, 'utf8'))
   : {}
-const nycOptions = pkg.nyc || {}
 const scripts = pkg.scripts || {}
 const DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME = 'coverage:report'
 const customNycReportScript = scripts[DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME]
@@ -40,6 +40,37 @@ function saveCoverage(coverage) {
   }
 
   writeFileSync(nycFilename, JSON.stringify(coverage, null, 2))
+}
+
+function maybePrintFinalCoverageFiles(folder) {
+  const jsonReportFilename = join(folder, 'coverage-final.json')
+  if (!existsSync) {
+    debug('Did not find final coverage file %s', jsonReportFilename)
+    return
+  }
+
+  debug('Final coverage in %s', jsonReportFilename)
+  const finalCoverage = JSON.parse(readFileSync(jsonReportFilename, 'utf8'))
+  Object.keys(finalCoverage).forEach(key => {
+    const s = finalCoverage[key].s || {}
+    const statements = Object.keys(s)
+    const totalStatements = statements.length
+    let coveredStatements = 0
+    statements.forEach(statementKey => {
+      if (s[statementKey]) {
+        coveredStatements += 1
+      }
+    })
+
+    const allCovered = coveredStatements === totalStatements
+    debug(
+      '%s %s statements covered %d/%d',
+      allCovered ? '✅' : '⚠️',
+      key,
+      coveredStatements,
+      totalStatements
+    )
+  })
 }
 
 const tasks = {
@@ -122,32 +153,13 @@ const tasks = {
       })
     }
 
-    const reportFolder = nycOptions['report-dir'] || './coverage'
-    const reportDir = resolve(reportFolder)
-    const reporter = nycOptions['reporter'] || ['lcov', 'clover', 'json']
-
-    // TODO we could look at how NYC is parsing its CLI arguments
-    // I am mostly worried about additional NYC options that are stored in
-    // package.json and .nycrc resource files.
-    // for now let's just camel case all options
     // https://github.com/istanbuljs/nyc#common-configuration-options
-    const nycReportOptions = {
-      reportDir,
-      tempDir: coverageFolder,
-      reporter: [].concat(reporter), // make sure this is a list
-      include: nycOptions.include,
-      exclude: nycOptions.exclude,
-      // from working with TypeScript code seems we need these settings too
-      excludeAfterRemap: true,
-      extension: nycOptions.extension || [
-        '.js',
-        '.cjs',
-        '.mjs',
-        '.ts',
-        '.tsx',
-        '.jsx'
-      ],
-      all: nycOptions.all
+    const nycReportOptions = readNycOptions(processWorkingDirectory)
+
+    // override a couple of options
+    nycReportOptions.tempDir = coverageFolder
+    if (nycReportOptions['report-dir']) {
+      nycReportOptions['report-dir'] = resolve(nycReportOptions['report-dir'])
     }
 
     debug('calling NYC reporter with options %o', nycReportOptions)
@@ -155,8 +167,15 @@ const tasks = {
     const nyc = new NYC(nycReportOptions)
 
     const returnReportFolder = () => {
-      debug('after reporting, returning the report folder name %s', reportDir)
-      return reportDir
+      const reportFolder = nycReportOptions['report-dir']
+      debug(
+        'after reporting, returning the report folder name %s',
+        reportFolder
+      )
+
+      maybePrintFinalCoverageFiles(reportFolder)
+
+      return reportFolder
     }
     return nyc.report().then(returnReportFolder)
   }

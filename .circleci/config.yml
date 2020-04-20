@@ -369,6 +369,7 @@ workflows:
           store_artifacts: true
           post-steps:
             - run: cat examples/exclude-files/.nyc_output/out.json
+            - run: cat examples/exclude-files/coverage/coverage-final.json
             # store the created coverage report folder
             # you can click on it in the CircleCI UI
             # to see live static HTML site
@@ -380,9 +381,11 @@ workflows:
                 working_directory: examples/exclude-files
             - run:
                 name: Check code coverage 📈
+                # we will check the final coverage report
+                # to make sure it only has files we are interested in
                 command: |
                   ../../node_modules/.bin/check-coverage main.js
-                  ../../node_modules/.bin/only-covered main.js
+                  ../../node_modules/.bin/only-covered --from coverage/coverage-final.json main.js
                 working_directory: examples/exclude-files
 
       - cypress/run:

@@ -66,9 +66,13 @@
     "semantic-release": "17.0.6",
     "serve": "11.3.0",
     "start-server-and-test": "1.11.0",
-    "typescript": "3.8.3"
+    "typescript": "3.8.3",
+    "webpack": "4.42.1",
+    "webpack-cli": "3.3.11"
   },
   "nyc": {
-    "exclude": ["utils.js"]
+    "exclude": [
+      "utils.js"
+    ]
   }
 }

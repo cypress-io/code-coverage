@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 // @ts-check
 
-const { filterSpecsFromCoverage } = require('./utils')
+const { filterSpecsFromCoverage } = require('./support-utils')
 
 /**
  * Sends collected code coverage object to the backend code

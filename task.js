@@ -162,6 +162,8 @@ const tasks = {
     if (nycReportOptions['report-dir']) {
       nycReportOptions['report-dir'] = resolve(nycReportOptions['report-dir'])
     }
+    // seems nyc API really is using camel cased version
+    nycReportOptions.reportDir = nycReportOptions['report-dir']
 
     debug('calling NYC reporter with options %o', nycReportOptions)
     debug('current working directory is %s', process.cwd())

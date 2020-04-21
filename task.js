@@ -168,7 +168,7 @@ const tasks = {
 
     if (nycReportOptions.all) {
       debug('nyc needs to report on all included files')
-      includeAllFiles(nycReportOptions)
+      includeAllFiles(nycFilename, nycReportOptions)
     }
 
     debug('calling NYC reporter with options %o', nycReportOptions)

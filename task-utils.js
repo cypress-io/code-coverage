@@ -272,7 +272,7 @@ function tryFindingLocalFiles(nycFilename) {
  *
  * @see https://github.com/cypress-io/code-coverage/issues/207
  */
-function includeAllFiles(nycOptions) {
+function includeAllFiles(nycFilename, nycOptions) {
   debug('include all files options: %o', {
     all: nycOptions.all,
     include: nycOptions.include,
@@ -298,9 +298,42 @@ function includeAllFiles(nycOptions) {
 
   debug('searching files to include using patterns %o', patterns)
 
-  const allFiles = globby.sync(patterns)
+  const allFiles = globby.sync(patterns, { absolute: true })
   debug('found these files %o', allFiles)
-  // TODO check if any of the files to include are missing from NYC output JSON file
+
+  const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
+  const coverageKeys = Object.keys(nycCoverage)
+  const coveredPaths = coverageKeys.map(key => nycCoverage[key].path)
+  debug('coverage has the following paths %o', coveredPaths)
+
+  let changed
+  allFiles.forEach(fullPath => {
+    if (coveredPaths.includes(fullPath)) {
+      // all good, this file exists in coverage object
+      return
+    }
+    debug('adding empty coverage for file %s', fullPath)
+    changed = true
+    // insert placeholder object for now
+    nycCoverage[fullPath] = {
+      path: fullPath,
+      statementMap: {},
+      fnMap: {},
+      branchMap: {},
+      s: {},
+      f: {},
+      b: {}
+    }
+  })
+
+  if (changed) {
+    debug('saving updated file %s', nycFilename)
+    writeFileSync(
+      nycFilename,
+      JSON.stringify(nycCoverage, null, 2) + '\n',
+      'utf8'
+    )
+  }
 }
 
 module.exports = {

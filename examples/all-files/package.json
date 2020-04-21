@@ -1,0 +1,16 @@
+{
+  "name": "example-all-files",
+  "description": "Report all files",
+  "scripts": {
+    "start": "../../node_modules/.bin/parcel serve index.html",
+    "cy:open": "../../node_modules/.bin/cypress open",
+    "dev": "../../node_modules/.bin/start-test 1234 cy:open"
+  },
+  "nyc": {
+    "all": true,
+    "include": ["*.js"]
+  },
+  "devDependencies": {
+    "@babel/core": "7.9.0"
+  }
+}

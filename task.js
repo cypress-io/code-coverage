@@ -63,10 +63,13 @@ function maybePrintFinalCoverageFiles(folder) {
       }
     })
 
+    const hasStatements = totalStatements > 0
     const allCovered = coveredStatements === totalStatements
+    const coverageStatus = hasStatements ? (allCovered ? '✅' : '⚠️') : '❓'
+
     debug(
       '%s %s statements covered %d/%d',
-      allCovered ? '✅' : '⚠️',
+      coverageStatus,
       key,
       coveredStatements,
       totalStatements

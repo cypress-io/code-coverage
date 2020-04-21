@@ -235,24 +235,35 @@ function tryFindingLocalFiles(nycFilename) {
 }
 
 /**
- * If the website or unit tests did not load ALL files we need to
- * include, then we should include the missing files ourselves
- * before generating the report.
- *
- * @see https://github.com/cypress-io/code-coverage/issues/207
+ * Tries to find source files to be included in the final coverage report
+ * using NYC options: extension list, include and exclude.
  */
-function includeAllFiles(nycFilename, nycOptions) {
+function findSourceFiles(nycOptions) {
   debug('include all files options: %o', {
     all: nycOptions.all,
     include: nycOptions.include,
-    exclude: nycOptions.exclude
+    exclude: nycOptions.exclude,
+    extension: nycOptions.extension
   })
+
+  if (!Array.isArray(nycOptions.extension)) {
+    console.error(
+      'Expected NYC "extension" option to be a list of file extensions'
+    )
+    console.error(nycOptions)
+    return []
+  }
 
   let patterns = []
   if (Array.isArray(nycOptions.include)) {
     patterns = patterns.concat(nycOptions.include)
   } else if (typeof nycOptions.include === 'string') {
     patterns.push(nycOptions.include)
+  } else {
+    debug('using default list of extensions')
+    nycOptions.extension.forEach(extension => {
+      patterns.push('**/*' + extension)
+    })
   }
 
   if (Array.isArray(nycOptions.exclude)) {
@@ -268,7 +279,30 @@ function includeAllFiles(nycFilename, nycOptions) {
   debug('searching files to include using patterns %o', patterns)
 
   const allFiles = globby.sync(patterns, { absolute: true })
-  debug('found these files %o', allFiles)
+  return allFiles
+}
+/**
+ * If the website or unit tests did not load ALL files we need to
+ * include, then we should include the missing files ourselves
+ * before generating the report.
+ *
+ * @see https://github.com/cypress-io/code-coverage/issues/207
+ */
+function includeAllFiles(nycFilename, nycOptions) {
+  if (!nycOptions.all) {
+    debug('NYC "all" option is not set, skipping including all files')
+    return
+  }
+
+  const allFiles = findSourceFiles(nycOptions)
+  if (debug.enabled) {
+    debug('found %d file(s)', allFiles.length)
+    console.error(allFiles.join('\n'))
+  }
+  if (!allFiles.length) {
+    debug('no files found, hoping for the best')
+    return
+  }
 
   const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
   const coverageKeys = Object.keys(nycCoverage)

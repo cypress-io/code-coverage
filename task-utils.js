@@ -7,6 +7,7 @@ const { readFileSync, writeFileSync, existsSync } = require('fs')
 const { isAbsolute, resolve, join } = require('path')
 const debug = require('debug')('code-coverage')
 const chalk = require('chalk')
+const globby = require('globby')
 
 function combineNycOptions({
   pkgNycOptions,
@@ -264,6 +265,44 @@ function tryFindingLocalFiles(nycFilename) {
   }
 }
 
+/**
+ * If the website or unit tests did not load ALL files we need to
+ * include, then we should include the missing files ourselves
+ * before generating the report.
+ *
+ * @see https://github.com/cypress-io/code-coverage/issues/207
+ */
+function includeAllFiles(nycOptions) {
+  debug('include all files options: %o', {
+    all: nycOptions.all,
+    include: nycOptions.include,
+    exclude: nycOptions.exclude
+  })
+
+  let patterns = []
+  if (Array.isArray(nycOptions.include)) {
+    patterns = patterns.concat(nycOptions.include)
+  } else if (typeof nycOptions.include === 'string') {
+    patterns.push(nycOptions.include)
+  }
+
+  if (Array.isArray(nycOptions.exclude)) {
+    const negated = nycOptions.exclude.map(s => '!' + s)
+    patterns = patterns.concat(negated)
+  } else if (typeof nycOptions.exclude === 'string') {
+    patterns.push('!' + nycOptions.exclude)
+  }
+  // always exclude node_modules
+  // https://github.com/istanbuljs/nyc#including-files-within-node_modules
+  patterns.push('!**/node_modules/**')
+
+  debug('searching files to include using patterns %o', patterns)
+
+  const allFiles = globby.sync(patterns)
+  debug('found these files %o', allFiles)
+  // TODO check if any of the files to include are missing from NYC output JSON file
+}
+
 module.exports = {
   showNycInfo,
   resolveRelativePaths,
@@ -271,5 +310,6 @@ module.exports = {
   tryFindingLocalFiles,
   readNycOptions,
   combineNycOptions,
-  defaultNycOptions
+  defaultNycOptions,
+  includeAllFiles
 }

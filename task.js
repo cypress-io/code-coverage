@@ -45,7 +45,7 @@ function saveCoverage(coverage) {
 
 function maybePrintFinalCoverageFiles(folder) {
   const jsonReportFilename = join(folder, 'coverage-final.json')
-  if (!existsSync) {
+  if (!existsSync(jsonReportFilename)) {
     debug('Did not find final coverage file %s', jsonReportFilename)
     return
   }

@@ -1,4 +1,4 @@
-const { combineNycOptions, defaultNycOptions } = require('../../task-utils')
+const { combineNycOptions, defaultNycOptions } = require('../../common-utils')
 describe('Combine NYC options', () => {
   it('overrides defaults', () => {
     const pkgNycOptions = {

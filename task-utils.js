@@ -8,38 +8,7 @@ const { isAbsolute, resolve, join } = require('path')
 const debug = require('debug')('code-coverage')
 const chalk = require('chalk')
 const globby = require('globby')
-
-function combineNycOptions({
-  pkgNycOptions,
-  nycrc,
-  nycrcJson,
-  defaultNycOptions
-}) {
-  // last option wins
-  const nycOptions = Object.assign(
-    {},
-    defaultNycOptions,
-    nycrc,
-    nycrcJson,
-    pkgNycOptions
-  )
-
-  if (typeof nycOptions.reporter === 'string') {
-    nycOptions.reporter = [nycOptions.reporter]
-  }
-  if (typeof nycOptions.extension === 'string') {
-    nycOptions.extension = [nycOptions.extension]
-  }
-
-  return nycOptions
-}
-
-const defaultNycOptions = {
-  'report-dir': './coverage',
-  reporter: ['lcov', 'clover', 'json'],
-  extension: ['.js', '.cjs', '.mjs', '.ts', '.tsx', '.jsx'],
-  excludeAfterRemap: true
-}
+const { combineNycOptions, defaultNycOptions } = require('./common-utils')
 
 function readNycOptions(workingDirectory) {
   const pkgFilename = join(workingDirectory, 'package.json')
@@ -342,7 +311,5 @@ module.exports = {
   checkAllPathsNotFound,
   tryFindingLocalFiles,
   readNycOptions,
-  combineNycOptions,
-  defaultNycOptions,
   includeAllFiles
 }

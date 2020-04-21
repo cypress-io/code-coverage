@@ -298,6 +298,8 @@ For example, if you want to only include files in the `app` folder, but exclude 
 }
 ```
 
+**Note:** if you have `all: true` NYC option set, this plugin will check the produced `.nyc_output/out.json` before generating the final report. If the `out.json` file does not have information for some files that should be there according to `include` list, then an empty placeholder will be included, see [PR 208](https://github.com/cypress-io/code-coverage/pull/208).
+
 ## Disable plugin
 
 You can skip the client-side code coverage hooks by setting the environment variable `coverage` to `false`.

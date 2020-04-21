@@ -356,6 +356,43 @@ workflows:
 
       - cypress/run:
           attach-workspace: true
+          name: example-all-files
+          requires:
+            - cypress/install
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          start: npm start --prefix examples/all-files
+          wait-on: 'http://localhost:1234'
+          command: npx cypress run --project examples/all-files
+          # store screenshots and videos
+          store_artifacts: true
+          post-steps:
+            - run: cat examples/all-files/.nyc_output/out.json
+            - run: cat examples/all-files/coverage/coverage-final.json
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/all-files/coverage
+            # make sure the examples captures 100% of code
+            - run:
+                command: npx nyc report --check-coverage true --lines 100
+                working_directory: examples/all-files
+            - run:
+                name: Check code coverage 📈
+                # we will check the final coverage report
+                # to make sure it only has files we are interested in
+                # because there are files covered at 0 in the report
+                command: |
+                  ../../node_modules/.bin/check-coverage main.js
+                  ../../node_modules/.bin/check-coverage second.js
+                  ../../node_modules/.bin/check-coverage not-covered.js
+                  ../../node_modules/.bin/only-covered --from coverage/coverage-final.json main.js second.js not-covered.js
+                working_directory: examples/all-files
+
+      - cypress/run:
+          attach-workspace: true
           name: example-exclude-files
           requires:
             - cypress/install
@@ -467,3 +504,4 @@ workflows:
             - example-exclude-files
             - example-docker-paths
             - example-use-webpack
+            - example-all-files

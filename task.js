@@ -8,7 +8,8 @@ const {
   resolveRelativePaths,
   checkAllPathsNotFound,
   tryFindingLocalFiles,
-  readNycOptions
+  readNycOptions,
+  includeAllFiles
 } = require('./task-utils')
 const { fixSourcePaths } = require('./support-utils')
 const NYC = require('nyc')
@@ -62,10 +63,13 @@ function maybePrintFinalCoverageFiles(folder) {
       }
     })
 
+    const hasStatements = totalStatements > 0
     const allCovered = coveredStatements === totalStatements
+    const coverageStatus = hasStatements ? (allCovered ? '✅' : '⚠️') : '❓'
+
     debug(
       '%s %s statements covered %d/%d',
-      allCovered ? '✅' : '⚠️',
+      coverageStatus,
       key,
       coveredStatements,
       totalStatements
@@ -164,6 +168,11 @@ const tasks = {
     }
     // seems nyc API really is using camel cased version
     nycReportOptions.reportDir = nycReportOptions['report-dir']
+
+    if (nycReportOptions.all) {
+      debug('nyc needs to report on all included files')
+      includeAllFiles(nycFilename, nycReportOptions)
+    }
 
     debug('calling NYC reporter with options %o', nycReportOptions)
     debug('current working directory is %s', process.cwd())

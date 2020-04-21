@@ -7,38 +7,8 @@ const { readFileSync, writeFileSync, existsSync } = require('fs')
 const { isAbsolute, resolve, join } = require('path')
 const debug = require('debug')('code-coverage')
 const chalk = require('chalk')
-
-function combineNycOptions({
-  pkgNycOptions,
-  nycrc,
-  nycrcJson,
-  defaultNycOptions
-}) {
-  // last option wins
-  const nycOptions = Object.assign(
-    {},
-    defaultNycOptions,
-    nycrc,
-    nycrcJson,
-    pkgNycOptions
-  )
-
-  if (typeof nycOptions.reporter === 'string') {
-    nycOptions.reporter = [nycOptions.reporter]
-  }
-  if (typeof nycOptions.extension === 'string') {
-    nycOptions.extension = [nycOptions.extension]
-  }
-
-  return nycOptions
-}
-
-const defaultNycOptions = {
-  'report-dir': './coverage',
-  reporter: ['lcov', 'clover', 'json'],
-  extension: ['.js', '.cjs', '.mjs', '.ts', '.tsx', '.jsx'],
-  excludeAfterRemap: true
-}
+const globby = require('globby')
+const { combineNycOptions, defaultNycOptions } = require('./common-utils')
 
 function readNycOptions(workingDirectory) {
   const pkgFilename = join(workingDirectory, 'package.json')
@@ -264,12 +234,116 @@ function tryFindingLocalFiles(nycFilename) {
   }
 }
 
+/**
+ * Tries to find source files to be included in the final coverage report
+ * using NYC options: extension list, include and exclude.
+ */
+function findSourceFiles(nycOptions) {
+  debug('include all files options: %o', {
+    all: nycOptions.all,
+    include: nycOptions.include,
+    exclude: nycOptions.exclude,
+    extension: nycOptions.extension
+  })
+
+  if (!Array.isArray(nycOptions.extension)) {
+    console.error(
+      'Expected NYC "extension" option to be a list of file extensions'
+    )
+    console.error(nycOptions)
+    return []
+  }
+
+  let patterns = []
+  if (Array.isArray(nycOptions.include)) {
+    patterns = patterns.concat(nycOptions.include)
+  } else if (typeof nycOptions.include === 'string') {
+    patterns.push(nycOptions.include)
+  } else {
+    debug('using default list of extensions')
+    nycOptions.extension.forEach(extension => {
+      patterns.push('**/*' + extension)
+    })
+  }
+
+  if (Array.isArray(nycOptions.exclude)) {
+    const negated = nycOptions.exclude.map(s => '!' + s)
+    patterns = patterns.concat(negated)
+  } else if (typeof nycOptions.exclude === 'string') {
+    patterns.push('!' + nycOptions.exclude)
+  }
+  // always exclude node_modules
+  // https://github.com/istanbuljs/nyc#including-files-within-node_modules
+  patterns.push('!**/node_modules/**')
+
+  debug('searching files to include using patterns %o', patterns)
+
+  const allFiles = globby.sync(patterns, { absolute: true })
+  return allFiles
+}
+/**
+ * If the website or unit tests did not load ALL files we need to
+ * include, then we should include the missing files ourselves
+ * before generating the report.
+ *
+ * @see https://github.com/cypress-io/code-coverage/issues/207
+ */
+function includeAllFiles(nycFilename, nycOptions) {
+  if (!nycOptions.all) {
+    debug('NYC "all" option is not set, skipping including all files')
+    return
+  }
+
+  const allFiles = findSourceFiles(nycOptions)
+  if (debug.enabled) {
+    debug('found %d file(s)', allFiles.length)
+    console.error(allFiles.join('\n'))
+  }
+  if (!allFiles.length) {
+    debug('no files found, hoping for the best')
+    return
+  }
+
+  const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
+  const coverageKeys = Object.keys(nycCoverage)
+  const coveredPaths = coverageKeys.map(key => nycCoverage[key].path)
+  debug('coverage has the following paths %o', coveredPaths)
+
+  let changed
+  allFiles.forEach(fullPath => {
+    if (coveredPaths.includes(fullPath)) {
+      // all good, this file exists in coverage object
+      return
+    }
+    debug('adding empty coverage for file %s', fullPath)
+    changed = true
+    // insert placeholder object for now
+    nycCoverage[fullPath] = {
+      path: fullPath,
+      statementMap: {},
+      fnMap: {},
+      branchMap: {},
+      s: {},
+      f: {},
+      b: {}
+    }
+  })
+
+  if (changed) {
+    debug('saving updated file %s', nycFilename)
+    writeFileSync(
+      nycFilename,
+      JSON.stringify(nycCoverage, null, 2) + '\n',
+      'utf8'
+    )
+  }
+}
+
 module.exports = {
   showNycInfo,
   resolveRelativePaths,
   checkAllPathsNotFound,
   tryFindingLocalFiles,
   readNycOptions,
-  combineNycOptions,
-  defaultNycOptions
+  includeAllFiles
 }

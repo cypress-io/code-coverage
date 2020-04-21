@@ -1,0 +1,19 @@
+{
+  "name": "example-all-files",
+  "description": "Report all files",
+  "scripts": {
+    "start": "../../node_modules/.bin/parcel serve index.html",
+    "cy:open": "../../node_modules/.bin/cypress open",
+    "cy:run": "../../node_modules/.bin/cypress run",
+    "dev": "../../node_modules/.bin/start-test 1234 cy:open",
+    "e2e": "../../node_modules/.bin/start-test 1234 cy:run",
+    "report": "../../node_modules/.bin/nyc report"
+  },
+  "nyc": {
+    "all": true,
+    "include": "*.js"
+  },
+  "devDependencies": {
+    "@babel/core": "7.9.0"
+  }
+}

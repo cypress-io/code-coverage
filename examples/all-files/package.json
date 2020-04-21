@@ -10,8 +10,7 @@
     "report": "../../node_modules/.bin/nyc report"
   },
   "nyc": {
-    "all": true,
-    "include": ["*.js"]
+    "all": true
   },
   "devDependencies": {
     "@babel/core": "7.9.0"

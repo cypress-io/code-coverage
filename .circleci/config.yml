@@ -384,11 +384,11 @@ workflows:
                 # we will check the final coverage report
                 # to make sure it only has files we are interested in
                 # because there are files covered at 0 in the report
-                # TODO confirm "not-covered.js" is at 0/0 but included in the report
                 command: |
                   ../../node_modules/.bin/check-coverage main.js
                   ../../node_modules/.bin/check-coverage second.js
-                  # ../../node_modules/.bin/only-covered --from coverage/coverage-final.json main.js
+                  ../../node_modules/.bin/check-coverage not-covered.js
+                  ../../node_modules/.bin/only-covered --from coverage/coverage-final.json main.js second.js not-covered.js
                 working_directory: examples/all-files
 
       - cypress/run:

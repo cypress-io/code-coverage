@@ -51,7 +51,9 @@ If you have instrumented your application's code and see the `window.__coverage_
 
 ![Coverage report](images/coverage.jpg)
 
-That should be it!
+That should be it! You should see messages from this plugin in the Cypress Command Log
+
+![Plugin messages](images/gui.png)
 
 ### More information
 

@@ -11,7 +11,8 @@ Please provide debug logs by running Cypress from the terminal with `DEBUG=code-
 
 **Versions**
 
-- What is this plugin's version?
+- What is this plugin's version? If this is NOT the latest [released version](https://github.com/cypress-io/code-coverage/releases) can you try the latest version, please?
+- If the plugin worked before in version X, but stopped after upgrading to version Y, please try the [released versions](https://github.com/cypress-io/code-coverage/releases) between X and Y to see where the breaking change was.
 - What is Cypress version?
 - What is your operating system?
 - What is the shell?

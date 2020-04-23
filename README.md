@@ -405,6 +405,10 @@ $ DEBUG=code-coverage npm run dev
 
 Common issue: [not instrumenting your application when running Cypress](#instrument-your-application).
 
+If the plugin worked before in version X, but stopped after upgrading to version Y, please try the [released versions](https://github.com/cypress-io/code-coverage/releases) between X and Y to see where the breaking change was.
+
+If you decide to open an issue in this repository, please fill all information the [issue template](https://github.com/cypress-io/code-coverage/blob/master/.github/ISSUE_TEMPLATE/bug_report.md) asks. The issues most likely to be resolved have debug logs, screenshots and hopefully public repository links so we can try running the tests ourselves.
+
 ## Contributing
 
 You can test changes locally by running tests and confirming the code coverage has been calculated and saved.

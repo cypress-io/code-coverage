@@ -137,7 +137,8 @@ function resolveRelativePaths(nycFilename) {
   })
 
   if (changed) {
-    debug('saving updated file %s', nycFilename)
+    debug('resolveRelativePaths saving updated file %s', nycFilename)
+    debug('there are %d keys in the file', coverageKeys.length)
     writeFileSync(
       nycFilename,
       JSON.stringify(nycCoverage, null, 2) + '\n',
@@ -225,7 +226,8 @@ function tryFindingLocalFiles(nycFilename) {
   })
 
   if (changed) {
-    debug('saving updated file %s', nycFilename)
+    debug('tryFindingLocalFiles saving updated file %s', nycFilename)
+    debug('there are %d keys in the file', coverageKeys.length)
     writeFileSync(
       nycFilename,
       JSON.stringify(nycCoverage, null, 2) + '\n',
@@ -307,7 +309,13 @@ function includeAllFiles(nycFilename, nycOptions) {
   const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
   const coverageKeys = Object.keys(nycCoverage)
   const coveredPaths = coverageKeys.map(key => nycCoverage[key].path)
-  debug('coverage has the following paths %o', coveredPaths)
+
+  debug('coverage has %d record(s)', coveredPaths.length)
+  // report on first couple of entries
+  if (debug.enabled) {
+    console.error('coverage has the following first paths')
+    console.error(coveredPaths.slice(0, 4).join('\n'))
+  }
 
   let changed
   allFiles.forEach(fullPath => {
@@ -330,7 +338,9 @@ function includeAllFiles(nycFilename, nycOptions) {
   })
 
   if (changed) {
-    debug('saving updated file %s', nycFilename)
+    debug('includeAllFiles saving updated file %s', nycFilename)
+    debug('there are %d keys in the file', Object.keys(nycCoverage).length)
+
     writeFileSync(
       nycFilename,
       JSON.stringify(nycCoverage, null, 2) + '\n',

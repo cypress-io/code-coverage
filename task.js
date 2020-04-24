@@ -52,7 +52,14 @@ function maybePrintFinalCoverageFiles(folder) {
 
   debug('Final coverage in %s', jsonReportFilename)
   const finalCoverage = JSON.parse(readFileSync(jsonReportFilename, 'utf8'))
-  Object.keys(finalCoverage).forEach(key => {
+  const finalCoverageKeys = Object.keys(finalCoverage)
+  debug(
+    'There are %d key(s) in %s',
+    finalCoverageKeys.length,
+    jsonReportFilename
+  )
+
+  finalCoverageKeys.forEach(key => {
     const s = finalCoverage[key].s || {}
     const statements = Object.keys(s)
     const totalStatements = statements.length

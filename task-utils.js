@@ -219,6 +219,7 @@ function tryFindingLocalFiles(nycFilename) {
     const from = nycCoverage[key].path
     if (from.startsWith(commonFolder)) {
       const to = join(cwd, from.slice(length))
+      // ? Do we need to replace the "key" in the coverage object or can we just replace the "path"?
       nycCoverage[key].path = to
       debug('replaced %s -> %s', from, to)
       changed = true

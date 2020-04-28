@@ -69,8 +69,21 @@ const registerHooks = () => {
     // we need to reset the coverage when running
     // in the interactive mode, otherwise the counters will
     // keep increasing every time we rerun the tests
-    // @ts-ignore
-    cy.task('resetCoverage', { isInteractive: Cypress.config('isInteractive') })
+    const logInstance = Cypress.log({
+      name: 'Coverage',
+      message: ['Reset [@cypress/code-coverage]']
+    })
+
+    cy.task(
+      'resetCoverage',
+      {
+        // @ts-ignore
+        isInteractive: Cypress.config('isInteractive')
+      },
+      { log: false }
+    ).then(() => {
+      logInstance.end()
+    })
   })
 
   beforeEach(() => {
@@ -105,7 +118,7 @@ const registerHooks = () => {
     cy.on('window:load', saveCoverageObject)
 
     // save reference if visiting a page inside a before() hook
-    cy.window().then(saveCoverageObject)
+    cy.window({ log: false }).then(saveCoverageObject)
   })
 
   afterEach(() => {
@@ -187,8 +200,19 @@ const registerHooks = () => {
 
   after(function generateReport() {
     // when all tests finish, lets generate the coverage report
-    cy.task('coverageReport', {
-      timeout: Cypress.moment.duration(3, 'minutes').asMilliseconds()
+    const logInstance = Cypress.log({
+      name: 'Coverage',
+      message: ['Generating report [@cypress/code-coverage]']
+    })
+    cy.task('coverageReport', null, {
+      timeout: Cypress.moment.duration(3, 'minutes').asMilliseconds(),
+      log: false
+    }).then(coverageReportFolder => {
+      logInstance.set('consoleProps', () => ({
+        'coverage report folder': coverageReportFolder
+      }))
+      logInstance.end()
+      return coverageReportFolder
     })
   })
 }

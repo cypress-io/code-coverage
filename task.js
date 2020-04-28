@@ -168,6 +168,11 @@ const tasks = {
     // https://github.com/istanbuljs/nyc#common-configuration-options
     const nycReportOptions = readNycOptions(processWorkingDirectory)
 
+    if (nycReportOptions.exclude && !Array.isArray(nycReportOptions.exclude)) {
+      console.error('NYC options: %o', nycReportOptions)
+      throw new Error('Expected "exclude" to by an array')
+    }
+
     // override a couple of options
     nycReportOptions.tempDir = coverageFolder
     if (nycReportOptions['report-dir']) {

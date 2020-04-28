@@ -28,7 +28,7 @@ const defaultNycOptions = {
   'report-dir': './coverage',
   reporter: ['lcov', 'clover', 'json'],
   extension: ['.js', '.cjs', '.mjs', '.ts', '.tsx', '.jsx'],
-  excludeAfterRemap: true
+  excludeAfterRemap: false
 }
 
 module.exports = {

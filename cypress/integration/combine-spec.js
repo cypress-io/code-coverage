@@ -15,7 +15,7 @@ describe('Combine NYC options', () => {
       'report-dir': './coverage',
       reporter: ['lcov', 'clover', 'json'],
       extension: ['.js', '.cjs', '.mjs', '.ts', '.tsx', '.jsx'],
-      excludeAfterRemap: true
+      excludeAfterRemap: false
     })
   })
 
@@ -31,7 +31,7 @@ describe('Combine NYC options', () => {
       'report-dir': './coverage',
       reporter: ['text'],
       extension: ['.js', '.cjs', '.mjs', '.ts', '.tsx', '.jsx'],
-      excludeAfterRemap: true
+      excludeAfterRemap: false
     })
   })
 
@@ -58,7 +58,7 @@ describe('Combine NYC options', () => {
       'report-dir': './coverage',
       reporter: ['json'],
       extension: ['.js'],
-      excludeAfterRemap: true,
+      excludeAfterRemap: false,
       include: ['foo.js'],
       exclude: ['bar.js']
     })

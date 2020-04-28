@@ -29,3 +29,6 @@ A clear and concise description of what the bug is.
 
 **Link to the repo**
 Bugs with a reproducible example, like an open source repo showing the bug, are the most likely to be resolved.
+
+**Example**
+See [#217](https://github.com/cypress-io/code-coverage/issues/217) that is an excellent bug report example

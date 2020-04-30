@@ -467,6 +467,7 @@ workflows:
           store_artifacts: true
           post-steps:
             - run: cat examples/one-spec/.nyc_output/out.json
+            - run: cat examples/one-spec/coverage/coverage-summary.json
             # store the created coverage report folder
             # you can click on it in the CircleCI UI
             # to see live static HTML site

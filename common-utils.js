@@ -26,7 +26,7 @@ function combineNycOptions({
 
 const defaultNycOptions = {
   'report-dir': './coverage',
-  reporter: ['lcov', 'clover', 'json'],
+  reporter: ['lcov', 'clover', 'json', 'json-summary'],
   extension: ['.js', '.cjs', '.mjs', '.ts', '.tsx', '.jsx'],
   excludeAfterRemap: false
 }

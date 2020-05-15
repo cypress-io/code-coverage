@@ -220,8 +220,16 @@ const registerHooks = () => {
 // to disable code coverage commands and save time
 // pass environment variable coverage=false
 //  cypress run --env coverage=false
+// or
+//  CYPRESS_coverage=false cypress run
 // see https://on.cypress.io/environment-variables
-if (Cypress.env('coverage') === false) {
+
+// to avoid "coverage" env variable being case-sensitive, convert to lowercase
+const cyEnvs = Cypress._.mapKeys(Cypress.env(), (value, key) =>
+  key.toLowerCase()
+)
+
+if (cyEnvs.coverage === false) {
   console.log('Skipping code coverage hooks')
 } else if (Cypress.env('codeCoverageTasksRegistered') !== true) {
   // register a hook just to log a message

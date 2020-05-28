@@ -5,10 +5,7 @@ describe('Combine NYC options', () => {
       extends: '@istanbuljs/nyc-config-typescript',
       all: true
     }
-    const combined = combineNycOptions({
-      pkgNycOptions,
-      defaultNycOptions
-    })
+    const combined = combineNycOptions(defaultNycOptions, pkgNycOptions)
     cy.wrap(combined).should('deep.equal', {
       extends: '@istanbuljs/nyc-config-typescript',
       all: true,
@@ -23,10 +20,7 @@ describe('Combine NYC options', () => {
     const pkgNycOptions = {
       reporter: 'text'
     }
-    const combined = combineNycOptions({
-      pkgNycOptions,
-      defaultNycOptions
-    })
+    const combined = combineNycOptions(defaultNycOptions, pkgNycOptions)
     cy.wrap(combined).should('deep.equal', {
       'report-dir': './coverage',
       reporter: ['text'],
@@ -47,15 +41,19 @@ describe('Combine NYC options', () => {
       exclude: ['bar.js'],
       reporter: ['json']
     }
-    const combined = combineNycOptions({
-      pkgNycOptions,
+    const nycConfig = {
+      'report-dir': './report'
+    }
+    const combined = combineNycOptions(
+      defaultNycOptions,
       nycrc,
       nycrcJson,
-      defaultNycOptions
-    })
+      nycConfig,
+      pkgNycOptions
+    )
     cy.wrap(combined).should('deep.equal', {
       all: true,
-      'report-dir': './coverage',
+      'report-dir': './report',
       reporter: ['json'],
       extension: ['.js'],
       excludeAfterRemap: false,

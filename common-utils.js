@@ -1,18 +1,7 @@
 // @ts-check
-function combineNycOptions({
-  pkgNycOptions,
-  nycrc,
-  nycrcJson,
-  defaultNycOptions
-}) {
+function combineNycOptions(...options) {
   // last option wins
-  const nycOptions = Object.assign(
-    {},
-    defaultNycOptions,
-    nycrc,
-    nycrcJson,
-    pkgNycOptions
-  )
+  const nycOptions = Object.assign({}, ...options)
 
   if (typeof nycOptions.reporter === 'string') {
     nycOptions.reporter = [nycOptions.reporter]

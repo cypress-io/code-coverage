@@ -1,14 +1,20 @@
 // @ts-check
+function stringToArray(prop, obj) {
+  if (typeof obj[prop] === 'string') {
+    obj[prop] = [obj[prop]]
+  }
+
+  return obj
+}
+
 function combineNycOptions(...options) {
   // last option wins
   const nycOptions = Object.assign({}, ...options)
 
-  if (typeof nycOptions.reporter === 'string') {
-    nycOptions.reporter = [nycOptions.reporter]
-  }
-  if (typeof nycOptions.extension === 'string') {
-    nycOptions.extension = [nycOptions.extension]
-  }
+  // normalize string and [string] props
+  stringToArray('reporter', nycOptions)
+  stringToArray('extension', nycOptions)
+  stringToArray('exclude', nycOptions)
 
   return nycOptions
 }

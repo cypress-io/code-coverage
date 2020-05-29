@@ -7,20 +7,9 @@ function stringToArray(prop, obj) {
   return obj
 }
 
-function combineNycOptions({
-  pkgNycOptions,
-  nycrc,
-  nycrcJson,
-  defaultNycOptions
-}) {
+function combineNycOptions(...options) {
   // last option wins
-  const nycOptions = Object.assign(
-    {},
-    defaultNycOptions,
-    nycrc,
-    nycrcJson,
-    pkgNycOptions
-  )
+  const nycOptions = Object.assign({}, ...options)
 
   // normalize string and [string] props
   stringToArray('reporter', nycOptions)

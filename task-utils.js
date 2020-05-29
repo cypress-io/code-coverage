@@ -8,6 +8,7 @@ const { isAbsolute, resolve, join } = require('path')
 const debug = require('debug')('code-coverage')
 const chalk = require('chalk')
 const globby = require('globby')
+const yaml = require('js-yaml')
 const { combineNycOptions, defaultNycOptions } = require('./common-utils')
 
 function readNycOptions(workingDirectory) {
@@ -27,12 +28,45 @@ function readNycOptions(workingDirectory) {
     ? JSON.parse(readFileSync(nycrcJsonFilename, 'utf8'))
     : {}
 
-  const nycOptions = combineNycOptions({
-    pkgNycOptions,
+  const nycrcYamlFilename = join(workingDirectory, '.nycrc.yaml')
+  let nycrcYaml = {}
+  if (existsSync(nycrcYamlFilename)) {
+    try {
+      nycrcYaml = yaml.safeLoad(readFileSync(nycrcYamlFilename, 'utf8'))
+    } catch (error) {
+      throw new Error(`Failed to load .nycrc.yaml: ${error.message}`)
+    }
+  }
+
+  const nycrcYmlFilename = join(workingDirectory, '.nycrc.yml')
+  let nycrcYml = {}
+  if (existsSync(nycrcYmlFilename)) {
+    try {
+      nycrcYml = yaml.safeLoad(readFileSync(nycrcYmlFilename, 'utf8'))
+    } catch (error) {
+      throw new Error(`Failed to load .nycrc.yml: ${error.message}`)
+    }
+  }
+
+  const nycConfigFilename = join(workingDirectory, 'nyc.config.js')
+  let nycConfig = {}
+  if (existsSync(nycConfigFilename)) {
+    try {
+      nycConfig = require(nycConfigFilename)
+    } catch (error) {
+      throw new Error(`Failed to load nyc.config.js: ${error.message}`)
+    }
+  }
+
+  const nycOptions = combineNycOptions(
+    defaultNycOptions,
     nycrc,
     nycrcJson,
-    defaultNycOptions
-  })
+    nycrcYaml,
+    nycrcYml,
+    nycConfig,
+    pkgNycOptions
+  )
   debug('combined NYC options %o', nycOptions)
 
   return nycOptions

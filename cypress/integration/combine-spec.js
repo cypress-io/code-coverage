@@ -63,4 +63,34 @@ describe('Combine NYC options', () => {
       exclude: ['bar.js']
     })
   })
+
+  it('converts exclude to array', () => {
+    // https://github.com/cypress-io/code-coverage/issues/248
+    const pkgNycOptions = {
+      all: true,
+      extension: '.js'
+    }
+    const nycrc = {
+      include: ['foo.js']
+    }
+    const nycrcJson = {
+      exclude: 'bar.js',
+      reporter: ['json']
+    }
+    const combined = combineNycOptions({
+      pkgNycOptions,
+      nycrc,
+      nycrcJson,
+      defaultNycOptions
+    })
+    cy.wrap(combined).should('deep.equal', {
+      all: true,
+      'report-dir': './coverage',
+      reporter: ['json'],
+      extension: ['.js'],
+      excludeAfterRemap: false,
+      include: ['foo.js'],
+      exclude: ['bar.js']
+    })
+  })
 })

@@ -76,10 +76,10 @@ describe('Combine NYC options', () => {
       reporter: ['json']
     }
     const combined = combineNycOptions(
-      defaultNycOptions
+      defaultNycOptions,
       nycrc,
       nycrcJson,
-      pkgNycOptions,
+      pkgNycOptions
     )
     cy.wrap(combined).should('deep.equal', {
       all: true,

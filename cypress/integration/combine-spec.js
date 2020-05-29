@@ -75,12 +75,12 @@ describe('Combine NYC options', () => {
       exclude: 'bar.js',
       reporter: ['json']
     }
-    const combined = combineNycOptions({
-      pkgNycOptions,
+    const combined = combineNycOptions(
+      defaultNycOptions
       nycrc,
       nycrcJson,
-      defaultNycOptions
-    })
+      pkgNycOptions,
+    )
     cy.wrap(combined).should('deep.equal', {
       all: true,
       'report-dir': './coverage',

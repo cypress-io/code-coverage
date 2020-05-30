@@ -63,7 +63,7 @@
     "chalk": "4.0.0",
     "check-code-coverage": "1.9.2",
     "console-log-div": "0.6.3",
-    "cypress": "4.6.0",
+    "cypress": "4.7.0",
     "express": "4.17.1",
     "lodash": "4.17.15",
     "markdown-link-check": "3.8.1",

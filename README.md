@@ -62,6 +62,7 @@ That should be it! You should see messages from this plugin in the Cypress Comma
 
 - Read [Cypress Code Coverage: Instrumenting code](https://on.cypress.io/code-coverage#Instrumenting-code) guide
 - Watch [Code coverage](https://youtu.be/C8g5X4vCZJA) webinar
+- Watch videos in [Cypress Tips & Tricks](https://www.youtube.com/playlist?list=PLP9o9QNnQuAYYRpJzDNWpeuOVTwxmIxcI) that deal with code coverage
 
 ### App vs unit tests
 
@@ -330,6 +331,7 @@ npm run dev:no:coverage
 - Read ["Code Coverage by Parcel Bundler"](https://glebbahmutov.com/blog/code-coverage-by-parcel/) blog post
 - Read ["Combined End-to-end and Unit Test Coverage"](https://glebbahmutov.com/blog/combined-end-to-end-and-unit-test-coverage/)
 - If you are using React, check out [@cypress/instrument-cra](https://github.com/cypress-io/instrument-cra)
+- Watch videos in [Cypress Tips & Tricks](https://www.youtube.com/playlist?list=PLP9o9QNnQuAYYRpJzDNWpeuOVTwxmIxcI) playlist
 
 ## Examples
 

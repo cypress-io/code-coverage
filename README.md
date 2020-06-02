@@ -104,6 +104,8 @@ All files |     100 |      100 |     100 |     100 |
 ERROR: Coverage for lines (100%) does not meet global threshold (101%)
 ```
 
+Watch video [How to read code coverage report](https://youtu.be/yVvCYtsmkZU) to see how to read the HTML coverage report.
+
 ## Instrument unit tests
 
 If you test your application code directly from `specs` you might want to instrument them and combine unit test code coverage with any end-to-end code coverage (from iframe). You can easily instrument spec files using [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul) for example.

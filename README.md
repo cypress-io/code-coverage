@@ -315,7 +315,20 @@ Another important option is `excludeAfterRemap`. By default it is false, which m
 You can skip the client-side code coverage hooks by setting the environment variable `coverage` to `false`.
 
 ```shell
+# tell Cypress to set environment variable "coverage" to false
 cypress run --env coverage=false
+# or pass the environment variable
+CYPRESS_coverage=false cypress run
+```
+
+or set it to `false` in the `cypress.json` file
+
+```json
+{
+  "env": {
+    "coverage": false
+  }
+}
 ```
 
 See [Cypress environment variables](https://on.cypress.io/environment-variables) and [support.js](support.js). You can try running without code coverage in this project yourself

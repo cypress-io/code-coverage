@@ -65,7 +65,7 @@
     "console-log-div": "0.6.3",
     "cypress": "4.12.1",
     "express": "4.17.1",
-    "lodash": "4.17.19",
+    "lodash": "4.17.20",
     "markdown-link-check": "3.8.1",
     "parcel-bundler": "1.12.4",
     "prettier": "1.19.1",

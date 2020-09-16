@@ -99,9 +99,10 @@ const registerHooks = () => {
       }
 
       if (
-        Cypress._.find(windowCoverageObjects, {
-          coverage: applicationSourceCoverage
-        })
+        Cypress._.find(
+          windowCoverageObjects,
+          ({ coverage }) => coverage === applicationSourceCoverage
+        )
       ) {
         // this application code coverage object is already known
         // which can happen when combining `window:load` and `before` callbacks

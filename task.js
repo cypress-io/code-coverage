@@ -12,7 +12,6 @@ const {
   includeAllFiles
 } = require('./task-utils')
 const { fixSourcePaths } = require('./support-utils')
-const NYC = require('nyc')
 
 const debug = require('debug')('code-coverage')
 
@@ -188,6 +187,7 @@ const tasks = {
 
     debug('calling NYC reporter with options %o', nycReportOptions)
     debug('current working directory is %s', process.cwd())
+    const NYC = require('nyc')
     const nyc = new NYC(nycReportOptions)
 
     const returnReportFolder = () => {

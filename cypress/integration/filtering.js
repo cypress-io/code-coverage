@@ -26,12 +26,12 @@ describe('filtering specs', () => {
     config.withArgs('integrationFolder').returns('/path/to/integration/')
 
     const totalCoverage = {
-      '/path/to/specA.js': {},
-      '/path/to/specB.js': {}
+      '/path/to/integration/specA.js': {},
+      '/path/to/integration/specB.js': {}
     }
     const result = filterSpecsFromCoverage(totalCoverage, config)
     expect(result).to.deep.equal({
-      '/path/to/specB.js': {}
+      '/path/to/integration/specB.js': {}
     })
   })
 
@@ -41,12 +41,12 @@ describe('filtering specs', () => {
     config.withArgs('integrationFolder').returns('/path/to/integration/')
 
     const totalCoverage = {
-      '/path/to/specA.js': {},
-      '/path/to/specB.js': {}
+      '/path/to/integration/specA.js': {},
+      '/path/to/integration/specB.js': {}
     }
     const result = filterSpecsFromCoverage(totalCoverage, config)
     expect(result).to.deep.equal({
-      '/path/to/specA.js': {}
+      '/path/to/integration/specA.js': {}
     })
   })
 
@@ -56,14 +56,14 @@ describe('filtering specs', () => {
     config.withArgs('integrationFolder').returns('/path/to/integration/')
 
     const totalCoverage = {
-      '/path/to/specA.js': {},
-      '/path/to/specB.js': {}
+      '/path/to/integration/specA.js': {},
+      '/path/to/integration/specB.js': {}
     }
     const result = filterSpecsFromCoverage(totalCoverage, config)
     expect(result, 'all specs have been filtered out').to.deep.equal({})
   })
 
-  it('filters list of specs in integration folder', () => {
+  it('filters the integration folder when using the default pattern', () => {
     const config = cy.stub()
     config.withArgs('testFiles').returns('**/*.*') // default pattern
     config.withArgs('integrationFolder').returns('/path/to/integration/')
@@ -79,6 +79,25 @@ describe('filtering specs', () => {
     expect(result).to.deep.equal({
       '/path/to/specA.js': {},
       '/path/to/specB.js': {}
+    })
+  })
+
+  it('filters the integration folder when using a custom pattern', () => {
+    const config = cy.stub()
+    config.withArgs('testFiles').returns('**/my-feature/*.*')
+    config.withArgs('integrationFolder').returns('/path/to/integration/')
+
+    const totalCoverage = {
+      '/path/to/my-feature/specA.js': {},
+      '/path/to/my-feature/specB.js': {},
+      // these files should be removed
+      '/path/to/integration/my-feature/spec1.js': {},
+      '/path/to/integration/my-feature/spec2.js': {}
+    }
+    const result = filterSpecsFromCoverage(totalCoverage, config)
+    expect(result).to.deep.equal({
+      '/path/to/my-feature/specA.js': {},
+      '/path/to/my-feature/specB.js': {}
     })
   })
 })

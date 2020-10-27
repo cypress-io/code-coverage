@@ -20,9 +20,7 @@ const filterSpecsFromCoverage = (totalCoverage, config = Cypress.config) => {
     ? testFilePattern
     : [testFilePattern]
 
-  const isUsingDefaultTestPattern = testFilePattern === '**/*.*'
-
-  const isTestFile = (filename) => {
+  const isTestFile = filename => {
     const matchedPattern = testFilePatterns.some((specPattern) =>
       Cypress.minimatch(filename, specPattern)
     )

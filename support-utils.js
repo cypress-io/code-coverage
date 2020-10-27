@@ -35,12 +35,9 @@ const filterSpecsFromCoverage = (totalCoverage, config = Cypress.config) => {
   const isInIntegrationFolder = (filename) =>
     filename.startsWith(integrationFolder)
 
-  const isA = (fileCoverge, filename) => isInIntegrationFolder(filename)
-  const isB = (fileCoverge, filename) => isTestFile(filename)
-
-  const isTestFileFilter = isUsingDefaultTestPattern ? isA : isB
-
-  const coverage = Cypress._.omitBy(totalCoverage, isTestFileFilter)
+  const coverage = Cypress._.omitBy(totalCoverage, (fileCoverage, filename) => (
+    isInIntegrationFolder(filename) && isTestFile(filename)
+  ))
   return coverage
 }
 

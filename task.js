@@ -31,7 +31,6 @@ const DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME = 'coverage:report'
 const customNycReportScript = scripts[DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME]
 
 const nycReportOptions = (function getNycOption() {
-
   // https://github.com/istanbuljs/nyc#common-configuration-options
   const nycReportOptions = readNycOptions(processWorkingDirectory)
 
@@ -54,11 +53,10 @@ const nycReportOptions = (function getNycOption() {
   // seems nyc API really is using camel cased version
   nycReportOptions.reportDir = nycReportOptions['report-dir']
 
-  return nycReportOptions;
-})();
+  return nycReportOptions
+})()
 
 const nycFilename = join(nycReportOptions['temp-dir'], 'out.json')
-
 
 function saveCoverage(coverage) {
   if (!existsSync(nycReportOptions.tempDir)) {
@@ -190,8 +188,6 @@ const tasks = {
         stdio: 'inherit'
       })
     }
-
-
 
     if (nycReportOptions.all) {
       debug('nyc needs to report on all included files')

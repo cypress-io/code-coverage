@@ -160,11 +160,7 @@ const registerHooks = () => {
       // we can only request server-side code coverage
       // if we are running end-to-end tests,
       // otherwise where do we send the request?
-      const urls = Cypress._.get(
-        Cypress.env('codeCoverage'),
-        'urls',
-        []
-      )
+      const urls = Cypress._.get(Cypress.env('codeCoverage'), 'urls', [])
       // If they didn't use urls config then grab single url config
       if (urls.length == 0) {
         const url = Cypress._.get(
@@ -172,7 +168,7 @@ const registerHooks = () => {
           'url',
           '/__coverage__'
         )
-        urls.push(url);
+        urls.push(url)
       }
       urls.map(url => {
         cy.request({

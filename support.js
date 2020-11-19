@@ -171,6 +171,7 @@ const registerHooks = () => {
         urls.push(url)
       }
       urls.map(url => {
+        logMessage(`Requesting coverage for **${url}**`)
         cy.request({
           url,
           log: false,
@@ -183,11 +184,13 @@ const registerHooks = () => {
             if (!coverage) {
               // we did not get code coverage - this is the
               // original failed request
+              logMessage(`No coverage for: **${url}**`)
               return
             }
             sendCoverage(coverage, `backend: ${url}`)
           })
       })
+      logMessage('Finished collecting coverage')
     }
   })
 

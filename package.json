@@ -57,7 +57,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.12.9",
-    "@cypress/webpack-preprocessor": "5.4.11",
+    "@cypress/webpack-preprocessor": "5.5.0",
     "babel-loader": "8.2.2",
     "babel-plugin-istanbul": "6.0.0",
     "chalk": "4.1.0",

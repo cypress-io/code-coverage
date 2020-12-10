@@ -22,17 +22,17 @@ const filterSpecsFromCoverage = (totalCoverage, config = Cypress.config) => {
 
   const isUsingDefaultTestPattern = testFilePattern === '**/*.*'
 
-  const isTestFile = filename => {
-    const matchedPattern = testFilePatterns.some(specPattern =>
+  const isTestFile = (filename) => {
+    const matchedPattern = testFilePatterns.some((specPattern) =>
       Cypress.minimatch(filename, specPattern)
     )
-    const matchedEndOfPath = testFilePatterns.some(specPattern =>
+    const matchedEndOfPath = testFilePatterns.some((specPattern) =>
       filename.endsWith(specPattern)
     )
     return matchedPattern || matchedEndOfPath
   }
 
-  const isInIntegrationFolder = filename =>
+  const isInIntegrationFolder = (filename) =>
     filename.startsWith(integrationFolder)
 
   const isA = (fileCoverge, filename) => isInIntegrationFolder(filename)
@@ -50,13 +50,13 @@ const filterSpecsFromCoverage = (totalCoverage, config = Cypress.config) => {
  * or containing Webpack loaders and query parameters)
  */
 function fixSourcePaths(coverage) {
-  Object.values(coverage).forEach(file => {
+  Object.values(coverage).forEach((file) => {
     const { path: absolutePath, inputSourceMap } = file
     const fileName = /([^\/\\]+)$/.exec(absolutePath)[1]
     if (!inputSourceMap || !fileName) return
 
     if (inputSourceMap.sourceRoot) inputSourceMap.sourceRoot = ''
-    inputSourceMap.sources = inputSourceMap.sources.map(source =>
+    inputSourceMap.sources = inputSourceMap.sources.map((source) =>
       source.includes(fileName) ? absolutePath : source
     )
   })

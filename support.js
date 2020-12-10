@@ -24,7 +24,7 @@ const sendCoverage = (coverage, pathname = '/') => {
  * so the user knows the log message is coming from this plugin.
  * @param {string} s Message to log.
  */
-const logMessage = s => {
+const logMessage = (s) => {
   cy.log(`${s} \`[@cypress/code-coverage]\``)
 }
 
@@ -32,7 +32,7 @@ const logMessage = s => {
  * Removes support file from the coverage object.
  * If there are more files loaded from support folder, also removes them
  */
-const filterSupportFilesFromCoverage = totalCoverage => {
+const filterSupportFilesFromCoverage = (totalCoverage) => {
   const integrationFolder = Cypress.config('integrationFolder')
   const supportFile = Cypress.config('supportFile')
 
@@ -40,7 +40,7 @@ const filterSupportFilesFromCoverage = totalCoverage => {
   // @ts-ignore
   const supportFolder = Cypress.config('supportFolder')
 
-  const isSupportFile = filename => filename === supportFile
+  const isSupportFile = (filename) => filename === supportFile
 
   let coverage = Cypress._.omitBy(totalCoverage, (fileCoverage, filename) =>
     isSupportFile(filename)
@@ -93,7 +93,7 @@ const registerHooks = () => {
     // to let the user know the coverage has been collected
     windowCoverageObjects = []
 
-    const saveCoverageObject = win => {
+    const saveCoverageObject = (win) => {
       // if application code has been instrumented, the app iframe "window" has an object
       const applicationSourceCoverage = win.__coverage__
       if (!applicationSourceCoverage) {
@@ -126,7 +126,7 @@ const registerHooks = () => {
   afterEach(() => {
     // save coverage after the test
     // because now the window coverage objects have been updated
-    windowCoverageObjects.forEach(cover => {
+    windowCoverageObjects.forEach((cover) => {
       sendCoverage(cover.coverage, cover.pathname)
     })
 
@@ -172,10 +172,10 @@ const registerHooks = () => {
         log: false,
         failOnStatusCode: false
       })
-        .then(r => {
+        .then((r) => {
           return Cypress._.get(r, 'body.coverage', null)
         })
-        .then(coverage => {
+        .then((coverage) => {
           if (!coverage) {
             // we did not get code coverage - this is the
             // original failed request
@@ -209,7 +209,7 @@ const registerHooks = () => {
     cy.task('coverageReport', null, {
       timeout: Cypress.moment.duration(3, 'minutes').asMilliseconds(),
       log: false
-    }).then(coverageReportFolder => {
+    }).then((coverageReportFolder) => {
       logInstance.set('consoleProps', () => ({
         'coverage report folder': coverageReportFolder
       }))

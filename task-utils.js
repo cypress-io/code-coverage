@@ -192,8 +192,8 @@ function findCommonRoot(filepaths) {
   }
 
   // assuming / as file separator
-  const splitParts = filepaths.map(name => name.split('/'))
-  const lengths = splitParts.map(arr => arr.length)
+  const splitParts = filepaths.map((name) => name.split('/'))
+  const lengths = splitParts.map((arr) => arr.length)
   const shortestLength = Math.min.apply(null, lengths)
   debug('shorted file path has %d parts', shortestLength)
 
@@ -205,7 +205,7 @@ function findCommonRoot(filepaths) {
     const part = splitParts[0][k]
     const prefix = commonPrefix.concat(part).join('/')
     debug('testing prefix %o', prefix)
-    const allFilesStart = filepaths.every(name => name.startsWith(prefix))
+    const allFilesStart = filepaths.every((name) => name.startsWith(prefix))
     if (!allFilesStart) {
       debug('stopped at non-common prefix %s', prefix)
       break
@@ -213,11 +213,11 @@ function findCommonRoot(filepaths) {
 
     commonPrefix.push(part)
 
-    const removedPrefixNames = filepaths.map(filepath =>
+    const removedPrefixNames = filepaths.map((filepath) =>
       filepath.slice(prefix.length)
     )
     debug('removedPrefix %o', removedPrefixNames)
-    const foundAllPaths = removedPrefixNames.every(filepath =>
+    const foundAllPaths = removedPrefixNames.every((filepath) =>
       existsSync(join(cwd, filepath))
     )
     debug('all files found at %s? %o', prefix, foundAllPaths)
@@ -234,7 +234,7 @@ function findCommonRoot(filepaths) {
 function tryFindingLocalFiles(nycFilename) {
   const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
   const coverageKeys = Object.keys(nycCoverage)
-  const filenames = coverageKeys.map(key => nycCoverage[key].path)
+  const filenames = coverageKeys.map((key) => nycCoverage[key].path)
   const commonFolder = findCommonRoot(filenames)
   if (!commonFolder) {
     debug('could not find common folder %s', commonFolder)
@@ -249,7 +249,7 @@ function tryFindingLocalFiles(nycFilename) {
   const length = commonFolder.length
   let changed
 
-  coverageKeys.forEach(key => {
+  coverageKeys.forEach((key) => {
     const from = nycCoverage[key].path
     if (from.startsWith(commonFolder)) {
       const to = join(cwd, from.slice(length))
@@ -298,13 +298,13 @@ function findSourceFiles(nycOptions) {
     patterns.push(nycOptions.include)
   } else {
     debug('using default list of extensions')
-    nycOptions.extension.forEach(extension => {
+    nycOptions.extension.forEach((extension) => {
       patterns.push('**/*' + extension)
     })
   }
 
   if (Array.isArray(nycOptions.exclude)) {
-    const negated = nycOptions.exclude.map(s => '!' + s)
+    const negated = nycOptions.exclude.map((s) => '!' + s)
     patterns = patterns.concat(negated)
   } else if (typeof nycOptions.exclude === 'string') {
     patterns.push('!' + nycOptions.exclude)
@@ -355,7 +355,7 @@ function includeAllFiles(nycFilename, nycOptions) {
   }
 
   let changed
-  allFiles.forEach(fullPath => {
+  allFiles.forEach((fullPath) => {
     if (coveredPaths.includes(fullPath)) {
       // all good, this file exists in coverage object
       return

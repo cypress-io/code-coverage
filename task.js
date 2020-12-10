@@ -83,12 +83,12 @@ function maybePrintFinalCoverageFiles(folder) {
     jsonReportFilename
   )
 
-  finalCoverageKeys.forEach(key => {
+  finalCoverageKeys.forEach((key) => {
     const s = finalCoverage[key].s || {}
     const statements = Object.keys(s)
     const totalStatements = statements.length
     let coveredStatements = 0
-    statements.forEach(statementKey => {
+    statements.forEach((statementKey) => {
       if (s[statementKey]) {
         coveredStatements += 1
       }

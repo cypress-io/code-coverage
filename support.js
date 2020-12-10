@@ -35,6 +35,8 @@ const logMessage = s => {
 const filterSupportFilesFromCoverage = totalCoverage => {
   const integrationFolder = Cypress.config('integrationFolder')
   const supportFile = Cypress.config('supportFile')
+
+  /** @type {string} Cypress run-time config has the support folder string */
   // @ts-ignore
   const supportFolder = Cypress.config('supportFolder')
 

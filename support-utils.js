@@ -8,6 +8,7 @@
  */
 const filterSpecsFromCoverage = (totalCoverage, config = Cypress.config) => {
   const integrationFolder = config('integrationFolder')
+  /** @type {string} Cypress run-time config has test files string pattern */
   // @ts-ignore
   const testFilePattern = config('testFiles')
 

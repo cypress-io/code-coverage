@@ -493,7 +493,7 @@ workflows:
             name: win/default
             shell: bash.exe
           no-workspace: true
-          start: npm start --prefix examples/all-files
+          start: npm run start:windows --prefix examples/all-files
           wait-on: 'http://localhost:1234'
           command: npx cypress run --project examples/all-files
           # store screenshots and videos

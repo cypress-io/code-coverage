@@ -343,7 +343,9 @@ function includeAllFiles(nycFilename, nycOptions) {
 
   const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
   const coverageKeys = Object.keys(nycCoverage)
-  const coveredPaths = coverageKeys.map(key => nycCoverage[key].path)
+  const coveredPaths = coverageKeys.map(key =>
+    nycCoverage[key].path.replace(/\\/g, '/')
+  )
 
   debug('coverage has %d record(s)', coveredPaths.length)
   // report on first couple of entries

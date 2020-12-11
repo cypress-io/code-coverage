@@ -26,7 +26,26 @@ const defaultNycOptions = {
   excludeAfterRemap: false
 }
 
+/**
+ * Returns an object with placeholder properties for files we
+ * do not have coverage yet. The result can go into the coverage object
+ *
+ * @param {string} fullPath Filename
+ */
+const fileCoveragePlaceholder = (fullPath) => {
+  return {
+    path: fullPath,
+    statementMap: {},
+    fnMap: {},
+    branchMap: {},
+    s: {},
+    f: {},
+    b: {}
+  }
+}
+
 module.exports = {
   combineNycOptions,
-  defaultNycOptions
+  defaultNycOptions,
+  fileCoveragePlaceholder
 }

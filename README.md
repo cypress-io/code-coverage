@@ -431,8 +431,10 @@ $ DEBUG=code-coverage npm run dev
 Deeply nested object will sometimes have `[object Object]` values printed. You can print these nested objects by specifying a deeper depth by adding `DEBUG_DEPTH=` setting
 
 ```shell
-$ DEBUG_DEPTH=10DEBUG=code-coverage npm run dev
+$ DEBUG_DEPTH=10 DEBUG=code-coverage npm run dev
 ```
+
+### Common issues
 
 Common issue: [not instrumenting your application when running Cypress](#instrument-your-application).
 

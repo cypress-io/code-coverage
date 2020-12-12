@@ -56,7 +56,7 @@
     "nyc": "15.1.0"
   },
   "devDependencies": {
-    "@babel/core": "7.12.9",
+    "@babel/core": "7.12.10",
     "@cypress/webpack-preprocessor": "5.5.0",
     "babel-loader": "8.2.2",
     "babel-plugin-istanbul": "6.0.0",

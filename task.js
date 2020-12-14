@@ -147,13 +147,13 @@ const tasks = {
     debug('parsed sent coverage')
 
     fixSourcePaths(coverage)
-    const previous = existsSync(nycFilename)
+
+    const previousCoverage = existsSync(nycFilename)
       ? JSON.parse(readFileSync(nycFilename, 'utf8'))
-      : istanbul.createCoverageMap({})
+      : {}
+    removePlaceholders(previousCoverage)
 
-    removePlaceholders(previous)
-
-    const coverageMap = istanbul.createCoverageMap(previous)
+    const coverageMap = istanbul.createCoverageMap(previousCoverage)
     coverageMap.merge(coverage)
     saveCoverage(coverageMap)
     debug('wrote coverage file %s', nycFilename)

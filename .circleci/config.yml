@@ -395,6 +395,40 @@ workflows:
 
       - cypress/run:
           attach-workspace: true
+          name: example-placeholders
+          requires:
+            - cypress/install
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          command: npx cypress run --project examples/placeholders
+          # store screenshots and videos
+          store_artifacts: true
+          post-steps:
+            - run: cat examples/placeholders/.nyc_output/out.json
+            - run: cat examples/placeholders/coverage/coverage-final.json
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/placeholders/coverage
+            # make sure the examples captures 100% of code
+            - run:
+                command: npx nyc report --check-coverage true --lines 100
+                working_directory: examples/placeholders
+            - run:
+                name: Check code coverage 📈
+                # we will check the final coverage report
+                # to make sure it only has files we are interested in
+                # because there are files covered at 0 in the report
+                command: |
+                  ../../node_modules/.bin/check-coverage src/a.js
+                  ../../node_modules/.bin/check-coverage src/a.js
+                  ../../node_modules/.bin/only-covered --from coverage/coverage-final.json src/a.js src/b.js
+                working_directory: examples/placeholders
+
+      - cypress/run:
+          attach-workspace: true
           name: example-exclude-files
           requires:
             - cypress/install
@@ -544,4 +578,5 @@ workflows:
             - example-docker-paths
             - example-use-webpack
             - example-all-files
+            - example-placeholders
             - Windows test

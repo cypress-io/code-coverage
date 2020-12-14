@@ -12,6 +12,7 @@ const {
   includeAllFiles
 } = require('./task-utils')
 const { fixSourcePaths } = require('./support-utils')
+const { removePlaceholders } = require('./common-utils')
 
 const debug = require('debug')('code-coverage')
 
@@ -146,10 +147,19 @@ const tasks = {
     debug('parsed sent coverage')
 
     fixSourcePaths(coverage)
-    const previous = existsSync(nycFilename)
+
+    const previousCoverage = existsSync(nycFilename)
       ? JSON.parse(readFileSync(nycFilename, 'utf8'))
-      : istanbul.createCoverageMap({})
-    const coverageMap = istanbul.createCoverageMap(previous)
+      : {}
+
+    // previous code coverage object might have placeholder entries
+    // for files that we have not seen yet,
+    // but the user expects to include in the coverage report
+    // the merge function messes up, so we should remove any placeholder entries
+    // and re-insert them again when creating the report
+    removePlaceholders(previousCoverage)
+
+    const coverageMap = istanbul.createCoverageMap(previousCoverage)
     coverageMap.merge(coverage)
     saveCoverage(coverageMap)
     debug('wrote coverage file %s', nycFilename)

@@ -1,3 +1,4 @@
+/// <reference types="Cypress" />
 const { combineNycOptions, defaultNycOptions } = require('../../common-utils')
 describe('Combine NYC options', () => {
   it('overrides defaults', () => {

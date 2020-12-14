@@ -9,7 +9,11 @@ const debug = require('debug')('code-coverage')
 const chalk = require('chalk')
 const globby = require('globby')
 const yaml = require('js-yaml')
-const { combineNycOptions, defaultNycOptions } = require('./common-utils')
+const {
+  combineNycOptions,
+  defaultNycOptions,
+  fileCoveragePlaceholder
+} = require('./common-utils')
 
 function readNycOptions(workingDirectory) {
   const pkgFilename = join(workingDirectory, 'package.json')
@@ -363,15 +367,8 @@ function includeAllFiles(nycFilename, nycOptions) {
     debug('adding empty coverage for file %s', fullPath)
     changed = true
     // insert placeholder object for now
-    nycCoverage[fullPath] = {
-      path: fullPath,
-      statementMap: {},
-      fnMap: {},
-      branchMap: {},
-      s: {},
-      f: {},
-      b: {}
-    }
+    const placeholder = fileCoveragePlaceholder(fullPath)
+    nycCoverage[fullPath] = placeholder
   })
 
   if (changed) {

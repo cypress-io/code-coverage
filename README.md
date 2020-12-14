@@ -21,9 +21,9 @@ Register tasks in your `cypress/plugins/index.js` file
 ```js
 module.exports = (on, config) => {
   require('@cypress/code-coverage/task')(on, config)
-  
+
   // add other tasks to be registered here
-  
+
   // IMPORTANT to return the config object
   // with the any changed environment variables
   return config
@@ -189,7 +189,7 @@ For any other server, define the endpoint yourself and return the coverage objec
 ```js
 if (global.__coverage__) {
   // add method "GET /__coverage__" and response with JSON
-  onRequest = response => response.sendJSON({ coverage: global.__coverage__ })
+  onRequest = (response) => response.sendJSON({ coverage: global.__coverage__ })
 }
 ```
 
@@ -365,6 +365,7 @@ Full examples we use for testing in this repository:
 ### External examples
 
 Look up the list of examples under GitHub topic [cypress-code-coverage-example](https://github.com/topics/cypress-code-coverage-example)
+
 - [cypress-io/cypress-realworld-app](https://github.com/cypress-io/cypress-realworld-app) is an easy to setup and run real-world application with E2E, API, and unit tests that achieves 100% code-coverage for both front and back end code. Its CI pipeline also reports code-coverage reports across parallelized test runs to [Codecov](https://codecov.io/gh/cypress-io/cypress-realworld-app).
 - [cypress-io/cypress-example-todomvc-redux](https://github.com/cypress-io/cypress-example-todomvc-redux) is a React / Redux application with 100% code coverage.
 - [cypress-io/cypress-example-conduit-app](https://github.com/cypress-io/cypress-example-conduit-app) shows how to collect the coverage information from both back and front end code and merge it into a single report. The E2E test step runs in parallel in several CI containers, each saving just partial test coverage information. Then a merge job runs taking artifacts and combining coverage into the final report to be sent to an exteral coverage as a service app.
@@ -426,6 +427,14 @@ $ DEBUG=code-coverage npm run dev
   code-coverage wrote coverage file /code-coverage/.nyc_output/out.json +28ms
   code-coverage saving coverage report using command: "nyc report --report-dir ./coverage --reporter=lcov --reporter=clover --reporter=json" +3ms
 ```
+
+Deeply nested object will sometimes have `[object Object]` values printed. You can print these nested objects by specifying a deeper depth by adding `DEBUG_DEPTH=` setting
+
+```shell
+$ DEBUG_DEPTH=10 DEBUG=code-coverage npm run dev
+```
+
+### Common issues
 
 Common issue: [not instrumenting your application when running Cypress](#instrument-your-application).
 

@@ -151,6 +151,12 @@ const tasks = {
     const previousCoverage = existsSync(nycFilename)
       ? JSON.parse(readFileSync(nycFilename, 'utf8'))
       : {}
+
+    // previous code coverage object might have placeholder entries
+    // for files that we have not seen yet,
+    // but the user expects to include in the coverage report
+    // the merge function messes up, so we should remove any placeholder entries
+    // and re-insert them again when creating the report
     removePlaceholders(previousCoverage)
 
     const coverageMap = istanbul.createCoverageMap(previousCoverage)

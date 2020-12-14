@@ -1,7 +1,10 @@
 /// <reference types="Cypress" />
 const istanbul = require('istanbul-lib-coverage')
 const coverage = require('../fixtures/coverage.json')
-const { fileCoveragePlaceholder } = require('../../common-utils')
+const {
+  fileCoveragePlaceholder,
+  removePlaceholders
+} = require('../../common-utils')
 
 /**
  * Extracts just the data from the coverage map object
@@ -66,5 +69,18 @@ describe('merging coverage', () => {
     delete expected[filename].hash
     delete expected[filename]._coverageSchema
     expect(merged).to.deep.equal(expected)
+  })
+
+  it('removes placeholders', () => {
+    const inputCoverage = Cypress._.cloneDeep(coverage)
+    removePlaceholders(inputCoverage)
+    expect(inputCoverage, 'nothing to remove').to.deep.equal(coverage)
+
+    // add placeholder
+    const placeholder = fileCoveragePlaceholder(filename)
+    inputCoverage[filename] = placeholder
+
+    removePlaceholders(inputCoverage)
+    expect(inputCoverage, 'the placeholder has been removed').to.deep.equal({})
   })
 })

@@ -44,8 +44,26 @@ const fileCoveragePlaceholder = (fullPath) => {
   }
 }
 
+const isPlaceholder = (entry) => {
+  // when the file has been instrumented, its entry has "hash" property
+  return !('hash' in entry)
+}
+
+/**
+ * Given a coverage object with potential placeholder entries
+ * inserted instead of covered files, removes them. Modifies the object in place
+ */
+const removePlaceholders = (coverage) => {
+  Object.keys(coverage).forEach((key) => {
+    if (isPlaceholder(coverage[key])) {
+      delete coverage[key]
+    }
+  })
+}
+
 module.exports = {
   combineNycOptions,
   defaultNycOptions,
-  fileCoveragePlaceholder
+  fileCoveragePlaceholder,
+  removePlaceholders
 }

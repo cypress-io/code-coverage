@@ -12,6 +12,7 @@ const {
   includeAllFiles
 } = require('./task-utils')
 const { fixSourcePaths } = require('./support-utils')
+const { removePlaceholders } = require('./common-utils')
 
 const debug = require('debug')('code-coverage')
 
@@ -149,6 +150,9 @@ const tasks = {
     const previous = existsSync(nycFilename)
       ? JSON.parse(readFileSync(nycFilename, 'utf8'))
       : istanbul.createCoverageMap({})
+
+    removePlaceholders(previous)
+
     const coverageMap = istanbul.createCoverageMap(previous)
     coverageMap.merge(coverage)
     saveCoverage(coverageMap)

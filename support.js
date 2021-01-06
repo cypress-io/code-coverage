@@ -134,12 +134,19 @@ const registerHooks = () => {
       if (hasUnitTestCoverage()) {
         logMessage(`👉 Only found unit test code coverage.`)
       } else {
-        logMessage(`
-          ⚠️ Could not find any coverage information in your application
-          by looking at the window coverage object.
-          Did you forget to instrument your application?
-          See [code-coverage#instrument-your-application](https://github.com/cypress-io/code-coverage#instrument-your-application)
-        `)
+        const expectBackendCoverageOnly = Cypress._.get(
+          Cypress.env('codeCoverage'),
+          'expectBackendCoverageOnly',
+          false
+        )
+        if (!expectBackendCoverageOnly) {
+          logMessage(`
+            ⚠️ Could not find any coverage information in your application
+            by looking at the window coverage object.
+            Did you forget to instrument your application?
+            See [code-coverage#instrument-your-application](https://github.com/cypress-io/code-coverage#instrument-your-application)
+          `)
+        }
       }
     }
   })
@@ -179,7 +186,19 @@ const registerHooks = () => {
           if (!coverage) {
             // we did not get code coverage - this is the
             // original failed request
-            return
+            const expectBackendCoverageOnly = Cypress._.get(
+              Cypress.env('codeCoverage'),
+              'expectBackendCoverageOnly',
+              false
+            )
+            if (expectBackendCoverageOnly) {
+              throw new Error(
+                `Expected to collect backend code coverage from ${url}`
+              )
+            } else {
+              // we did not really expect to collect the backend code coverage
+              return
+            }
           }
           sendCoverage(coverage, 'backend')
         })

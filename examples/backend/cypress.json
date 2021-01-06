@@ -3,7 +3,8 @@
   "baseUrl": "http://localhost:3003",
   "env": {
     "codeCoverage": {
-      "url": "http://localhost:3003/__coverage__"
+      "url": "http://localhost:3003/__coverage__",
+      "expectBackendCoverageOnly": true
     }
   }
 }

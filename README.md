@@ -207,6 +207,29 @@ if (global.__coverage__) {
 
 That should be enough - the code coverage from the server will be requested at the end of the test run and merged with the client-side code coverage, producing a combined report.
 
+### expectBackendCoverageOnly
+
+If there is NO frontend code coverage, and you want to only collect the backend code coverage using Cypress tests, set `expectBackendCoverageOnly: true` in `cypress.json` file. Otherwise Cypress complains that it cannot find the frontend code coverage.
+
+Default:
+
+![No frontend code coverage warning](./images/warning.png)
+
+After:
+
+```json
+{
+  "env": {
+    "codeCoverage": {
+      "url": "http://localhost:3003/__coverage__",
+      "expectBackendCoverageOnly": true
+    }
+  }
+}
+```
+
+![Cypress knows to expect the backend code coverage only](./images/expect-backend.png)
+
 ## Custom report folder
 
 You can specify custom report folder by adding `nyc` object to the `package.json` file. For example to save reports to `cypress-coverage` folder, use:

@@ -2,6 +2,7 @@
   "name": "example-backend",
   "description": "Code coverage for backend",
   "devDependencies": {},
+  "private": true,
   "scripts": {
     "start": "../../node_modules/.bin/nyc --silent node server/server",
     "cy:open": "../../node_modules/.bin/cypress open",

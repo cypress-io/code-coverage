@@ -275,6 +275,23 @@ TypeScript source files should be automatically included in the report, if they 
 
 See [examples/ts-example](examples/ts-example), [bahmutov/cra-ts-code-coverage-example](https://github.com/bahmutov/cra-ts-code-coverage-example) or [bahmutov/cypress-angular-coverage-example](https://github.com/bahmutov/cypress-angular-coverage-example).
 
+## Include code
+
+By default, the code coverage report includes _only_ the instrumented files loaded by the application during the tests. If some modules are loaded dynamically, or are loaded by the pages NOT visited during any tests, these files are not going to be in the report - because the plugin does not know about them. You can include all expected source files in the report by using `include` list in the `package.json` file. The files without counters will have 0 percent code coverage.
+
+For example, if you want to make sure the final report includes all JS files from the "src/pages" folder, set the "nyc" object in your `package.json` file.
+
+```json
+{
+  "nyc": {
+    "all": true,
+    "include": "src/pages/*.js"
+  }
+}
+```
+
+See example [examples/all-files](./examples/all-files)
+
 ## Exclude code
 
 You can exclude parts of the code or entire files from the code coverage report. See [Istanbul guide](https://github.com/gotwarlost/istanbul/blob/master/ignoring-code-for-coverage.md). Common cases:

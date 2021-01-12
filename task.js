@@ -61,7 +61,7 @@ const nycFilename = join(nycReportOptions['temp-dir'], 'out.json')
 
 function saveCoverage(coverage) {
   if (!existsSync(nycReportOptions.tempDir)) {
-    mkdirSync(nycReportOptions.tempDir)
+    mkdirSync(nycReportOptions.tempDir, { recursive: true })
     debug('created folder %s for output coverage', nycReportOptions.tempDir)
   }
 

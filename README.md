@@ -136,6 +136,8 @@ module.exports = (on, config) => {
 
 Now the code coverage from spec files will be combined with end-to-end coverage.
 
+Find example of a just the unit tests and JavaScript source files with collected code coverage in [examples/unit-tests-js](./examples/unit-tests-js).
+
 ### Alternative for unit tests
 
 If you cannot use `.babelrc` for some reason (maybe it is used by other tools?), try using the Browserify transformer included with this module in `use-browserify-istanbul` file.
@@ -401,6 +403,7 @@ Full examples we use for testing in this repository:
 - [examples/one-spec.js](examples/one-spec.js) confirms that coverage is collected and filtered correctly if the user only executes a single Cypress test
 - [examples/ts-example](examples/ts-example) uses Babel + Parcel to instrument and serve TypeScript file
 - [examples/use-webpack](examples/use-webpack) shows Webpack build with source maps and Babel
+- [examples/unit-tests-js](examples/unit-tests-js) runs just the unit tests and reports code coverage (JavaScript source code)
 
 ### External examples
 

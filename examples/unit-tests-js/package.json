@@ -1,0 +1,7 @@
+{
+  "name": "example-unit-tests-js",
+  "description": "Run unit tests written using JavaScript",
+  "scripts": {
+    "cy:open": "../../node_modules/.bin/cypress open"
+  }
+}

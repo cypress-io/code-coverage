@@ -1,0 +1,7 @@
+{
+  "name": "example-unit-tests-ts",
+  "description": "Run unit tests written using TypeScript",
+  "scripts": {
+    "cy:open": "../../node_modules/.bin/cypress open"
+  }
+}

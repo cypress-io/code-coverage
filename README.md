@@ -404,6 +404,7 @@ Full examples we use for testing in this repository:
 - [examples/ts-example](examples/ts-example) uses Babel + Parcel to instrument and serve TypeScript file
 - [examples/use-webpack](examples/use-webpack) shows Webpack build with source maps and Babel
 - [examples/unit-tests-js](examples/unit-tests-js) runs just the unit tests and reports code coverage (JavaScript source code)
+- [examples/unit-tests-ts](examples/unit-tests-ts) **NOT WORKING** runs just the unit tests and reports code coverage (TypeScript source code)
 
 ### External examples
 

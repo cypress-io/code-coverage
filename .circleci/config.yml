@@ -521,6 +521,36 @@ workflows:
                 working_directory: examples/one-spec
 
       - cypress/run:
+          attach-workspace: true
+          name: example-unit-tests-js
+          requires:
+            - cypress/install
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          command: npx cypress run --project examples/unit-tests-js
+          # store screenshots and videos
+          store_artifacts: true
+          post-steps:
+            - run: cat examples/unit-tests-js/.nyc_output/out.json
+            - run: cat examples/unit-tests-js/coverage/coverage-summary.json
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/unit-tests-js/coverage
+            # make sure the examples captures 100% of code
+            - run:
+                command: npx nyc report --check-coverage true --lines 100
+                working_directory: examples/unit-tests-js
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  ../../node_modules/.bin/check-coverage misc.js
+                  ../../node_modules/.bin/only-covered misc.js
+                working_directory: examples/unit-tests-js
+
+      - cypress/run:
           name: Windows test
           executor:
             # executor comes from the "windows" orb
@@ -579,4 +609,5 @@ workflows:
             - example-use-webpack
             - example-all-files
             - example-placeholders
+            - example-unit-tests-js
             - Windows test

@@ -75,6 +75,7 @@
     "serve": "11.3.2",
     "start-server-and-test": "1.11.7",
     "ts-loader": "8.0.14",
+    "tsify": "5.0.2",
     "typescript": "4.1.3",
     "webpack": "4.46.0",
     "webpack-cli": "3.3.12"

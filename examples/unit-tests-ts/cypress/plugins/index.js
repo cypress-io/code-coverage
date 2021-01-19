@@ -11,7 +11,9 @@ module.exports = (on, config) => {
   //   require.resolve('browserify-istanbul'),
   //   {}
   // ])
-  options.typescript = require.resolve('typescript')
+  options.browserifyOptions.transform.push('browserify-istanbul')
+  options.browserifyOptions.plugin.push('tsify')
+  // options.typescript = require.resolve('typescript')
   // on('file:preprocessor', require('../../../../use-babelrc'))
   console.log('browserify options')
   console.log(JSON.stringify(options, null, 2))

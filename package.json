@@ -71,7 +71,7 @@
     "markdown-link-check": "3.8.6",
     "parcel-bundler": "1.12.4",
     "prettier": "2.2.1",
-    "semantic-release": "17.3.3",
+    "semantic-release": "17.3.7",
     "serve": "11.3.2",
     "start-server-and-test": "1.11.7",
     "ts-loader": "8.0.14",

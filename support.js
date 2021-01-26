@@ -1,7 +1,11 @@
 /// <reference types="cypress" />
 // @ts-check
 
+const dayjs = require('dayjs')
+var duration = require('dayjs/plugin/duration')
 const { filterSpecsFromCoverage } = require('./support-utils')
+
+dayjs.extend(duration)
 
 /**
  * Sends collected code coverage object to the backend code
@@ -226,7 +230,7 @@ const registerHooks = () => {
       message: ['Generating report [@cypress/code-coverage]']
     })
     cy.task('coverageReport', null, {
-      timeout: Cypress.moment.duration(3, 'minutes').asMilliseconds(),
+      timeout: dayjs.duration(3, 'minutes').asMilliseconds(),
       log: false
     }).then((coverageReportFolder) => {
       logInstance.set('consoleProps', () => ({

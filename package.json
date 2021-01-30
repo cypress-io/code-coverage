@@ -66,7 +66,7 @@
     "check-code-coverage": "1.10.0",
     "console-log-div": "0.6.3",
     "cypress": "6.3.0",
-    "dayjs": "^1.10.4",
+    "dayjs": "1.10.4",
     "express": "4.17.1",
     "lodash": "4.17.20",
     "markdown-link-check": "3.8.6",

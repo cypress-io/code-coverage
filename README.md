@@ -335,7 +335,7 @@ switch (foo) {
 
 ### Exclude files and folders
 
-See [`nyc` configuration](https://github.com/istanbuljs/nyc#common-configuration-options) and [ include and exclude options](https://github.com/istanbuljs/nyc#using-include-and-exclude-arrays). You can include and exclude files using `minimatch` patterns in `.nycrc` file or using "nyc" object inside your `package.json` file.
+See [`nyc` configuration](https://github.com/istanbuljs/nyc#common-configuration-options) and [ include and exclude options](https://github.com/istanbuljs/nyc#using-include-and-exclude-arrays). You can include and exclude files using `minimatch` patterns in "nyc" object inside your `package.json` file.
 
 For example, if you want to only include files in the `app` folder, but exclude `app/util.js` file, you can set in your `package.json`
 
@@ -351,6 +351,9 @@ For example, if you want to only include files in the `app` folder, but exclude 
 **Note:** if you have `all: true` NYC option set, this plugin will check the produced `.nyc_output/out.json` before generating the final report. If the `out.json` file does not have information for some files that should be there according to `include` list, then an empty placeholder will be included, see [PR 208](https://github.com/cypress-io/code-coverage/pull/208).
 
 Another important option is `excludeAfterRemap`. By default it is false, which might let excluded files through. If you are excluding the files, and the instrumenter does not respect the `nyc.exclude` setting, then add `excludeAfterRemap: true` to tell `nyc report` to exclude files. See [examples/exclude-files](examples/exclude-files).
+
+Potentially, there might be "nyc" options in other configuration files, see https://github.com/istanbuljs/nyc#configuring-nyc
+But for now, please, provide "nyc" configuration in your package.json file. All other configuration files are ignored.
 
 ## Disable plugin
 

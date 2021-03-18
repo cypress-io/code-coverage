@@ -164,7 +164,9 @@ const registerHooks = () => {
         Cypress.env('codeCoverage'),
         'url',
         '/__coverage__'
-      ).split(',').map(u => u.trim());
+      )
+        .split(',')
+        .map(u => u.trim())
       urls.map(url => {
         logMessage(`Requesting coverage for **${url}**`)
         cy.request({

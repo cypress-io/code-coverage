@@ -1,0 +1,15 @@
+{
+  "name": "example-multiple-backends",
+  "description": "Combined code coverage from multiple backend code bases, and e2e and unit tests",
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  },
+  "scripts": {
+    "start": "npm-run-all -p start:server1 start:server2",
+    "start:server1": "../../node_modules/.bin/nyc --silent node server1/server",
+    "start:server2": "../../node_modules/.bin/nyc --silent node server2/server",
+    "cy:open": "../../node_modules/.bin/cypress open",
+    "dev": "../../node_modules/.bin/start-test 3003 cy:open",
+    "report": "../../node_modules/.bin/nyc report --reporter text"
+  }
+}

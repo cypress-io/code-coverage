@@ -69,7 +69,7 @@
     "cypress": "7.0.1",
     "express": "4.17.1",
     "lodash": "4.17.21",
-    "markdown-link-check": "3.8.6",
+    "markdown-link-check": "3.8.7",
     "parcel-bundler": "1.12.5",
     "prettier": "2.2.1",
     "semantic-release": "17.4.2",

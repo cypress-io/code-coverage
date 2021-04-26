@@ -54,7 +54,8 @@
     "globby": "11.0.3",
     "istanbul-lib-coverage": "3.0.0",
     "js-yaml": "3.14.1",
-    "nyc": "15.1.0"
+    "nyc": "15.1.0",
+    "chalk": "4.1.1"
   },
   "devDependencies": {
     "@babel/core": "7.13.16",
@@ -63,7 +64,6 @@
     "babel-loader": "8.2.2",
     "babel-plugin-istanbul": "6.0.0",
     "browserify-istanbul": "3.0.1",
-    "chalk": "4.1.1",
     "check-code-coverage": "1.10.0",
     "console-log-div": "0.6.3",
     "cypress": "7.1.0",

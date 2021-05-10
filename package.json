@@ -71,7 +71,7 @@
     "lodash": "4.17.21",
     "markdown-link-check": "3.8.7",
     "parcel-bundler": "1.12.5",
-    "prettier": "2.2.1",
+    "prettier": "2.3.0",
     "semantic-release": "17.4.2",
     "serve": "11.3.2",
     "start-server-and-test": "1.12.1",

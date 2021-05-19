@@ -428,6 +428,7 @@ Look up the list of examples under GitHub topic [cypress-code-coverage-example](
 - [bahmutov/docker-with-cypress-included-code-coverage-example](https://github.com/bahmutov/docker-with-cypress-included-code-coverage-example) runs tests inside pre-installed Cypress using [cypress/included:x.y.z](https://github.com/cypress-io/cypress-docker-images/tree/master/included) Docker image and reports code coverage.
 - [bahmutov/app-in-docker-coverage-example](https://github.com/bahmutov/app-in-docker-coverage-example) shows an app running inside a Docker container, while Cypress runs on the local machine. Cypress can still [discover the source files](https://github.com/cypress-io/code-coverage/pull/197) before generating the report.
 - [bahmutov/gatsby-cypress-with-code-coverage](https://github.com/bahmutov/gatsby-cypress-with-code-coverage) shows code coverage using the official Gatsby "Hello World" starter.
+- [muratkeremozcan/angular-playground](https://github.com/muratkeremozcan/angular-playground) is an Angular TypeScript application with combined unit and E2E coverage.
 
 ## Migrations
 

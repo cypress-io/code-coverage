@@ -58,7 +58,7 @@
     "chalk": "4.1.1"
   },
   "devDependencies": {
-    "@babel/core": "7.14.6",
+    "@babel/core": "7.14.8",
     "@babel/preset-typescript": "7.14.5",
     "@cypress/webpack-preprocessor": "5.9.1",
     "babel-loader": "8.2.2",

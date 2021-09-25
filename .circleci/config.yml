@@ -56,6 +56,8 @@ workflows:
       - unit
 
       - cypress/install:
+          # npm ci is the default, but we need the peer dependency as well
+          install-command: npm ci && npm install --save false --package-lock false @cypress/browserify-preprocessor
           post-steps:
             - run: npm run check:markdown
 

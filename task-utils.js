@@ -319,7 +319,7 @@ function findSourceFiles(nycOptions) {
 
   debug('searching files to include using patterns %o', patterns)
 
-  const allFiles = globby.sync(patterns, { absolute: true })
+  const allFiles = globby.sync(patterns, { absolute: true, cwd: nycOptions.cwd })
   return allFiles
 }
 /**

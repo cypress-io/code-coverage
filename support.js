@@ -11,14 +11,14 @@ dayjs.extend(duration)
  * Sends collected code coverage object to the backend code
  * via "cy.task".
  */
-const sendCoverage = (coverage, pathname = '/') => {
+const sendCoverage = (coverage, pathname = '/', testName = '') => {
   logMessage(`Saving code coverage for **${pathname}**`)
 
   const withoutSpecs = filterSpecsFromCoverage(coverage)
   const appCoverageOnly = filterSupportFilesFromCoverage(withoutSpecs)
 
   // stringify coverage object for speed
-  cy.task('combineCoverage', JSON.stringify(appCoverageOnly), {
+  cy.task('combineCoverage', JSON.stringify({coverage: appCoverageOnly, testName}), {
     log: false
   })
 }
@@ -131,7 +131,7 @@ const registerHooks = () => {
     // save coverage after the test
     // because now the window coverage objects have been updated
     windowCoverageObjects.forEach((cover) => {
-      sendCoverage(cover.coverage, cover.pathname)
+      sendCoverage(cover.coverage, cover.pathname, Cypress.spec.name)
     })
 
     if (!hasE2ECoverage()) {

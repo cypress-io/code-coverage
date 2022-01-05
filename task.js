@@ -1,7 +1,7 @@
 // @ts-check
 const istanbul = require('istanbul-lib-coverage')
-const { join, resolve } = require('path')
-const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
+const { join, resolve, dirname } = require('path')
+const { existsSync, mkdirSync, readFileSync, writeFileSync, rmdirSync, readdirSync } = require('fs')
 const execa = require('execa')
 const {
   showNycInfo,
@@ -57,15 +57,17 @@ const nycReportOptions = (function getNycOption() {
   return nycReportOptions
 })()
 
-const nycFilename = join(nycReportOptions['temp-dir'], 'out.json')
+const globalNycFilename = 'out.json'
+const nycFilename = join(nycReportOptions.tempDir, globalNycFilename)
 
-function saveCoverage(coverage) {
-  if (!existsSync(nycReportOptions.tempDir)) {
-    mkdirSync(nycReportOptions.tempDir, { recursive: true })
+function saveCoverage(coverage, fileName = 'out.json') {
+  const outputLocation = join(nycReportOptions.tempDir, fileName)
+  if (!existsSync(dirname(outputLocation))) {
+    mkdirSync(dirname(outputLocation), { recursive: true })
     debug('created folder %s for output coverage', nycReportOptions.tempDir)
   }
 
-  writeFileSync(nycFilename, JSON.stringify(coverage, null, 2))
+  writeFileSync(outputLocation, JSON.stringify(coverage))
 }
 
 function maybePrintFinalCoverageFiles(folder) {
@@ -124,6 +126,7 @@ const tasks = {
       debug('reset code coverage in interactive mode')
       const coverageMap = istanbul.createCoverageMap({})
       saveCoverage(coverageMap)
+      rmdirSync(join(nycReportOptions.tempDir, 'specific'), { recursive: true })
     }
     /*
         Else:
@@ -143,26 +146,39 @@ const tasks = {
    * @returns {null} Nothing is returned from this task
    */
   combineCoverage(sentCoverage) {
-    const coverage = JSON.parse(sentCoverage)
+    const {coverage, testName} = JSON.parse(sentCoverage)
     debug('parsed sent coverage')
+    console.log('coverage for '+testName)
 
     fixSourcePaths(coverage)
 
-    const previousCoverage = existsSync(nycFilename)
-      ? JSON.parse(readFileSync(nycFilename, 'utf8'))
-      : {}
+    const handleCoverage = (fileName) => {
 
-    // previous code coverage object might have placeholder entries
-    // for files that we have not seen yet,
-    // but the user expects to include in the coverage report
-    // the merge function messes up, so we should remove any placeholder entries
-    // and re-insert them again when creating the report
-    removePlaceholders(previousCoverage)
+      const fullPath = join(nycReportOptions.tempDir, fileName)
+      console.log('saving to', fullPath)
 
-    const coverageMap = istanbul.createCoverageMap(previousCoverage)
-    coverageMap.merge(coverage)
-    saveCoverage(coverageMap)
-    debug('wrote coverage file %s', nycFilename)
+      const previousCoverage = existsSync(fullPath)
+        ? JSON.parse(readFileSync(fullPath, 'utf8'))
+        : {}
+
+      // previous code coverage object might have placeholder entries
+      // for files that we have not seen yet,
+      // but the user expects to include in the coverage report
+      // the merge function messes up, so we should remove any placeholder entries
+      // and re-insert them again when creating the report
+      removePlaceholders(previousCoverage)
+
+      const coverageMap = istanbul.createCoverageMap(previousCoverage)
+      coverageMap.merge(coverage)
+      saveCoverage(coverageMap, fileName)
+      debug('wrote coverage file %s', fileName)
+    }
+
+    console.log("handle global")
+    handleCoverage(globalNycFilename)
+    const slug = testName.replace(/[\/]+/g, '--')
+    console.log('handle specific for '+slug)
+    handleCoverage(join('specific', slug, 'out.json'))
 
     return null
   },
@@ -220,6 +236,60 @@ const tasks = {
 
       return reportFolder
     }
+
+    const specificFiles = readdirSync(join(nycReportOptions.tempDir, 'specific'))
+    console.log(specificFiles)
+    specificFiles.forEach(async fileName => {
+      const fullCoverageMap = await nyc.getCoverageMapFromAllCoverageFiles(join(nycReportOptions.tempDir, 'specific', fileName))
+
+      const writeFile = join(nycReportOptions.reportDir, 'specific', fileName.slice(fileName.lastIndexOf('--')+2).replace(/\.spec\.[jt]{1}s$/, '')+'.json')
+      mkdirSync(dirname(writeFile), { recursive: true })
+      writeFileSync(writeFile, JSON.stringify(Object.values(fullCoverageMap.data).map(data => {
+        const mapData = data.data
+        //console.log('mapdata', mapData)
+        const b = {}
+        Object.entries(mapData.b).forEach(([index, value]) => {
+          if (value.some(i => i > 0)) {
+            if (!mapData.branchMap[index].loc || !mapData.branchMap[index].loc.start) {
+              console.log('not found ', index, ' in ', mapData.branchMap)
+            }
+            const lineNr = mapData.branchMap[index].loc.start.line
+            b[lineNr] = value
+          }
+        })
+        const s = {}
+        Object.entries(mapData.s).forEach(([index, value]) => {
+          if (value > 0) {
+            if (!mapData.statementMap[index] || !mapData.statementMap[index].start) {
+              console.log('not found ', index, ' in ', mapData.statementMap)
+            }
+            const lineNr = mapData.statementMap[index].start.line
+            s[lineNr] = value
+          }
+        })
+        const f = {}
+        Object.entries(mapData.f).forEach(([index, value]) => {
+          if (value > 0) {
+            if (!mapData.fnMap[index].loc || !mapData.fnMap[index].loc.start) {
+              console.log('not found ', index, ' in ', mapData.fnMap)
+            }
+            const lineNr = mapData.fnMap[index].loc.start.line
+            f[lineNr] = value
+          }
+        })
+
+        if (Object.keys(b).length > 0 || Object.keys(s).length > 0 || Object.keys(f).length > 0) {
+          return {
+            path: mapData.path.replace(process.cwd()+'/', ''),
+            b,
+            s,
+            f
+          }
+        }
+        return undefined
+      }).filter(i => i)))
+    })
+
     return nyc.report().then(returnReportFolder)
   }
 }

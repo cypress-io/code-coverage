@@ -38,6 +38,7 @@
   },
   "homepage": "https://github.com/cypress-io/code-coverage#readme",
   "files": [
+    "*.d.ts",
     "*.js",
     "middleware"
   ],

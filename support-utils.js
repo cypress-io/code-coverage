@@ -7,24 +7,18 @@
  * only keep "external" application source file coverage
  */
 const filterSpecsFromCoverage = (totalCoverage, config = Cypress.config) => {
-  const integrationFolder = config('integrationFolder')
-  /** @type {string} Cypress run-time config has test files string pattern */
-  // @ts-ignore
-  const testFilePattern = config('testFiles')
+  // const integrationFolder = config('integrationFolder')
 
-  // test files chould be:
-  //  wild card string "**/*.*" (default)
-  //  wild card string "**/*spec.js"
-  //  list of wild card strings or names ["**/*spec.js", "spec-one.js"]
-  const testFilePatterns = Array.isArray(testFilePattern)
-    ? testFilePattern
-    : [testFilePattern]
+  const testFilePatterns = getCypressTestFilePatterns(config)
 
-  const isUsingDefaultTestPattern = testFilePattern === '**/*.*'
+  // const isUsingDefaultTestPattern = testFilePattern === '**/*.*'
 
-  const isTestFile = (filename) => {
+  // const isTestFile = (filename) => {
+  const isTestFile = (_, filePath) => {
+    const workingDir = Cypress.spec.absolute.replace(Cypress.spec.relative, '')
+    const filename = filePath.replace(workingDir, '')
     const matchedPattern = testFilePatterns.some((specPattern) =>
-      Cypress.minimatch(filename, specPattern)
+      Cypress.minimatch(filename, specPattern, { debug: false })
     )
     const matchedEndOfPath = testFilePatterns.some((specPattern) =>
       filename.endsWith(specPattern)
@@ -32,16 +26,54 @@ const filterSpecsFromCoverage = (totalCoverage, config = Cypress.config) => {
     return matchedPattern || matchedEndOfPath
   }
 
-  const isInIntegrationFolder = (filename) =>
-    filename.startsWith(integrationFolder)
+  // const isInIntegrationFolder = (filename) =>
+  //   filename.startsWith(integrationFolder)
 
-  const isA = (fileCoverge, filename) => isInIntegrationFolder(filename)
-  const isB = (fileCoverge, filename) => isTestFile(filename)
+  // const isA = (fileCoverge, filename) => isInIntegrationFolder(filename)
+  // const isB = (fileCoverge, filename) => isTestFile(filename)
 
-  const isTestFileFilter = isUsingDefaultTestPattern ? isA : isB
+  // const isTestFileFilter = isUsingDefaultTestPattern ? isA : isB
 
-  const coverage = Cypress._.omitBy(totalCoverage, isTestFileFilter)
+  // const coverage = Cypress._.omitBy(totalCoverage, isTestFileFilter)
+  const coverage = Cypress._.omitBy(totalCoverage, isTestFile)
   return coverage
+}
+
+function getCypressTestFilePatterns(config) {
+  let testFilePatterns = []
+
+  const testFilePattern =
+    Cypress.config().specPattern || Cypress.config().testFiles
+  const excludePattern = Cypress.env().codeCoverageExclude
+
+  // test files chould be:
+  //  wild card string "**/*.*" (default)
+  //  wild card string "**/*spec.js"
+  //  list of wild card strings or names ["**/*spec.js", "spec-one.js"]
+  if (Array.isArray(testFilePattern)) {
+    testFilePatterns = testFilePattern
+  } else {
+    testFilePatterns = [testFilePattern]
+  }
+
+  if (Array.isArray(excludePattern)) {
+    testFilePatterns = [...testFilePatterns, ...excludePattern]
+  } else if (excludePattern) {
+    testFilePatterns = [...testFilePatterns, excludePattern]
+  }
+
+  // Cypress <v10 might have integration folder with default **/*.* pattern,
+  // if so, exclude those files
+  const integrationFolder = config('integrationFolder')
+  if (integrationFolder) {
+    testFilePatterns.forEach((pattern) => {
+      if (pattern === '**/*.*') {
+        pattern = `${integrationFolder}/${pattern}`
+      }
+    })
+  }
+
+  return testFilePatterns
 }
 
 /**

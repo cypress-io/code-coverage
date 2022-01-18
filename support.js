@@ -37,7 +37,13 @@ const logMessage = (s) => {
  * If there are more files loaded from support folder, also removes them
  */
 const filterSupportFilesFromCoverage = (totalCoverage) => {
+
   const integrationFolder = Cypress.config('integrationFolder')
+  
+  if (!integrationFolder) {
+    return totalCoverage;
+  }
+
   const supportFile = Cypress.config('supportFile')
 
   /** @type {string} Cypress run-time config has the support folder string */

@@ -20,7 +20,7 @@ describe('minimatch', () => {
 })
 
 describe('filtering specs', () => {
-  it('filters list of specs by single string', () => {
+  it.only('filters list of specs by single string', () => {
     const config = cy.stub()
     config.withArgs('testFiles').returns(['specA.js'])
     config.withArgs('integrationFolder').returns('/path/to/integration/')

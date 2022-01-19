@@ -37,11 +37,14 @@ const logMessage = (s) => {
  * If there are more files loaded from support folder, also removes them
  */
 const filterSupportFilesFromCoverage = (totalCoverage) => {
-
   const integrationFolder = Cypress.config('integrationFolder')
-  
+
+  /**
+   * Cypress v10 doesn't have an integrationFolder config value any more, so we nope out here if its undefined.
+   * Instead, we rely on the new exclude option logic done in the getCypressExcludePatterns function.
+   */
   if (!integrationFolder) {
-    return totalCoverage;
+    return totalCoverage
   }
 
   const supportFile = Cypress.config('supportFile')

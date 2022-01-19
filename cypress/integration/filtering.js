@@ -20,14 +20,14 @@ describe('minimatch', () => {
 })
 
 describe('filtering specs', () => {
-  describe('using integrationFolder in Cypress < v10', () => {
+  describe('using integrationFolder and testFiles in Cypress < v10', () => {
     let config
     let env
     let spec
 
     beforeEach(() => {
       config = cy.stub()
-      config.withArgs('integrationFolder').returns('src')
+      config.withArgs('integrationFolder').returns('cypress/integration')
 
       env = cy.stub().returns({})
 
@@ -118,7 +118,7 @@ describe('filtering specs', () => {
     })
   })
 
-  describe('using codeCoverageExclude in Cypress >= v10', () => {
+  describe('using codeCoverage.exclude and specPattern in Cypress >= v10', () => {
     let config
     let env
     let spec
@@ -128,7 +128,9 @@ describe('filtering specs', () => {
 
       env = cy.stub().returns({
         //filter out all files in the cypress folder
-        codeCoverageExclude: 'cypress/**/*.*'
+        codeCoverage: {
+          exclude: 'cypress/**/*.*'
+        }
       })
 
       spec = {
@@ -229,6 +231,30 @@ describe('filtering specs', () => {
       }
       const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
       expect(result).to.deep.equal({
+        'src/my-code.js': {}
+      })
+    })
+
+    it.only('filters list of specs when exclude pattern is an array', () => {
+      env = cy.stub().returns({
+        //filter out a.js and b.js in cypress folder
+        codeCoverage: {
+          exclude: ['cypress/**/a.js', 'cypress/**/b.js']
+        }
+      })
+
+      config.withArgs('specPattern').returns(['src/**/*.cy.js'])
+
+      const totalCoverage = {
+        '/user/app/cypress/a.js': {},
+        '/user/app/cypress/b.js': {},
+        // These files should be included in coverage
+        '/user/app/cypress/c.js': {},
+        'src/my-code.js': {}
+      }
+      const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+      expect(result).to.deep.equal({
+        '/user/app/cypress/c.js': {},
         'src/my-code.js': {}
       })
     })

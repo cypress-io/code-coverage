@@ -41,7 +41,7 @@ function getCypressExcludePatterns(config, env) {
 
   const testFilePattern =
     config('specPattern') || config('testFiles')
-  const excludePattern = env().codeCoverageExclude
+  const excludePattern = env().codeCoverage?.exclude
 
   if (Array.isArray(testFilePattern)) {
     testFilePatterns = testFilePattern

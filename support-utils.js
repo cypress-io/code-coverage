@@ -2,6 +2,18 @@
 // helper functions that are safe to use in the browser
 // from support.js file - no file system access
 
+/** excludes files that shouldn't be in code coverage report */
+const filterFilesFromCoverage = (
+  totalCoverage,
+  config = Cypress.config,
+  env = Cypress.env,
+  spec = Cypress.spec
+) => {
+  const withoutSpecs = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+  const appCoverageOnly = filterSupportFilesFromCoverage(withoutSpecs, config)
+  return appCoverageOnly
+}
+
 /**
  * remove coverage for the spec files themselves,
  * only keep "external" application source file coverage
@@ -12,7 +24,7 @@ const filterSpecsFromCoverage = (
   env = Cypress.env,
   spec = Cypress.spec
 ) => {
-  const testFilePatterns = getCypressExcludePatterns(config, env)
+  const testFilePatterns = getCypressExcludePatterns(config, env, spec)
 
   const isTestFile = (_, filePath) => {
     const workingDir = spec.absolute.replace(spec.relative, '')
@@ -36,7 +48,7 @@ const filterSpecsFromCoverage = (
  * @param {*} env
  * @returns string[]
  */
-function getCypressExcludePatterns(config, env) {
+function getCypressExcludePatterns(config, env, spec) {
   let testFilePatterns = []
 
   const testFilePattern = config('specPattern') || config('testFiles')
@@ -57,8 +69,10 @@ function getCypressExcludePatterns(config, env) {
 
   // Cypress <v10 might have integration folder with default **/*.* pattern,
   // if so, exclude those files
-  const integrationFolder = config('integrationFolder')
+  let integrationFolder = config('integrationFolder')
   if (integrationFolder) {
+    const workingDir = spec.absolute.replace(spec.relative, '')
+    integrationFolder = integrationFolder.replace(workingDir, '')
     testFilePatterns.forEach((pattern, idx) => {
       if (pattern === '**/*.*') {
         testFilePatterns[idx] = `${integrationFolder}/${pattern}`.replace(
@@ -70,6 +84,49 @@ function getCypressExcludePatterns(config, env) {
   }
 
   return testFilePatterns
+}
+
+/**
+ * Removes support file from the coverage object.
+ * If there are more files loaded from support folder, also removes them
+ */
+const filterSupportFilesFromCoverage = (
+  totalCoverage,
+  config = Cypress.config
+) => {
+  const integrationFolder = config('integrationFolder')
+
+  /**
+   * Cypress v10 doesn't have an integrationFolder config value any more, so we nope out here if its undefined.
+   * Instead, we rely on the new exclude option logic done in the getCypressExcludePatterns function.
+   */
+  if (!integrationFolder) {
+    return totalCoverage
+  }
+
+  const supportFile = config('supportFile')
+
+  /** @type {string} Cypress run-time config has the support folder string */
+  // @ts-ignore
+  const supportFolder = config('supportFolder')
+
+  const isSupportFile = (filename) => filename === supportFile
+
+  let coverage = Cypress._.omitBy(totalCoverage, (fileCoverage, filename) =>
+    isSupportFile(filename)
+  )
+
+  // check the edge case
+  //   if we have files from support folder AND the support folder is not same
+  //   as the integration, or its prefix (this might remove all app source files)
+  //   then remove all files from the support folder
+  if (!integrationFolder.startsWith(supportFolder)) {
+    // remove all covered files from support folder
+    coverage = Cypress._.omitBy(totalCoverage, (fileCoverage, filename) =>
+      filename.startsWith(supportFolder)
+    )
+  }
+  return coverage
 }
 
 /**
@@ -92,5 +149,5 @@ function fixSourcePaths(coverage) {
 
 module.exports = {
   fixSourcePaths,
-  filterSpecsFromCoverage
+  filterFilesFromCoverage
 }

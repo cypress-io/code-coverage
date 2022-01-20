@@ -1,4 +1,4 @@
-const { filterSpecsFromCoverage } = require('../../support-utils')
+const { filterFilesFromCoverage } = require('../../support-utils')
 
 describe('minimatch', () => {
   it('string matches', () => {
@@ -27,7 +27,13 @@ describe('filtering specs', () => {
 
     beforeEach(() => {
       config = cy.stub()
-      config.withArgs('integrationFolder').returns('cypress/integration')
+      config.withArgs('integrationFolder').returns('/user/app/cypress/integration')
+      config
+        .withArgs('supportFile')
+        .returns('/user/app/cypress/support/index.js')
+      config
+        .withArgs('supportFolder')
+        .returns('/user/app/cypress/support')
 
       env = cy.stub().returns({})
 
@@ -43,7 +49,7 @@ describe('filtering specs', () => {
         '/user/app/cypress/integration/specA.js': {},
         '/user/app/cypress/integration/specB.js': {}
       }
-      const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+      const result = filterFilesFromCoverage(totalCoverage, config, env, spec)
       expect(result).to.deep.equal({
         '/user/app/cypress/integration/specB.js': {}
       })
@@ -55,7 +61,7 @@ describe('filtering specs', () => {
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
       }
-      const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+      const result = filterFilesFromCoverage(totalCoverage, config, env, spec)
       expect(result).to.deep.equal({
         '/user/app/src/codeB.js': {}
       })
@@ -68,7 +74,7 @@ describe('filtering specs', () => {
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
       }
-      const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+      const result = filterFilesFromCoverage(totalCoverage, config, env, spec)
       expect(result).to.deep.equal({
         '/user/app/src/codeA.js': {}
       })
@@ -81,11 +87,11 @@ describe('filtering specs', () => {
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
       }
-      const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+      const result = filterFilesFromCoverage(totalCoverage, config, env, spec)
       expect(result, 'all specs have been filtered out').to.deep.equal({})
     })
 
-    it('filters list of specs in integration folder', () => {
+    it('filters specs from integration folder', () => {
       config.withArgs('testFiles').returns('**/*.*') // default pattern
 
       const totalCoverage = {
@@ -95,7 +101,7 @@ describe('filtering specs', () => {
         '/user/app/cypress/integration/spec1.js': {},
         '/user/app/cypress/integration/spec2.js': {}
       }
-      const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+      const result = filterFilesFromCoverage(totalCoverage, config, env, spec)
       expect(result).to.deep.equal({
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
@@ -111,7 +117,22 @@ describe('filtering specs', () => {
         // This file should be included in coverage
         'src/my-code.js': {}
       }
-      const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+      const result = filterFilesFromCoverage(totalCoverage, config, env, spec)
+      expect(result).to.deep.equal({
+        'src/my-code.js': {}
+      })
+    })
+
+    it('filters files out of cypress support directory', () => {
+      config.withArgs('testFiles').returns(['**/*.*']) // default pattern
+      const totalCoverage = {
+        '/user/app/cypress/support/index.js': {},
+        '/user/app/cypress/support/command.js': {},
+        '/user/app/cypress/integration/spec.js': {},
+        // This file should be included in coverage
+        'src/my-code.js': {}
+      }
+      const result = filterFilesFromCoverage(totalCoverage, config, env, spec)
       expect(result).to.deep.equal({
         'src/my-code.js': {}
       })
@@ -145,7 +166,7 @@ describe('filtering specs', () => {
         '/user/app/src/specA.cy.js': {},
         '/user/app/src/specB.cy.js': {}
       }
-      const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+      const result = filterFilesFromCoverage(totalCoverage, config, env, spec)
       expect(result).to.deep.equal({
         '/user/app/src/specB.cy.js': {}
       })
@@ -157,7 +178,7 @@ describe('filtering specs', () => {
         '/user/app/src/specA.cy.js': {},
         '/user/app/src/specB.cy.js': {}
       }
-      const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+      const result = filterFilesFromCoverage(totalCoverage, config, env, spec)
       expect(result).to.deep.equal({
         '/user/app/src/specB.cy.js': {}
       })
@@ -172,7 +193,7 @@ describe('filtering specs', () => {
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
       }
-      const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+      const result = filterFilesFromCoverage(totalCoverage, config, env, spec)
       expect(result).to.deep.equal({
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
@@ -186,7 +207,7 @@ describe('filtering specs', () => {
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
       }
-      const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+      const result = filterFilesFromCoverage(totalCoverage, config, env, spec)
       expect(result).to.deep.equal({
         '/user/app/src/codeA.js': {}
       })
@@ -199,7 +220,7 @@ describe('filtering specs', () => {
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
       }
-      const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+      const result = filterFilesFromCoverage(totalCoverage, config, env, spec)
       expect(result, 'all specs have been filtered out').to.deep.equal({})
     })
 
@@ -213,7 +234,7 @@ describe('filtering specs', () => {
         '/user/app/cypress/integration/spec1.js': {},
         '/user/app/cypress/integration/spec2.js': {}
       }
-      const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+      const result = filterFilesFromCoverage(totalCoverage, config, env, spec)
       expect(result).to.deep.equal({
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
@@ -229,7 +250,7 @@ describe('filtering specs', () => {
         // This file should be included in coverage
         'src/my-code.js': {}
       }
-      const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+      const result = filterFilesFromCoverage(totalCoverage, config, env, spec)
       expect(result).to.deep.equal({
         'src/my-code.js': {}
       })
@@ -252,7 +273,7 @@ describe('filtering specs', () => {
         '/user/app/cypress/c.js': {},
         'src/my-code.js': {}
       }
-      const result = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+      const result = filterFilesFromCoverage(totalCoverage, config, env, spec)
       expect(result).to.deep.equal({
         '/user/app/cypress/c.js': {},
         'src/my-code.js': {}

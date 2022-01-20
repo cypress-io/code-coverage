@@ -163,7 +163,7 @@ describe('filtering specs', () => {
       })
     })
 
-    it('filters out file in codeCoverageExclude', () => {
+    it('filters out file in codeCoverage.exclude', () => {
       config.withArgs('specPattern').returns(['**/*.cy.js'])
       const totalCoverage = {
         '/user/app/cypress/support/index.js': {},
@@ -235,7 +235,7 @@ describe('filtering specs', () => {
       })
     })
 
-    it.only('filters list of specs when exclude pattern is an array', () => {
+    it('filters list of specs when exclude pattern is an array', () => {
       env = cy.stub().returns({
         //filter out a.js and b.js in cypress folder
         codeCoverage: {

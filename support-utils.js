@@ -32,15 +32,14 @@ const filterSpecsFromCoverage = (
 
 /**
  * Reads Cypress config and exclude patterns and combines them into one array
- * @param {*} config 
- * @param {*} env 
+ * @param {*} config
+ * @param {*} env
  * @returns string[]
  */
 function getCypressExcludePatterns(config, env) {
   let testFilePatterns = []
 
-  const testFilePattern =
-    config('specPattern') || config('testFiles')
+  const testFilePattern = config('specPattern') || config('testFiles')
   const excludePattern = env().codeCoverage && env().codeCoverage.exclude
 
   if (Array.isArray(testFilePattern)) {

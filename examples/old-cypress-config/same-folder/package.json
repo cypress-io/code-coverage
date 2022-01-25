@@ -3,6 +3,6 @@
   "description": "Check if test files are correctly filtered out",
   "devDependencies": {},
   "scripts": {
-    "cy:open": "../../node_modules/.bin/cypress open"
+    "cy:open": "../node_modules/.bin/cypress open"
   }
 }

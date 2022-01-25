@@ -13,6 +13,6 @@ module.exports = (on, config) => {
   }
   on('file:preprocessor', webpack(options))
 
-  require('../../../../task')(on, config)
+  require('../../../../../task')(on, config)
   return config
 }

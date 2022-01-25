@@ -2,7 +2,7 @@
 const browserify = require('@cypress/browserify-preprocessor')
 
 module.exports = (on, config) => {
-  require('../../../../task')(on, config)
+  require('../../../../../task')(on, config)
 
   const options = browserify.defaultOptions
   // options.browserifyOptions.transform[1][1].babelrc = true
@@ -12,7 +12,7 @@ module.exports = (on, config) => {
   //   {}
   // ])
   options.typescript = require.resolve('typescript')
-  // on('file:preprocessor', require('../../../../use-babelrc'))
+  // on('file:preprocessor', require('../../../../../use-babelrc'))
   console.log('browserify options')
   console.log(JSON.stringify(options, null, 2))
 
@@ -36,6 +36,6 @@ module.exports = (on, config) => {
 //   }
 //   on('file:preprocessor', webpack(options))
 
-//   require('../../../../task')(on, config)
+//   require('../../../../../task')(on, config)
 //   return config
 // }

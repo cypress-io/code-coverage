@@ -5,8 +5,8 @@
   "description": "Instrumented files in Docker container are found locally",
   "main": "index.js",
   "scripts": {
-    "cy:open": "../../node_modules/.bin/cypress open",
-    "cy:run": "../../node_modules/.bin/cypress run"
+    "cy:open": "../node_modules/.bin/cypress open",
+    "cy:run": "../node_modules/.bin/cypress run"
   },
   "keywords": [],
   "author": "",

@@ -3,12 +3,12 @@
   "description": "Fills placeholder values",
   "private": true,
   "scripts": {
-    "cy:open": "../../node_modules/.bin/cypress open",
-    "cy:run": "../../node_modules/.bin/cypress run",
-    "report": "../../node_modules/.bin/nyc report",
+    "cy:open": "../node_modules/.bin/cypress open",
+    "cy:run": "../node_modules/.bin/cypress run",
+    "report": "../../../node_modules/.bin/nyc report",
     "clean": "rm -rf .nyc_output || true",
-    "test:a": "../../node_modules/.bin/cypress run --spec cypress/integration/spec-a.js",
-    "test:b": "../../node_modules/.bin/cypress run --spec cypress/integration/spec-b.js"
+    "test:a": "../node_modules/.bin/cypress run --spec cypress/integration/spec-a.js",
+    "test:b": "../node_modules/.bin/cypress run --spec cypress/integration/spec-b.js"
   },
   "nyc": {
     "all": true,

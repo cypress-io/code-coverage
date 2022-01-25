@@ -5,8 +5,8 @@
     "@babel/core": "7.9.0"
   },
   "scripts": {
-    "start": "../../node_modules/.bin/parcel serve index.html",
-    "cy:open": "../../node_modules/.bin/cypress open",
-    "dev": "../../node_modules/.bin/start-test 1234 cy:open"
+    "start": "../../../node_modules/.bin/parcel serve index.html",
+    "cy:open": "../node_modules/.bin/cypress open",
+    "dev": "../../../node_modules/.bin/start-test 1234 cy:open"
   }
 }

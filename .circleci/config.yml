@@ -145,6 +145,7 @@ workflows:
           # there are no jobs to follow this one
           # so no need to save the workspace files (saves time)
           no-workspace: true
+          working_directory: examples/old-cypress-config/backend
           command: '../node_modules/.bin/cypress run'
           # store screenshots and videos
           store_artifacts: true

@@ -49,9 +49,9 @@ jobs:
       CI_PULL_REQUEST: ''
     steps:
       - checkout
-      - node/with-cache:
-          steps:
-            - run: npm ci
+      # - node/with-cache:
+      #     steps:
+      - run: npm ci
       - run: npm run semantic-release
 
 workflows:

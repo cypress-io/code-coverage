@@ -58,6 +58,9 @@ workflows:
       - cypress/install:
           post-steps:
             - run: npm run check:markdown
+            - run:
+              command: npm ci
+              working_directory: examples/old-cypress-config
 
       - cypress/run:
           name: frontend coverage

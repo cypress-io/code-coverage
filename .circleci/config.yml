@@ -371,10 +371,11 @@ workflows:
           # there are no jobs to follow this one
           # so no need to save the workspace files (saves time)
           no-workspace: true
-          start: npm start --prefix examples/old-cypress-config/all-files
+          working_directory: examples/old-cypress-config/all-files
+          start: npm start
           wait-on: 'http://localhost:1234'
           # command: npx cypress run --project examples/all-files
-          command: pwd && ../node_modules/.bin/cypress run
+          command: ../node_modules/.bin/cypress run
           # store screenshots and videos
           store_artifacts: true
           post-steps:

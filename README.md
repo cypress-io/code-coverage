@@ -348,7 +348,7 @@ env: {
 
 Cypress v10 and later users should set the `exclude` option to exclude any items from the `cypress` folder they don't want to be included in the coverage reports. 
 
-Additionaly, you can use [`nyc` configuration](https://github.com/istanbuljs/nyc#common-configuration-options) and [ include and exclude options](https://github.com/istanbuljs/nyc#using-include-and-exclude-arrays). You can include and exclude files using `minimatch` patterns in `.nycrc` file or using "nyc" object inside your `package.json` file.
+Additionaly, you can use [`nyc` configuration](https://github.com/istanbuljs/nyc#common-configuration-options) and [include and exclude options](https://github.com/istanbuljs/nyc#using-include-and-exclude-arrays). You can include and exclude files using `minimatch` patterns in `.nycrc` file or using "nyc" object inside your `package.json` file.
 
 For example, if you want to only include files in the `app` folder, but exclude `app/util.js` file, you can set in your `package.json`
 

@@ -605,28 +605,28 @@ workflows:
       #             ../../node_modules/.bin/only-covered --from coverage/coverage-final.json main.js second.js not-covered.js
       #           working_directory: examples/old-cypress-config/all-files
 
-      - publish:
-          filters:
-            branches:
-              only:
-                - master
-                - beta
-          requires:
-            - unit
-            - frontend coverage
-            - backend coverage
-            - fullstack coverage
-            - example-before-each-visit
-            - example-before-all-visit
-            - example-ts-example
-            - example-same-folder
-            - example-support-files
-            - example-use-plugins-and-support
-            - example-one-spec
-            - example-exclude-files
-            - example-docker-paths
-            - example-use-webpack
-            - example-all-files
-            - example-placeholders
-            - example-unit-tests-js
-            - Windows test
+      # - publish:
+      #     filters:
+      #       branches:
+      #         only:
+      #           - master
+      #           - beta
+      #     requires:
+      #       - unit
+      #       - frontend coverage
+      #       - backend coverage
+      #       - fullstack coverage
+      #       - example-before-each-visit
+      #       - example-before-all-visit
+      #       - example-ts-example
+      #       - example-same-folder
+      #       - example-support-files
+      #       - example-use-plugins-and-support
+      #       - example-one-spec
+      #       - example-exclude-files
+      #       - example-docker-paths
+      #       - example-use-webpack
+      #       - example-all-files
+      #       - example-placeholders
+      #       - example-unit-tests-js
+      #       - Windows test

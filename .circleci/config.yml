@@ -152,7 +152,9 @@ workflows:
           # store screenshots and videos
           store_artifacts: true
           post-steps:
-            - run: cat examples/old-cypress-config/before-all-visit/.nyc_output/out.json
+            - run: 
+                command: cat .nyc_output/out.json
+                working_directory: examples/old-cypress-config/before-all-visit
             # store the created coverage report folder
             # you can click on it in the CircleCI UI
             # to see live static HTML site

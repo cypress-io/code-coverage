@@ -3,6 +3,7 @@
   "description": "Getting code coverage when cy.visit is used in beforeEach hook",
   "devDependencies": {},
   "scripts": {
+    "start": "../../../node_modules/.bin/parcel serve index.html",
     "cy:open": "../node_modules/.bin/cypress open",
     "coverage:report using npx": "npx nyc report --report-dir ./coverage --temp-dir .nyc_output --reporter=lcov --reporter=clover --reporter=json",
     "coverage:report using bin-up": "bin-up nyc report --report-dir ./coverage --temp-dir .nyc_output --reporter=lcov --reporter=clover --reporter=json"

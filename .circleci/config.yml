@@ -171,6 +171,41 @@ workflows:
                   ../../../node_modules/.bin/only-covered main.js
                 working_directory: examples/old-cypress-config/before-all-visit
 
+      - cypress/run:
+          name: example-before-each-visit
+          requires:
+            - cypress/install
+          # grab the workspace created by cypress/install job
+          attach-workspace: true  
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          working_directory: examples/old-cypress-config/before-each-visit
+          start: npm start
+          wait-on: 'http://localhost:1234'
+          command: '../node_modules/.bin/cypress run'
+          # store screenshots and videos
+          store_artifacts: true
+          post-steps:
+            - run: 
+                command: .nyc_output/out.json
+                working_directory: examples/old-cypress-config/before-each-visit
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/old-cypress-config/before-each-visit/coverage
+            # make sure the examples captures 100% of code
+            - run:
+                command: npx nyc report --check-coverage true --lines 100
+                working_directory: examples/old-cypress-config/before-each-visit
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  ../../node_modules/.bin/check-coverage main.js
+                  ../../node_modules/.bin/only-covered main.js
+                working_directory: examples/old-cypress-config/before-each-visit
+
 
       # - cypress/run:
       #     name: frontend coverage
@@ -229,35 +264,7 @@ workflows:
       #             ../../node_modules/.bin/only-covered server.js main.js string-utils.js
       #           working_directory: examples/old-cypress-config/fullstack
 
-      # - cypress/run:
-      #     attach-workspace: true
-      #     name: example-before-each-visit
-      #     requires:
-      #       - cypress/install
-      #     # there are no jobs to follow this one
-      #     # so no need to save the workspace files (saves time)
-      #     no-workspace: true
-      #     # command: npx cypress run --project examples/before-each-visit
-      #     command: '../node_modules/.bin/cypress run'
-      #     # store screenshots and videos
-      #     store_artifacts: true
-      #     post-steps:
-      #       - run: cat examples/old-cypress-config/before-each-visit/.nyc_output/out.json
-      #       # store the created coverage report folder
-      #       # you can click on it in the CircleCI UI
-      #       # to see live static HTML site
-      #       - store_artifacts:
-      #           path: examples/old-cypress-config/before-each-visit/coverage
-      #       # make sure the examples captures 100% of code
-      #       - run:
-      #           command: npx nyc report --check-coverage true --lines 100
-      #           working_directory: examples/old-cypress-config/before-each-visit
-      #       - run:
-      #           name: Check code coverage 📈
-      #           command: |
-      #             ../../node_modules/.bin/check-coverage main.js
-      #             ../../node_modules/.bin/only-covered main.js
-      #           working_directory: examples/old-cypress-config/before-each-visit
+      
 
       
       # - cypress/run:

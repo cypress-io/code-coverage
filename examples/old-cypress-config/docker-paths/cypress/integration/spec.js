@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 describe('docker-paths', () => {
   it('works', () => {
-    cy.visit('dist/index.html')
+    cy.visit('index.html')
     cy.contains('Page body')
 
     cy.window()

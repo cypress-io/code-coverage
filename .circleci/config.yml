@@ -188,7 +188,7 @@ workflows:
           store_artifacts: true
           post-steps:
             - run: 
-                command: .nyc_output/out.json
+                command: cat .nyc_output/out.json
                 working_directory: examples/old-cypress-config/before-each-visit
             # store the created coverage report folder
             # you can click on it in the CircleCI UI

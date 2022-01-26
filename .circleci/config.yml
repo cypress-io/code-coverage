@@ -228,7 +228,7 @@ workflows:
             # make sure the examples captures 100% of code
             - run:
                 command: npx nyc report --check-coverage true --lines 100
-                working_directory: examples/old-cypress-config/before-all-visit
+                working_directory: examples/old-cypress-config/docker-paths
             - run:
                 name: Check code coverage 📈
                 command: |

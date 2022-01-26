@@ -5,6 +5,7 @@
   "description": "Instrumented files in Docker container are found locally",
   "main": "index.js",
   "scripts": {
+    "start": "../../../node_modules/.bin/parcel serve index.html",
     "cy:open": "../node_modules/.bin/cypress open",
     "cy:run": "../node_modules/.bin/cypress run"
   },

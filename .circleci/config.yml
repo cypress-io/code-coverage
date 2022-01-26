@@ -202,9 +202,34 @@ workflows:
             - run:
                 name: Check code coverage 📈
                 command: |
-                  ../../node_modules/.bin/check-coverage main.js
-                  ../../node_modules/.bin/only-covered main.js
+                  ../../../node_modules/.bin/check-coverage main.js
+                  ../../../node_modules/.bin/only-covered main.js
                 working_directory: examples/old-cypress-config/before-each-visit
+
+      - cypress/run:
+          name: example-docker-paths
+          requires:
+            - cypress/install
+          # grab the workspace created by cypress/install job
+          attach-workspace: true        
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          working_directory: examples/old-cypress-config/docker-paths
+          command: '../node_modules/.bin/cypress run'
+          post-steps:
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/old-cypress-config/docker-paths/coverage
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  ../../../node_modules/.bin/check-coverage main.js
+                  ../../../node_modules/.bin/check-coverage second.js
+                  ../../../node_modules/.bin/only-covered main.js second.js
+                working_directory: examples/old-cypress-config/docker-paths
 
 
       # - cypress/run:
@@ -267,29 +292,7 @@ workflows:
       
 
       
-      # - cypress/run:
-      #     attach-workspace: true
-      #     name: example-docker-paths
-      #     requires:
-      #       - cypress/install
-      #     # there are no jobs to follow this one
-      #     # so no need to save the workspace files (saves time)
-      #     no-workspace: true
-      #     working_directory: examples/old-cypress-config/docker-paths
-      #     command: '../node_modules/.bin/cypress run'
-      #     post-steps:
-      #       # store the created coverage report folder
-      #       # you can click on it in the CircleCI UI
-      #       # to see live static HTML site
-      #       - store_artifacts:
-      #           path: examples/old-cypress-config/docker-paths/coverage
-      #       - run:
-      #           name: Check code coverage 📈
-      #           command: |
-      #             ../../node_modules/.bin/check-coverage main.js
-      #             ../../node_modules/.bin/check-coverage second.js
-      #             ../../node_modules/.bin/only-covered main.js second.js
-      #           working_directory: examples/old-cypress-config/docker-paths
+      
 
       # - cypress/run:
       #     attach-workspace: true

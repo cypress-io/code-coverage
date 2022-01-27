@@ -484,8 +484,8 @@ workflows:
             - run:
                 name: Check code coverage 📈
                 command: |
-                  ../../node_modules/.bin/check-coverage misc.js
-                  ../../node_modules/.bin/only-covered misc.js
+                  ../../../node_modules/.bin/check-coverage misc.js
+                  ../../../node_modules/.bin/only-covered misc.js
                 working_directory: examples/old-cypress-config/unit-tests-js
 
       - cypress/run:          

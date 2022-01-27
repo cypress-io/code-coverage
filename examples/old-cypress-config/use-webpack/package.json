@@ -6,10 +6,10 @@
   "scripts": {
     "cy:open": "../node_modules/.bin/cypress open",
     "cy:run": "../node_modules/.bin/cypress run",
-    "dev": "../../../node_modules/.bin/start-test 5000 cy:open",
+    "dev": "../../../node_modules/.bin/start-test 1234 cy:open",
     "build": "../../../node_modules/.bin/webpack",
-    "start": "../../../node_modules/.bin/serve dist",
-    "test:ci": "../../../node_modules/.bin/start-test 5000 cy:run"
+    "start": "../../../node_modules/.bin/serve -l 1234 dist",
+    "test:ci": "../../../node_modules/.bin/start-test 1234 cy:run"
   },
   "keywords": [],
   "author": "",

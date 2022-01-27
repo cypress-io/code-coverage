@@ -1,6 +1,5 @@
 {
-  "baseUrl": "http://localhost:5000",
-  "supportFile": "../../support",
+  "baseUrl": "http://localhost:1234",
   "fixturesFolder": false,
   "viewportHeight": 400,
   "viewportWidth": 400

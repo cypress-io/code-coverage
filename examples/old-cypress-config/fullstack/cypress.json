@@ -1,9 +1,9 @@
 {
   "fixturesFolder": false,
-  "baseUrl": "http://localhost:3003",
+  "baseUrl": "http://localhost:1234",
   "env": {
     "codeCoverage": {
-      "url": "http://localhost:3003/__coverage__"
+      "url": "http://localhost:1234/__coverage__"
     }
   }
 }

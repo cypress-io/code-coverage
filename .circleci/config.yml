@@ -456,6 +456,39 @@ workflows:
                   ../../../node_modules/.bin/only-covered main.ts calc.ts
                 working_directory: examples/old-cypress-config/ts-example
 
+      - cypress/run:          
+          name: example-unit-tests-js
+          requires:
+            - cypress/install
+          # grab the workspace created by cypress/install job
+          attach-workspace: true 
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          working_directory: examples/old-cypress-config/unit-tests-js
+          # command: npx cypress run --project examples/old-cypress-config/unit-tests-js
+          command: ../node_modules/.bin/cypress run
+          # store screenshots and videos
+          store_artifacts: true
+          post-steps:
+            - run: cat examples/old-cypress-config/unit-tests-js/.nyc_output/out.json
+            - run: cat examples/old-cypress-config/unit-tests-js/coverage/coverage-summary.json
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/old-cypress-config/unit-tests-js/coverage
+            # make sure the examples captures 100% of code
+            - run:
+                command: npx nyc report --check-coverage true --lines 100
+                working_directory: examples/old-cypress-config/unit-tests-js
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  ../../node_modules/.bin/check-coverage misc.js
+                  ../../node_modules/.bin/only-covered misc.js
+                working_directory: examples/old-cypress-config/unit-tests-js
+
       # - cypress/run:
       #     name: frontend coverage
       #     requires:
@@ -587,36 +620,7 @@ workflows:
 
       
 
-      # - cypress/run:
-      #     attach-workspace: true
-      #     name: example-unit-tests-js
-      #     requires:
-      #       - cypress/install
-      #     # there are no jobs to follow this one
-      #     # so no need to save the workspace files (saves time)
-      #     no-workspace: true
-      #     # command: npx cypress run --project examples/old-cypress-config/unit-tests-js
-      #     command: ../node_modules/.bin/cypress run
-      #     # store screenshots and videos
-      #     store_artifacts: true
-      #     post-steps:
-      #       - run: cat examples/old-cypress-config/unit-tests-js/.nyc_output/out.json
-      #       - run: cat examples/old-cypress-config/unit-tests-js/coverage/coverage-summary.json
-      #       # store the created coverage report folder
-      #       # you can click on it in the CircleCI UI
-      #       # to see live static HTML site
-      #       - store_artifacts:
-      #           path: examples/old-cypress-config/unit-tests-js/coverage
-      #       # make sure the examples captures 100% of code
-      #       - run:
-      #           command: npx nyc report --check-coverage true --lines 100
-      #           working_directory: examples/old-cypress-config/unit-tests-js
-      #       - run:
-      #           name: Check code coverage 📈
-      #           command: |
-      #             ../../node_modules/.bin/check-coverage misc.js
-      #             ../../node_modules/.bin/only-covered misc.js
-      #           working_directory: examples/old-cypress-config/unit-tests-js
+      
 
       # - cypress/run:
       #     name: Windows test

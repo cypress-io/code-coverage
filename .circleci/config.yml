@@ -489,6 +489,7 @@ workflows:
                   ../../node_modules/.bin/only-covered misc.js
                 working_directory: examples/old-cypress-config/unit-tests-js
 
+
       # - cypress/run:
       #     name: frontend coverage
       #     requires:

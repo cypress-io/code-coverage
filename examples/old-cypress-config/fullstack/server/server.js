@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 3003
+const port = 1234
 
 // if there is code coverage information
 // then expose an endpoint that returns it

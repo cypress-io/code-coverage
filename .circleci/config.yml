@@ -247,6 +247,39 @@ workflows:
                   ../../../node_modules/.bin/only-covered --from coverage/coverage-final.json main.js
                 working_directory: examples/old-cypress-config/exclude-files
 
+      - cypress/run:
+          name: fullstack coverage
+          requires:
+            - cypress/install
+          # grab the workspace created by cypress/install job
+          attach-workspace: true
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          working_directory: examples/old-cypress-config/fullstack
+          start: npm start
+          wait-on: 'http://localhost:1234'
+          command: '../node_modules/.bin/cypress run'
+          # store screenshots and videos
+          store_artifacts: true
+          post-steps:
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/old-cypress-config/backend/coverage
+            - run:
+                command: npm run report
+                working_directory: examples/old-cypress-config/fullstack
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  ../../../node_modules/.bin/check-coverage fullstack/server/server.js
+                  ../../../node_modules/.bin/check-coverage fullstack/main.js
+                  ../../../node_modules/.bin/check-coverage fullstack/string-utils.js
+                  ../../../node_modules/.bin/only-covered server.js main.js string-utils.js
+                working_directory: examples/old-cypress-config/fullstack
+
       # - cypress/run:
       #     name: frontend coverage
       #     requires:
@@ -271,38 +304,6 @@ workflows:
       #       - run: npx nyc report --check-coverage true --lines 100 --include cypress/about.js
       #       # make sure unit tests are covered
       #       - run: npx nyc report --check-coverage true --lines 100 --include cypress/unit.js
-
-      # - cypress/run:
-      #     name: fullstack coverage
-      #     requires:
-      #       - cypress/install
-      #     # grab the workspace created by cypress/install job
-      #     attach-workspace: true
-      #     working_directory: examples/old-cypress-config/fullstack
-      #     start: npm start
-      #     wait-on: 'http://localhost:3003'
-      #     command: '../node_modules/.bin/cypress run'
-
-      #     # there are no jobs to follow this one
-      #     # so no need to save the workspace files (saves time)
-      #     no-workspace: true
-      #     post-steps:
-      #       # store the created coverage report folder
-      #       # you can click on it in the CircleCI UI
-      #       # to see live static HTML site
-      #       - store_artifacts:
-      #           path: examples/old-cypress-config/backend/coverage
-      #       - run:
-      #           command: npm run report
-      #           working_directory: examples/old-cypress-config/fullstack
-      #       - run:
-      #           name: Check code coverage 📈
-      #           command: |
-      #             ../../node_modules/.bin/check-coverage fullstack/server/server.js
-      #             ../../node_modules/.bin/check-coverage fullstack/main.js
-      #             ../../node_modules/.bin/check-coverage fullstack/string-utils.js
-      #             ../../node_modules/.bin/only-covered server.js main.js string-utils.js
-      #           working_directory: examples/old-cypress-config/fullstack
 
       
 

@@ -392,6 +392,40 @@ workflows:
                   ../../../node_modules/.bin/only-covered main.js unit-utils.js
                 working_directory: examples/old-cypress-config/same-folder
 
+      - cypress/run:      
+          name: example-support-files
+          requires:
+            - cypress/install
+          # grab the workspace created by cypress/install job
+          attach-workspace: true
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          working_directory: examples/old-cypress-config/support-files
+          start: npm start
+          wait-on: 'http://localhost:1234'
+          # command: npx cypress run --project examples/support-files
+          command: ../node_modules/.bin/cypress run
+          # store screenshots and videos
+          store_artifacts: true
+          post-steps:
+            - run: cat examples/old-cypress-config/support-files/.nyc_output/out.json
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: examples/old-cypress-config/support-files/coverage
+            # make sure the examples captures 100% of code
+            - run:
+                command: npx nyc report --check-coverage true --lines 100
+                working_directory: examples/old-cypress-config/support-files
+            - run:
+                name: Check code coverage 📈
+                command: |
+                  ../../../node_modules/.bin/check-coverage main.js
+                  ../../../node_modules/.bin/only-covered main.js
+                working_directory: examples/old-cypress-config/support-files
+
       # - cypress/run:
       #     name: frontend coverage
       #     requires:
@@ -446,7 +480,7 @@ workflows:
       #       - run:
       #           name: Check code coverage 📈
       #           command: |
-      #             ../../node_modules/.bin/check-coverage main.ts
+      #             ../../../node_modules/.bin/check-coverage main.ts
       #             ../../node_modules/.bin/check-coverage calc.ts
       #             ../../node_modules/.bin/only-covered main.ts calc.ts
       #           working_directory: examples/old-cypress-config/ts-example
@@ -487,37 +521,7 @@ workflows:
       #           working_directory: examples/old-cypress-config/use-webpack
 
       
-      # - cypress/run:
-      #     attach-workspace: true
-      #     name: example-support-files
-      #     requires:
-      #       - cypress/install
-      #     # there are no jobs to follow this one
-      #     # so no need to save the workspace files (saves time)
-      #     no-workspace: true
-      #     start: npm start --prefix examples/old-cypress-config/support-files
-      #     wait-on: 'http://localhost:1234'
-      #     # command: npx cypress run --project examples/support-files
-      #     command: ../node_modules/.bin/cypress run
-      #     # store screenshots and videos
-      #     store_artifacts: true
-      #     post-steps:
-      #       - run: cat examples/old-cypress-config/support-files/.nyc_output/out.json
-      #       # store the created coverage report folder
-      #       # you can click on it in the CircleCI UI
-      #       # to see live static HTML site
-      #       - store_artifacts:
-      #           path: examples/old-cypress-config/support-files/coverage
-      #       # make sure the examples captures 100% of code
-      #       - run:
-      #           command: npx nyc report --check-coverage true --lines 100
-      #           working_directory: examples/old-cypress-config/support-files
-      #       - run:
-      #           name: Check code coverage 📈
-      #           command: |
-      #             ../../node_modules/.bin/check-coverage main.js
-      #             ../../node_modules/.bin/only-covered main.js
-      #           working_directory: examples/old-cypress-config/support-files
+      
 
       
 

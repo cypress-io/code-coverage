@@ -1,8 +1,11 @@
 {
   "name": "example-same-folder",
   "description": "Check if test files are correctly filtered out",
-  "devDependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.16.12"
+  },
   "scripts": {
+    "start": "../../../node_modules/.bin/parcel serve index.html",
     "cy:open": "../node_modules/.bin/cypress open"
   }
 }

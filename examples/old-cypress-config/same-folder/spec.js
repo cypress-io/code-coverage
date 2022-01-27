@@ -4,8 +4,8 @@ import { reverse } from './unit-utils'
 
 describe('coverage information', () => {
   before(() => {
-    cy.log('visiting index.html')
-    cy.visit('index.html')
+    cy.log('visiting /')
+    cy.visit('/')
   })
 
   it('calls add', () => {

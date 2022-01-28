@@ -269,6 +269,10 @@ workflows:
             # to see live static HTML site
             - store_artifacts:
                 path: examples/old-cypress-config/frontend/coverage
+            # make sure the examples captures 100% of code
+            - run:
+                command: npx nyc report --check-coverage true --lines 100
+                working_directory: examples/old-cypress-config/frontend
             - run:
                 name: Check code coverage 📈
                 command: |

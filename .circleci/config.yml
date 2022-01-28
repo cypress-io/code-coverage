@@ -10,15 +10,12 @@ jobs:
     description: Checks the code formatting
     docker:
       - image: cimg/node:16.9.1
-    environment:
-      # we don't need Cypress to check code style
-      CYPRESS_INSTALL_BINARY: '0'
     steps:
       - checkout
       - run:
           name: Install dependencies 📦
           # installs NPM dependencies but skips Cypress
-          command: CYPRESS_INSTALL_BINARY=0 npm ci
+          command: npm ci
       - run:
           name: Install deps for examples/old-cypress-config
           command: npm ci

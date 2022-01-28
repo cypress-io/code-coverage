@@ -2,8 +2,8 @@
 // https://on.cypress.io/intelligent-code-completion
 /// <reference types="Cypress" />
 
-import { add } from '../unit'
-const { fixSourcePaths } = require('../../support-utils')
+import { add } from '../../unit'
+const { fixSourcePaths } = require('../../../../../support-utils')
 
 context('Page test', () => {
   beforeEach(() => {

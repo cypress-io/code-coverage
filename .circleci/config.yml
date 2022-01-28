@@ -3,7 +3,6 @@ version: 2.1
 orbs:
   # https://github.com/cypress-io/circleci-orb
   cypress: cypress-io/cypress@1.26.0 # used to run e2e tests
-  # node: circleci/node@1.1.6 # used to publish new NPM version
   win: circleci/windows@2 # run a test job on Windows
 
 jobs:
@@ -11,20 +10,19 @@ jobs:
     description: Checks the code formatting
     docker:
       - image: cimg/node:16.9.1
-    # executor:
-    #   name: node/default
-    #   tag: '12'
     environment:
       # we don't need Cypress to check code style
       CYPRESS_INSTALL_BINARY: '0'
     steps:
       - checkout
-      # - node/with-cache:
-      #     steps:
       - run:
           name: Install dependencies 📦
           # installs NPM dependencies but skips Cypress
           command: CYPRESS_INSTALL_BINARY=0 npm ci
+      - run:
+          name: Install deps for examples/old-cypress-config
+          command: npm ci
+          working_directory: examples/old-cypress-config
       - run:
           name: Code style check 🧹
           command: npm run format:check
@@ -39,9 +37,6 @@ jobs:
     description: Publishes the new version of the plugin to NPM
     docker:
       - image: cimg/node:16.9.1
-    # executor:
-    #   name: node/default
-    #   tag: '12'
     environment:
       # we don't need Cypress to do the release
       CYPRESS_INSTALL_BINARY: '0'
@@ -52,24 +47,17 @@ jobs:
       CI_PULL_REQUEST: ''
     steps:
       - checkout
-      # - node/with-cache:
-      #     steps:
       - run: npm ci
       - run: npm run semantic-release
 
 workflows:
   build:
     jobs:
-      # - unit
-
+      - unit
+      
       - cypress/install:
           post-steps:
             - run: npm run check:markdown
-          post-install:
-            - run:
-                command: npm ci
-                working_directory: examples/old-cypress-config
-
       - cypress/run:
           name: code coverage tests
           requires:

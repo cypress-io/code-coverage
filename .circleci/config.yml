@@ -31,6 +31,9 @@ jobs:
       - run:
           name: Types lint 🧹
           command: npm run types
+      - run:
+          name: Test
+          command: npm test
 
   publish:
     description: Publishes the new version of the plugin to NPM

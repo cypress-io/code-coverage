@@ -54,8 +54,10 @@ workflows:
   build:
     jobs:
       - unit
-      
+
       - cypress/install:
+          requires:
+            -unit
           post-steps:
             - run: npm run check:markdown
       - cypress/run:

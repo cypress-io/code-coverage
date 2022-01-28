@@ -68,6 +68,31 @@ workflows:
                 working_directory: examples/old-cypress-config
 
       - cypress/run:
+          name: code coverage tests
+          requires:
+            - cypress/install
+          # grab the workspace created by cypress/install job
+          attach-workspace: true
+          # we need to start the web application
+          start: npm start
+          # there are no jobs to follow this one
+          # so no need to save the workspace files (saves time)
+          no-workspace: true
+          post-steps:
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: coverage
+            # print code coverage summary to the terminal
+            # and make sure there the coverage is above certain limit
+            - run: npx nyc report --check-coverage true --lines 80
+            # make sure second page (about.html) has its JavaScript counted and covered
+            - run: npx nyc report --check-coverage true --lines 100 --include cypress/about.js
+            # make sure unit tests are covered
+            - run: npx nyc report --check-coverage true --lines 100 --include cypress/unit.js
+
+      - cypress/run:
           name: example-all-files
           requires:
             - cypress/install
@@ -559,30 +584,6 @@ workflows:
                   ../../../node_modules/.bin/only-covered src/index.js src/calc.js
                 working_directory: examples/old-cypress-config/use-webpack
 
-      # - cypress/run:
-      #     name: code coverage tests
-      #     requires:
-      #       - cypress/install
-      #     # grab the workspace created by cypress/install job
-      #     attach-workspace: true
-      #     # we need to start the web application
-      #     start: npm start
-      #     # there are no jobs to follow this one
-      #     # so no need to save the workspace files (saves time)
-      #     no-workspace: true
-      #     post-steps:
-      #       # store the created coverage report folder
-      #       # you can click on it in the CircleCI UI
-      #       # to see live static HTML site
-      #       - store_artifacts:
-      #           path: coverage
-      #       # print code coverage summary to the terminal
-      #       # and make sure there the coverage is above certain limit
-      #       - run: npx nyc report --check-coverage true --lines 80
-      #       # make sure second page (about.html) has its JavaScript counted and covered
-      #       - run: npx nyc report --check-coverage true --lines 100 --include cypress/about.js
-      #       # make sure unit tests are covered
-      #       - run: npx nyc report --check-coverage true --lines 100 --include cypress/unit.js
 
       # - cypress/run:
       #     name: Windows test

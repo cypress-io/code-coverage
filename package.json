@@ -4,12 +4,11 @@
   "description": "Saves the code coverage collected during Cypress tests",
   "main": "index.js",
   "scripts": {
-    "test": "cypress run",
     "start": "parcel serve cypress/index.html",
     "cy:open": "cypress open",
     "dev": "start-test 1234 cy:open",
     "semantic-release": "semantic-release",
-    "test:ci": "start-test 1234",
+    "test": "start-test 1234 'npx cypress run'",
     "report:coverage": "nyc report --reporter=html",
     "dev:no:coverage": "start-test 1234 'cypress open --env coverage=false'",
     "format": "prettier --write '*.js'",

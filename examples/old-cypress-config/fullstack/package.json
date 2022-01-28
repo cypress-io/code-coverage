@@ -3,7 +3,8 @@
   "description": "Combined code coverage from the backend code, and e2e and unit tests",
   "devDependencies": {},
   "scripts": {
-    "start": "../../../node_modules/.bin/nyc --silent node server/server",
+    "start": "node server/server",
+    "start2": "../../../node_modules/.bin/nyc --silent node server/server",
     "cy:open": "../node_modules/.bin/cypress open",
     "cy:run": "../node_modules/.bin/cypress run",
     "test": "../../../node_modules/.bin/start-test 1234 cy:run",

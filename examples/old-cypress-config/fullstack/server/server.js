@@ -1,4 +1,5 @@
 const express = require('express')
+const path = require('path')
 const app = express()
 const port = 1234
 
@@ -11,7 +12,7 @@ if (global.__coverage__) {
   require('../../../../middleware/express')(app)
 }
 
-app.use(express.static(__dirname))
+app.use(express.static(path.join(__dirname, '../dist')))
 
 app.get('/hello', (req, res) => {
   console.log('sending hello world')

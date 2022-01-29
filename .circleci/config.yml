@@ -46,7 +46,7 @@ jobs:
 workflows:
   build:
     jobs:
-      - unit
+      # - unit
 
       - cypress/install:
           post-install:
@@ -90,7 +90,6 @@ workflows:
           working_directory: examples/old-cypress-config/all-files
           start: npm start
           wait-on: 'http://localhost:1234'
-          # command: npx cypress run --project examples/all-files
           command: ../node_modules/.bin/cypress run
           # store screenshots and videos
           store_artifacts: true
@@ -269,7 +268,6 @@ workflows:
           working_directory: examples/old-cypress-config/frontend
           start: npm start
           wait-on: 'http://localhost:1234'
-          # command: npx cypress run --project examples/frontend
           command: ../node_modules/.bin/cypress run
           # store screenshots and videos
           store_artifacts: true
@@ -325,81 +323,7 @@ workflows:
                   ../../../node_modules/.bin/check-coverage fullstack/string-utils.js
                   ../../../node_modules/.bin/only-covered server.js main.js string-utils.js
                 working_directory: examples/old-cypress-config/fullstack
-
-      # leaving out as it doesn't seem to exercise code coverage capabilityes, but cypress testFiles pattern instead
-      # - cypress/run:
-      #     name: example-one-spec
-      #     requires:
-      #       - cypress/install
-      #     # grab the workspace created by cypress/install job
-      #     attach-workspace: true
-      #     # there are no jobs to follow this one
-      #     # so no need to save the workspace files (saves time)
-      #     no-workspace: true
-      #     working_directory: examples/old-cypress-config/one-spec
-      #     # command: npx cypress run --project examples/one-spec
-      #     command: ../node_modules/.bin/cypress run
-      #     # store screenshots and videos
-      #     store_artifacts: true
-      #     post-steps:
-      #       - run:
-      #           command: cat .nyc_output/out.json
-      #           working_directory: examples/old-cypress-config/one-spec
-      #       - run:
-      #           command: cat coverage/coverage-summary.json
-      #           working_directory: examples/old-cypress-config/one-spec
-      #       # store the created coverage report folder
-      #       # you can click on it in the CircleCI UI
-      #       # to see live static HTML site
-      #       - store_artifacts:
-      #           path: examples/old-cypress-config/one-spec/coverage
-      #       # make sure the examples captures 100% of code
-      #       - run:
-      #           command: npx nyc report --check-coverage true --lines 100
-      #           working_directory: examples/old-cypress-config/one-spec
-      #       - run:
-      #           name: Check code coverage 📈
-      #           command: |
-      #             ../../../node_modules/.bin/check-coverage main.js
-      #             ../../../node_modules/.bin/only-covered main.js
-      #           working_directory: examples/old-cypress-config/one-spec
-
-      # leaving out, doesn't run cypress
-      # - cypress/run:
-      #     attach-workspace: true
-      #     name: example-placeholders
-      #     requires:
-      #       - cypress/install
-      #     # there are no jobs to follow this one
-      #     # so no need to save the workspace files (saves time)
-      #     no-workspace: true
-      #     # command: npx cypress run --project examples/placeholders
-      #     command: ../node_modules/.bin/cypress run
-      #     # store screenshots and videos
-      #     store_artifacts: true
-      #     post-steps:
-      #       - run: cat examples/old-cypress-config/placeholders/.nyc_output/out.json
-      #       - run: cat examples/old-cypress-config/placeholders/coverage/coverage-final.json
-      #       # store the created coverage report folder
-      #       # you can click on it in the CircleCI UI
-      #       # to see live static HTML site
-      #       - store_artifacts:
-      #           path: examples/old-cypress-config/placeholders/coverage
-      #       # make sure the examples captures 100% of code
-      #       - run:
-      #           command: npx nyc report --check-coverage true --lines 100
-      #           working_directory: examples/old-cypress-config/placeholders
-      #       - run:
-      #           name: Check code coverage 📈
-      #           # we will check the final coverage report
-      #           # to make sure it only has files we are interested in
-      #           # because there are files covered at 0 in the report
-      #           command: |
-      #             ../../node_modules/.bin/check-coverage src/a.js
-      #             ../../node_modules/.bin/check-coverage src/a.js
-      #             ../../node_modules/.bin/only-covered --from coverage/coverage-final.json src/a.js src/b.js
-      #           working_directory: examples/old-cypress-config/placeholders
-
+      
       - cypress/run:
           attach-workspace: true
           name: example-same-folder
@@ -449,7 +373,6 @@ workflows:
           working_directory: examples/old-cypress-config/support-files
           start: npm start
           wait-on: 'http://localhost:1234'
-          # command: npx cypress run --project examples/support-files
           command: ../node_modules/.bin/cypress run
           # store screenshots and videos
           store_artifacts: true
@@ -511,7 +434,6 @@ workflows:
           # so no need to save the workspace files (saves time)
           no-workspace: true
           working_directory: examples/old-cypress-config/unit-tests-js
-          # command: npx cypress run --project examples/old-cypress-config/unit-tests-js
           command: ../node_modules/.bin/cypress run
           # store screenshots and videos
           store_artifacts: true
@@ -580,7 +502,6 @@ workflows:
       #     no-workspace: true
       #     start: npm run start:windows --prefix examples/old-cypress-config/all-files
       #     wait-on: 'http://localhost:1234'
-      #     # command: npx cypress run --project examples/all-files
       #     command: ../node_modules/.bin/cypress run
       #     # store screenshots and videos
       #     store_artifacts: true
@@ -616,7 +537,6 @@ workflows:
       #           - beta
       #     requires:
       #       - unit
-      #       - frontend coverage
       #       - backend coverage
       #       - fullstack coverage
       #       - example-before-each-visit
@@ -625,11 +545,9 @@ workflows:
       #       - example-same-folder
       #       - example-support-files
       #       - example-use-plugins-and-support
-      #       - example-one-spec
       #       - example-exclude-files
       #       - example-docker-paths
       #       - example-use-webpack
       #       - example-all-files
-      #       - example-placeholders
       #       - example-unit-tests-js
       #       - Windows test

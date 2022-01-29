@@ -49,12 +49,13 @@ workflows:
       - unit
 
       - cypress/install:
-          post-steps:
-            - run: npm run check:markdown
+          post-install:
             - run:
                 name: Install deps for examples/old-cypress-config
                 command: npm ci
                 working_directory: examples/old-cypress-config
+          post-steps:
+            - run: npm run check:markdown               
 
       - cypress/run:
           name: code-coverage-tests

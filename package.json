@@ -46,7 +46,6 @@
   },
   "private": false,
   "dependencies": {
-    "@cypress/browserify-preprocessor": "3.0.2",
     "chalk": "4.1.2",
     "dayjs": "1.10.7",
     "debug": "4.3.3",

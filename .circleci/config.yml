@@ -10,16 +10,15 @@ jobs:
     description: Checks the code formatting
     docker:
       - image: cimg/node:16.9.1
+        environment:
+      # we don't need Cypress to check code style
+      CYPRESS_INSTALL_BINARY: '0'
     steps:
       - checkout
       - run:
           name: Install dependencies 📦
           # installs NPM dependencies but skips Cypress
-          command: npm ci
-      - run:
-          name: Install deps for examples/old-cypress-config
-          command: npm ci
-          working_directory: examples/old-cypress-config
+          command: CYPRESS_INSTALL_BINARY=0 npm ci
       - run:
           name: Code style check 🧹
           command: npm run format:check
@@ -29,6 +28,8 @@ jobs:
       - run:
           name: Test
           command: npm test
+      # and make sure there the coverage is above certain limit
+      - run: npx nyc report --check-coverage true --lines 80
 
   publish:
     description: Publishes the new version of the plugin to NPM
@@ -57,18 +58,6 @@ workflows:
             - unit
           post-steps:
             - run: npm run check:markdown
-      - cypress/run:
-          name: code coverage tests
-          requires:
-            - cypress/install
-          # grab the workspace created by cypress/install job
-          attach-workspace: true
-          # we need to start the web application
-          start: npm start
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          post-steps:
             # store the created coverage report folder
             # you can click on it in the CircleCI UI
             # to see live static HTML site
@@ -81,7 +70,11 @@ workflows:
             - run: npx nyc report --check-coverage true --lines 100 --include cypress/about.js
             # make sure unit tests are covered
             - run: npx nyc report --check-coverage true --lines 100 --include cypress/unit.js
-
+            - run:
+                name: Install deps for examples/old-cypress-config
+                command: npm ci
+                working_directory: examples/old-cypress-config
+          
       - cypress/run:
           name: example-all-files
           requires:
@@ -298,7 +291,7 @@ workflows:
                 working_directory: examples/old-cypress-config/frontend
 
       - cypress/run:
-          name: fullstack coverage
+          name: example-fullstack
           requires:
             - cypress/install
           # grab the workspace created by cypress/install job

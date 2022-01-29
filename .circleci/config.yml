@@ -11,8 +11,8 @@ jobs:
     docker:
       - image: cimg/node:16.9.1
         environment:
-      # we don't need Cypress to check code style
-      CYPRESS_INSTALL_BINARY: '0'
+          # we don't need Cypress to check code style
+          CYPRESS_INSTALL_BINARY: '0'
     steps:
       - checkout
       - run:

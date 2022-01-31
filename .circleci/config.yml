@@ -41,6 +41,7 @@ jobs:
       - checkout
       - run: npm ci
       - run: npm run semantic-release
+
   test-example:
     docker:
       - image: cimg/node:16.9.1
@@ -62,7 +63,7 @@ jobs:
     # store screenshots and videos
     # store_artifacts: true
     steps:
-      - run: npm run start-test
+      - run: npm run test
       - run: cat examples/<< parameters.jobname >>/.nyc_output/out.json
       - run: cat examples/<< parameters.jobname >>/coverage/coverage-final.json
       # store the created coverage report folder

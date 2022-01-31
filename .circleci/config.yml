@@ -106,6 +106,7 @@ workflows:
       
       - test-example:
           name: test-<< matrix.jobname>>
+          requires: cypress/install
           matrix:
             parameters:
               jobname: ["old-cypress-config/all-files"]  

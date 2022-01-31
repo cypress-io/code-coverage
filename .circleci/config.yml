@@ -41,7 +41,9 @@ jobs:
       - checkout
       - run: npm ci
       - run: npm run semantic-release
-  cypress/run:
+  test-example:
+    docker:
+      - image: cimg/node:16.9.1
     parameters:
         jobname:
           type: string
@@ -54,11 +56,13 @@ jobs:
     # so no need to save the workspace files (saves time)
     no-workspace: true
     working_directory: examples/<< parameters.jobname >>
-    start: npm start
-    wait-on: 'http://localhost:1234'
-    command: npm run test
+    # start: npm start
+    # wait-on: 'http://localhost:1234'
+    # command: npm run test
     # store screenshots and videos
     store_artifacts: true
+    steps:
+      - run: npm run start-test
     post-steps:
       - run: cat examples/<< parameters.jobname >>/.nyc_output/out.json
       - run: cat examples/<< parameters.jobname >>/coverage/coverage-final.json
@@ -100,7 +104,7 @@ workflows:
                 working_directory: examples/new-cypress-config
           post-steps:
             - run: npm run check:markdown     
-      - cypress/install:
+      - test-example:
           matrix:
               parameters:
                 jobname: ['old-cypress-config/all-files']          

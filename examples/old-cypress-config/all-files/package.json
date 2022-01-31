@@ -3,12 +3,9 @@
   "description": "Report all files",
   "private": true,
   "scripts": {
-    "start": "../../../node_modules/.bin/parcel serve index.html",
+    "start": "../node_modules/.bin/parcel serve index.html",
     "start:windows": "npx bin-up parcel serve index.html",
-    "dev": "../../../node_modules/.bin/start-test 1234 cy:open",
-    "e2e": "../../../node_modules/.bin/start-test 1234 cy:run",
-    "report": "../../../node_modules/.bin/nyc report",
-    "test": "../node_modules/.bin/cypress run"
+    "test": "../node_modules/.bin/start-test 1234 cy:run"
   },
   "nyc": {
     "all": true,

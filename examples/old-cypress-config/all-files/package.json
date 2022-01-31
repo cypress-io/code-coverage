@@ -5,11 +5,10 @@
   "scripts": {
     "start": "../../../node_modules/.bin/parcel serve index.html",
     "start:windows": "npx bin-up parcel serve index.html",
-    "cy:open": "../node_modules/.bin/cypress open",
-    "cy:run": "../node_modules/.bin/cypress run",
     "dev": "../../../node_modules/.bin/start-test 1234 cy:open",
     "e2e": "../../../node_modules/.bin/start-test 1234 cy:run",
-    "report": "../../../node_modules/.bin/nyc report"
+    "report": "../../../node_modules/.bin/nyc report",
+    "test": "../node_modules/.bin/cypress run"
   },
   "nyc": {
     "all": true,

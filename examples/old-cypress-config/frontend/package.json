@@ -9,6 +9,6 @@
     "start": "../node_modules/.bin/parcel serve index.html",
     "test": "../node_modules/.bin/start-test 1234 cy:run",
     "coverage:verify": "npx nyc report --check-coverage true --lines 100",
-    "coverage:check-files": "../node_modules/.bin/check-coverage app.js && ../node_modules/.bin/check-coverage about.js && ./node_modules/.bin/check-coverage unit.js && ./node_modules/.bin/only-covered app.js about.js unit.js"
+    "coverage:check-files": "../node_modules/.bin/check-coverage app.js && ../node_modules/.bin/check-coverage about.js && ./node_modules/.bin/check-coverage unit.js && ../node_modules/.bin/only-covered app.js about.js unit.js"
   }
 }

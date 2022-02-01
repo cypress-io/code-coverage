@@ -3,12 +3,11 @@
   "description": "Fills placeholder values",
   "private": true,
   "scripts": {
-    "cy:open": "../node_modules/.bin/cypress open",
     "cy:run": "../node_modules/.bin/cypress run",
-    "report": "../../../node_modules/.bin/nyc report",
-    "clean": "rm -rf .nyc_output || true",
-    "test:a": "../node_modules/.bin/cypress run --spec cypress/integration/spec-a.js",
-    "test:b": "../node_modules/.bin/cypress run --spec cypress/integration/spec-b.js"
+    "start": "../node_modules/.bin/parcel serve src/index.html",
+    "test": "../node_modules/.bin/start-test 1234 cy:run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "../node_modules/.bin/check-coverage a.js && ../node_modules/.bin/only-covered a.js b.js"
   },
   "nyc": {
     "all": true,

@@ -46,7 +46,7 @@ jobs:
 
   cyrun:
     docker:
-      - image: cimg/node:16.9.1
+      - image: cypress/base:16.13.2
     parameters:
           jobname:
             type: string

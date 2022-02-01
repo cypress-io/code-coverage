@@ -44,7 +44,7 @@ jobs:
       - run: npm ci
       - run: npm run semantic-release
 
-  test-example:
+  cyrun:
     docker:
       - image: cimg/node:16.9.1
     parameters:
@@ -65,44 +65,47 @@ jobs:
       # store screenshots and videos
       # store_artifacts: true
     steps:
-      - cypress/run:
-          name: example-new-all-files
-          requires:
-            - cypress/install
-          # grab the workspace created by cypress/install job
-          attach-workspace: true
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          working_directory: examples/<< parameters.jobname >>
-          start: npm start
-          wait-on: 'http://localhost:1234'
+      - run:
           command: npm run test
-          # store screenshots and videos
-          store_artifacts: true
-          post-steps:
-            - run: cat examples/<< parameters.jobname >>/.nyc_output/out.json
-            - run: cat examples/<< parameters.jobname >>/coverage/coverage-final.json
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/<< parameters.jobname >>/coverage
-            # make sure the examples captures 100% of code
-            - run:
-                command: npx nyc report --check-coverage true --lines 100
-                working_directory: examples/<< parameters.jobname >>
-            - run:
-                name: Check code coverage 📈
-                # we will check the final coverage report
-                # to make sure it only has files we are interested in
-                # because there are files covered at 0 in the report
-                command: |
-                  ../../../node_modules/.bin/check-coverage main.js
-                  ../../../node_modules/.bin/check-coverage second.js
-                  ../../../node_modules/.bin/check-coverage not-covered.js
-                  ../../../node_modules/.bin/only-covered --from coverage/coverage-final.json main.js second.js not-covered.js
-                working_directory: examples/<< parameters.jobname >>
+          working_directory: examples/<< parameters.jobname >>
+      # - cypress/run:
+      #     name: example-new-all-files
+      #     requires:
+      #       - cypress/install
+      #     # grab the workspace created by cypress/install job
+      #     attach-workspace: true
+      #     # there are no jobs to follow this one
+      #     # so no need to save the workspace files (saves time)
+      #     no-workspace: true
+      #     working_directory: examples/<< parameters.jobname >>
+      #     start: npm start
+      #     wait-on: 'http://localhost:1234'
+      #     command: npm run test
+      #     # store screenshots and videos
+      #     store_artifacts: true
+      #     post-steps:
+      #       - run: cat examples/<< parameters.jobname >>/.nyc_output/out.json
+      #       - run: cat examples/<< parameters.jobname >>/coverage/coverage-final.json
+      #       # store the created coverage report folder
+      #       # you can click on it in the CircleCI UI
+      #       # to see live static HTML site
+      #       - store_artifacts:
+      #           path: examples/<< parameters.jobname >>/coverage
+      #       # make sure the examples captures 100% of code
+      #       - run:
+      #           command: npx nyc report --check-coverage true --lines 100
+      #           working_directory: examples/<< parameters.jobname >>
+      #       - run:
+      #           name: Check code coverage 📈
+      #           # we will check the final coverage report
+      #           # to make sure it only has files we are interested in
+      #           # because there are files covered at 0 in the report
+      #           command: |
+      #             ../../../node_modules/.bin/check-coverage main.js
+      #             ../../../node_modules/.bin/check-coverage second.js
+      #             ../../../node_modules/.bin/check-coverage not-covered.js
+      #             ../../../node_modules/.bin/only-covered --from coverage/coverage-final.json main.js second.js not-covered.js
+      #           working_directory: examples/<< parameters.jobname >>
     
 
 workflows:
@@ -123,7 +126,7 @@ workflows:
       #     post-steps:
       #       - run: npm run check:markdown     
       
-      - test-example:
+      - cyrun:
           name: test-<< matrix.jobname>>
           # requires: 
           #   - cypress/install

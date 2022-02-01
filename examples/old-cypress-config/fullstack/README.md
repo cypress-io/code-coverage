@@ -7,7 +7,7 @@ This example runs instrumented server code, that serves instrumented frontend co
 To run
 
 ```sh
-$ npm run dev
+$ npm run test
 ```
 
 You should see messages from the plugin when it saves each coverage object

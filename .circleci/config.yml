@@ -65,6 +65,8 @@ jobs:
       # store screenshots and videos
       # store_artifacts: true
     steps:
+      - attach_workspace:
+              at: ~/ 
       - run:
           command: npm run test
           working_directory: examples/<< parameters.jobname >>

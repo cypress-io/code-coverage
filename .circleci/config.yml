@@ -54,7 +54,7 @@ jobs:
       # requires:
       #   - cypress/install
       # grab the workspace created by cypress/install job
-    
+      # attach_workspace: true
       # there are no jobs to follow this one
       # so no need to save the workspace files (saves time)
       # no-workspace: true
@@ -65,8 +65,6 @@ jobs:
       # store screenshots and videos
       # store_artifacts: true
     steps:
-      - attach_workspace:
-              at: ~/
       - run:
           command: npm run test
           working_directory: examples/<< parameters.jobname >>
@@ -115,23 +113,23 @@ workflows:
     jobs:
       # - unit
 
-      # - cypress/install:
-      #     post-install:
-      #       - run:
-      #           name: Install deps for examples/old-cypress-config
-      #           command: npm ci
-      #           working_directory: examples/old-cypress-config
-      #       # - run:
-      #       #     name: Install deps for examples/new-cypress-config
-      #       #     command: npm ci
-      #       #     working_directory: examples/new-cypress-config
-      #     post-steps:
-      #       - run: npm run check:markdown     
+      - cypress/install:
+          post-install:
+            - run:
+                name: Install deps for examples/old-cypress-config
+                command: npm ci
+                working_directory: examples/old-cypress-config
+            # - run:
+            #     name: Install deps for examples/new-cypress-config
+            #     command: npm ci
+            #     working_directory: examples/new-cypress-config
+          post-steps:
+            - run: npm run check:markdown     
       
       - cyrun:
           name: test-<< matrix.jobname>>
-          # requires: 
-          #   - cypress/install
+          requires: 
+            - cypress/install
           matrix:
             parameters:
               jobname: ["old-cypress-config/all-files"]  

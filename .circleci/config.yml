@@ -68,7 +68,7 @@ jobs:
           # we will check the final coverage report
           # to make sure it only has files we are interested in
           # because there are files covered at 0 in the report
-          command: ./validate.sh
+          command: npm run validate
           working_directory: examples/<< parameters.jobname >>
 
 workflows:

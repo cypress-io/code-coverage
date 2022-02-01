@@ -1,5 +1,4 @@
 module.exports = (on, config) => {
-  require('../../../../../task')(on, config)
-  // on('file:preprocessor', require('../../../../../use-babelrc'))
+  require('@cypress/code-coverage/task')(on, config)
   return config
 }

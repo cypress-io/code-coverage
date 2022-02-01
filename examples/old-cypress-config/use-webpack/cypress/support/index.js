@@ -1,2 +1,2 @@
 
-import '../../../../../support'
+import '@cypress/code-coverage/support'

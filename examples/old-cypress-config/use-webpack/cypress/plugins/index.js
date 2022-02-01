@@ -13,6 +13,6 @@ module.exports = (on, config) => {
   // on('file:preprocessor', webpack(options))
   on('file:preprocessor', require('cypress-istanbul/use-babelrc'))
 
-  require('../../../../../task')(on, config)
+  require('@cypress/code-coverage/task')(on, config)
   return config
 }

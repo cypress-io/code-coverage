@@ -1,2 +1,1 @@
-import '../../../../../support'
-console.log('this is commands file')
+import '@cypress/code-coverage/support'

@@ -4,12 +4,12 @@
   "description": "Code coverage from webpack",
   "private": true,
   "scripts": {
-    "cy:open": "../node_modules/.bin/cypress open",
     "cy:run": "../node_modules/.bin/cypress run",
-    "dev": "../../../node_modules/.bin/start-test 1234 cy:open",
-    "build": "../../../node_modules/.bin/webpack",
-    "start": "../../../node_modules/.bin/serve -l 1234 dist",
-    "test:ci": "../../../node_modules/.bin/start-test 1234 cy:run"
+    "build": "../node_modules/.bin/webpack",
+    "start": "../node_modules/.bin/serve -p 1234 dist",
+    "test": "npm run build && ../node_modules/.bin/start-test 1234 cy:run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "../node_modules/.bin/check-coverage src/index.js && ../node_modules/.bin/check-coverage src/calc.js && ../node_modules/.bin/only-covered src/index.js src/calc.js"
   },
   "keywords": [],
   "author": "",

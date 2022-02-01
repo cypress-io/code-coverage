@@ -54,7 +54,7 @@ jobs:
       # requires:
       #   - cypress/install
       # grab the workspace created by cypress/install job
-      # attach_workspace: true
+    
       # there are no jobs to follow this one
       # so no need to save the workspace files (saves time)
       # no-workspace: true
@@ -65,6 +65,8 @@ jobs:
       # store screenshots and videos
       # store_artifacts: true
     steps:
+      - attach_workspace:
+              at: ~/
       - run:
           command: npm run test
           working_directory: examples/<< parameters.jobname >>

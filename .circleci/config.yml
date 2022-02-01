@@ -59,14 +59,15 @@ jobs:
       - store_artifacts:
           path: examples/<< parameters.jobname >>/coverage
       - run:
-          command: npx nyc report --check-coverage true --lines 100
+          name: Verify Code Coverage
+          command: npm run coverage:verify
           working_directory: examples/<< parameters.jobname >>
       - run:
-          name: Check code coverage 📈
+          name: Check code coverage files 📈
           # we will check the final coverage report
           # to make sure it only has files we are interested in
           # because there are files covered at 0 in the report
-          command: npm run validate
+          command: npm run coverage:check-files
           working_directory: examples/<< parameters.jobname >>
 
 workflows:
@@ -93,7 +94,10 @@ workflows:
             - cypress/install
           matrix:
             parameters:
-              jobname: ["old-cypress-config/all-files"]  
+              jobname: 
+                - old-cypress-config/all-files
+                - old-cypress-config/backend
+
 
       # - test-example:
       #     name: abc

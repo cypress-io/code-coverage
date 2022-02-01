@@ -4,9 +4,10 @@
   "devDependencies": {},
   "private": true,
   "scripts": {
-    "start": "../../../node_modules/.bin/nyc --silent node server/server",
-    "cy:open": "../node_modules/.bin/cypress open",
-    "dev": "../../../node_modules/.bin/start-test 3003 cy:open",
-    "coverage:report": "../../../node_modules/.bin/nyc report"
+    "cy:run": "../node_modules/.bin/cypress run",
+    "start": "../node_modules/.bin/nyc --silent node server/server",
+    "test": "../node_modules/.bin/start-test 3003 cy:run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "../node_modules/.bin/check-coverage server.js && ../node_modules/.bin/only-covered server.js"
   }
 }

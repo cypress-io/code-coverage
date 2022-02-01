@@ -3,6 +3,7 @@
   "description": "Report all files",
   "private": true,
   "scripts": {
+    "cy:run": "../node_modules/.bin/cypress run",
     "start": "../node_modules/.bin/parcel serve index.html",
     "start:windows": "npx bin-up parcel serve index.html",
     "test": "../node_modules/.bin/start-test 1234 cy:run"
@@ -12,6 +13,6 @@
     "include": "*.js"
   },
   "devDependencies": {
-    "@babel/core": "7.9.0"
+    "@babel/core": "^7.16.12"
   }
 }

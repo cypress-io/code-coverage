@@ -103,7 +103,7 @@ workflows:
                 - old-cypress-config/fullstack
                 - old-cypress-config/one-spec
                 # - old-cypress-config/placeholders # leaving out as it currently errors during cypress run
-      
+                - old-cypress-config/same-folder
       
       # - cypress/run:
       #     name: example-support-files

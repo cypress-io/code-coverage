@@ -2,7 +2,7 @@
   "name": "example-before-each-visit",
   "description": "Getting code coverage when cy.visit is used in beforeEach hook",
   "devDependencies": {
-    "@babel/core": "7.9.0"
+    "@babel/core": "^7.16.12"
   },
   "scripts": {
     "cy:run": "../node_modules/.bin/cypress run",

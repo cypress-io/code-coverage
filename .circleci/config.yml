@@ -104,40 +104,10 @@ workflows:
                 - old-cypress-config/one-spec
                 # - old-cypress-config/placeholders # leaving out as it currently errors during cypress run
                 - old-cypress-config/same-folder
+                - old-cypress-config/support-files
+                - old-cypress-config/ts-example
       
-      # - cypress/run:
-      #     name: example-support-files
-      #     requires:
-      #       - cypress/install
-      #     # grab the workspace created by cypress/install job
-      #     attach-workspace: true
-      #     # there are no jobs to follow this one
-      #     # so no need to save the workspace files (saves time)
-      #     no-workspace: true
-      #     working_directory: examples/old-cypress-config/support-files
-      #     start: npm start
-      #     wait-on: 'http://localhost:1234'
-      #     command: ../node_modules/.bin/cypress run
-      #     # store screenshots and videos
-      #     store_artifacts: true
-      #     post-steps:
-      #       - run: cat examples/old-cypress-config/support-files/.nyc_output/out.json
-      #       # store the created coverage report folder
-      #       # you can click on it in the CircleCI UI
-      #       # to see live static HTML site
-      #       - store_artifacts:
-      #           path: examples/old-cypress-config/support-files/coverage
-      #       # make sure the examples captures 100% of code
-      #       - run:
-      #           command: npx nyc report --check-coverage true --lines 100
-      #           working_directory: examples/old-cypress-config/support-files
-      #       - run:
-      #           name: Check code coverage 📈
-      #           command: |
-      #             ../../../node_modules/.bin/check-coverage main.js
-      #             ../../../node_modules/.bin/only-covered main.js
-      #           working_directory: examples/old-cypress-config/support-files
-
+     
       # - cypress/run:
       #     name: example-ts-example
       #     requires:

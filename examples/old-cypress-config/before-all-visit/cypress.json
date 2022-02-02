@@ -1,1 +1,4 @@
-{}
+{
+  "fixturesFolder": false,
+  "baseUrl": "http://localhost:1234"
+}

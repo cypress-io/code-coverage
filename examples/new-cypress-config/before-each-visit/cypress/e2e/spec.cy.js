@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 describe('coverage information', () => {
   beforeEach(() => {
-    cy.visit('index.html')
+    cy.visit('/')
   })
 
   it('calls add', () => {

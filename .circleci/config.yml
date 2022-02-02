@@ -54,8 +54,6 @@ jobs:
       - run:
           command: npm run test
           working_directory: examples/<< parameters.jobname >>
-      - run: cat examples/<< parameters.jobname >>/.nyc_output/out.json
-      - run: cat examples/<< parameters.jobname >>/coverage/coverage-final.json
       - store_artifacts:
           path: examples/<< parameters.jobname >>/coverage
       - run:
@@ -98,6 +96,7 @@ workflows:
                 - old-cypress-config/all-files
                 - old-cypress-config/backend
                 - old-cypress-config/before-all-visit
+                - old-cypress-config/before-each-visit
                 - old-cypress-config/exclude-files
                 - old-cypress-config/frontend
                 - old-cypress-config/fullstack

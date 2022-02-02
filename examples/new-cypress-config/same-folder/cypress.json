@@ -1,0 +1,7 @@
+{
+  "integrationFolder": ".",
+  "testFiles": "**/spec.js",
+  "supportFile": "support.js",
+  "pluginsFile": "plugins.js",
+  "baseUrl": "http://localhost:1234"
+}

@@ -57,9 +57,10 @@
     "nyc": "15.1.0"
   },
   "devDependencies": {
-    "@babel/core": "7.16.0",
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.11",
     "@cypress/webpack-preprocessor": "^5.11.0",
-    "babel-loader": "8.2.3",
+    "babel-loader": "^8.2.3",
     "babel-plugin-istanbul": "6.1.1",
     "check-code-coverage": "1.10.0",
     "console-log-div": "0.6.3",
@@ -70,6 +71,7 @@
     "parcel-bundler": "1.12.5",
     "prettier": "2.5.0",
     "semantic-release": "17.4.7",
-    "start-server-and-test": "1.14.0"
+    "start-server-and-test": "1.14.0",
+    "webpack": "^5.68.0"
   }
 }

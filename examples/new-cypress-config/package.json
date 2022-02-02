@@ -12,7 +12,6 @@
     "babel-plugin-istanbul": "^6.1.1",
     "check-code-coverage": "^1.10.0",
     "cypress": "https://cdn.cypress.io/beta/npm/10.0.0/circle-10.0-release-b16eb65eb27c7df237d653ae15389d6ce54ca7df/cypress.tgz",
-    "cypress-istanbul": "^1.3.0",
     "nyc": "^15.1.0",
     "parcel-bundler": "^1.12.5",
     "serve": "^13.0.2",

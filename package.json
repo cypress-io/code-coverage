@@ -18,6 +18,7 @@
     "types": "tsc --noEmit --allowJs *.js cypress/integration/*.js"
   },
   "peerDependencies": {
+    "@cypress/webpack-preprocessor": "*",
     "cypress": "*"
   },
   "repository": {
@@ -57,6 +58,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.16.0",
+    "@cypress/webpack-preprocessor": "^5.11.0",
     "babel-loader": "8.2.3",
     "babel-plugin-istanbul": "6.1.1",
     "check-code-coverage": "1.10.0",

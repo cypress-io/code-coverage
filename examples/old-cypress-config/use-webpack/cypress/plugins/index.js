@@ -11,7 +11,7 @@ module.exports = (on, config) => {
     watchOptions: {}
   }
   // on('file:preprocessor', webpack(options))
-  on('file:preprocessor', require('cypress-istanbul/use-babelrc'))
+  on('file:preprocessor', require('@cypress/code-coverage/use-babelrc'))
 
   require('@cypress/code-coverage/task')(on, config)
   return config

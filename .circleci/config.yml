@@ -80,10 +80,10 @@ workflows:
                 name: Install deps for examples/old-cypress-config
                 command: npm ci
                 working_directory: examples/old-cypress-config
-            # - run:
-            #     name: Install deps for examples/new-cypress-config
-            #     command: npm ci
-            #     working_directory: examples/new-cypress-config
+            - run:
+                name: Install deps for examples/new-cypress-config
+                command: npm ci
+                working_directory: examples/new-cypress-config
           post-steps:
             - run: npm run check:markdown     
       

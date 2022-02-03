@@ -9,7 +9,7 @@ module.exports = defineConfig({
     baseUrl: 'http://localhost:1234',
     env: {
       codeCoverage: {
-        exclude: ['cypress.config.js']
+        exclude: ['**/cypress.config.js']
       }
     }
   }

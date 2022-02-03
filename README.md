@@ -10,11 +10,13 @@ npm install -D @cypress/code-coverage
 
 Note: this plugin assumes `cypress` is a peer dependency already installed in your project.
 
-Add to your `cypress/support/index.js` file
+Add to your project's [support file](https://on.cypress.io/support-file)
 
 ```js
 import '@cypress/code-coverage/support'
 ```
+
+### Prior to 10.0
 
 Register tasks in your `cypress/plugins/index.js` file
 
@@ -28,6 +30,27 @@ module.exports = (on, config) => {
   // with the any changed environment variables
   return config
 }
+```
+
+### 10.0 and Beyond
+
+In your project's [cypress config](https://on.cypress.io/plugins-api):
+
+```js
+const { defineConfig } = require('cypress')
+
+module.exports = defineConfig({
+  e2e: {
+    setupNodeEvents(on, config) {
+      require('@cypress/code-coverage/task')(on, config)
+    }
+  },
+  component: {
+    setupNodeEvents(on, config) {
+      require('@cypress/code-coverage/task')(on, config)
+    }
+  }
+})
 ```
 
 ## Instrument your application
@@ -124,6 +147,8 @@ Set your `.babelrc` file
 }
 ```
 
+### Prior to 10.0
+
 Put the following in `cypress/plugins/index.js` file to use `.babelrc` file
 
 ```js
@@ -134,6 +159,29 @@ module.exports = (on, config) => {
 }
 ```
 
+### 10 and Beyond
+
+```js
+const { defineConfig } = require('cypress')
+
+module.exports = defineConfig({
+  e2e: {
+    setupNodeEvents(on, config) {
+      require('@cypress/code-coverage/task')(on, config)
+      on('file:preprocessor', require('@cypress/code-coverage/use-babelrc'))
+      return config
+    }
+  },
+  component: {
+    setupNodeEvents(on, config) {
+      require('@cypress/code-coverage/task')(on, config)
+      on('file:preprocessor', require('@cypress/code-coverage/use-babelrc'))
+      return config
+    }
+  }
+})
+```
+
 Now the code coverage from spec files will be combined with end-to-end coverage.
 
 Find example of a just the unit tests and JavaScript source files with collected code coverage in [examples/unit-tests-js](./examples/unit-tests-js).
@@ -141,6 +189,8 @@ Find example of a just the unit tests and JavaScript source files with collected
 ### Alternative for unit tests
 
 If you cannot use `.babelrc` for some reason (maybe it is used by other tools?), try using the Browserify transformer included with this module in `use-browserify-istanbul` file.
+
+### Prior to 10.0
 
 ```js
 module.exports = (on, config) => {
@@ -151,6 +201,35 @@ module.exports = (on, config) => {
   )
   return config
 }
+```
+
+### 10.0 and Beyond
+
+```js
+const { defineConfig } = require('cypress')
+
+module.exports = defineConfig({
+  e2e: {
+    setupNodeEvents(on, config) {
+      require('@cypress/code-coverage/task')(on, config)
+      on(
+        'file:preprocessor',
+        require('@cypress/code-coverage/use-browserify-istanbul')
+      )
+      return config
+    }
+  },
+  component: {
+    setupNodeEvents(on, config) {
+      require('@cypress/code-coverage/task')(on, config)
+      on(
+        'file:preprocessor',
+        require('@cypress/code-coverage/use-browserify-istanbul')
+      )
+      return config
+    }
+  }
+})
 ```
 
 ## Instrument backend code

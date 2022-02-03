@@ -102,12 +102,24 @@ workflows:
                 - old-cypress-config/frontend
                 - old-cypress-config/fullstack
                 - old-cypress-config/one-spec
-                # - old-cypress-config/placeholders # leaving out as it currently errors during cypress run
                 - old-cypress-config/same-folder
                 - old-cypress-config/support-files
                 - old-cypress-config/ts-example
                 - old-cypress-config/unit-tests-js
                 - old-cypress-config/use-webpack
+                - new-cypress-config/all-files
+                - new-cypress-config/backend
+                - new-cypress-config/before-all-visit
+                - new-cypress-config/before-each-visit
+                - new-cypress-config/exclude-files
+                - new-cypress-config/frontend
+                - new-cypress-config/fullstack
+                - new-cypress-config/one-spec
+                - new-cypress-config/same-fnewer
+                - new-cypress-config/support-files
+                - new-cypress-config/ts-example
+                - new-cypress-config/unit-tests-js
+                - new-cypress-config/use-webpack
      
          # - cypress/run:
       #     name: Windows test

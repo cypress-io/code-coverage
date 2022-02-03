@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+const webpack = require('@cypress/webpack-preprocessor')
 
 /**
  * @type {Cypress.PluginConfig}
@@ -10,8 +11,7 @@ module.exports = (on, config) => {
     webpackOptions: require('../../webpack.config'),
     watchOptions: {}
   }
-  // on('file:preprocessor', webpack(options))
-  on('file:preprocessor', require('@cypress/code-coverage/use-babelrc'))
+  on('file:preprocessor', webpack(options))
 
   require('@cypress/code-coverage/task')(on, config)
   return config

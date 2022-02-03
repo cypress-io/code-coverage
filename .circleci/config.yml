@@ -61,6 +61,6 @@ workflows:
           requires:
             - cypress/install
 
-      - lint:
+      - test-code-coverage-plugin:
           requires:
             - cypress/install  

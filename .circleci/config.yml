@@ -6,7 +6,7 @@ orbs:
   win: circleci/windows@2 # run a test job on Windows
 
 jobs:
-  check-formatting:
+  lint:
     description: Checks the code formatting
     docker:
       - image: cimg/node:16.9.1
@@ -14,17 +14,9 @@ jobs:
           # we don't need Cypress to check code styl
           CYPRESS_INSTALL_BINARY: '0'
     steps:
-      - checkout
-      - run:
-          name: Install dependencies 📦
-          # installs NPM dependencies but skips Cypress
-          command: CYPRESS_INSTALL_BINARY=0 npm ci
       - run:
           name: Code style check 🧹
           command: npm run format:check
-      - run:
-          name: Types lint 🧹
-          command: npm run types
   publish:
     description: Publishes the new version of the plugin to NPM
     docker:
@@ -58,14 +50,17 @@ jobs:
 
 workflows:
   build:
-    jobs:
-      - check-formatting
+    jobs:      
 
       - cypress/install:
           cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}'
           post-steps:
             - run: npm run check:markdown 
 
-      -  test-code-coverage-plugin:
+      - check-formatting:
+          requires:
+            - cypress/install
+
+      - lint:
           requires:
             - cypress/install  

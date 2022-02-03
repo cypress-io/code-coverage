@@ -14,6 +14,8 @@ jobs:
           # we don't need Cypress to check code styl
           CYPRESS_INSTALL_BINARY: '0'
     steps:
+      - attach_workspace:
+          at: ~/ 
       - run:
           name: Code style check 🧹
           command: npm run format:check
@@ -39,7 +41,7 @@ jobs:
       - image: cypress/base:16.13.2
     steps:
       - attach_workspace:
-              at: ~/ 
+          at: ~/ 
       - run:
           command: npm run test
       - store_artifacts:

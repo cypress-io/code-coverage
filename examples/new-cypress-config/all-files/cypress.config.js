@@ -7,5 +7,10 @@ module.exports = defineConfig({
       return require('./cypress/plugins/index.js')(on, config)
     },
     baseUrl: 'http://localhost:1234',
-  },
+    env: {
+      codeCoverage: {
+        exclude: ['cypress.config.js']
+      }
+    }
+  }
 })

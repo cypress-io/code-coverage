@@ -115,7 +115,7 @@ workflows:
                 - new-cypress-config/frontend
                 - new-cypress-config/fullstack
                 - new-cypress-config/one-spec
-                - new-cypress-config/same-fnewer
+                - new-cypress-config/same-folder
                 - new-cypress-config/support-files
                 - new-cypress-config/ts-example
                 - new-cypress-config/unit-tests-js

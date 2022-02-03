@@ -59,7 +59,7 @@ jobs:
 workflows:
   build:
     jobs:
-      # - check-formatting
+      - check-formatting
 
       - cypress/install:
           cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}'

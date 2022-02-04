@@ -47,6 +47,7 @@
   },
   "private": false,
   "dependencies": {
+    "@cypress/webpack-preprocessor": "^5.11.0",
     "chalk": "4.1.2",
     "dayjs": "1.10.7",
     "debug": "4.3.3",
@@ -59,7 +60,6 @@
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.11",
-    "@cypress/webpack-preprocessor": "^5.11.0",
     "babel-loader": "^8.2.3",
     "babel-plugin-istanbul": "6.1.1",
     "check-code-coverage": "1.10.0",

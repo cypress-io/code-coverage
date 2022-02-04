@@ -7,9 +7,5 @@ dist/
 .cache/
 .vscode/
 cypress-coverage/
-examples/*/old-cypress-config/cypress/videos
-examples/*/old-cypress-config/cypress/screenshots
-examples/*/new-cypress-config/cypress/videos
-examples/*/new-cypress-config/cypress/screenshots
 yarn.lock
 .parcel-cache

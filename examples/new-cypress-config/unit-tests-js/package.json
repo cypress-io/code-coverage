@@ -1,0 +1,10 @@
+{
+  "name": "example-unit-tests-js",
+  "description": "Run unit tests written using JavaScript",
+  "scripts": {
+    "pretest": "rimraf .nyc_output .cache coverage dist",
+    "test": "../node_modules/.bin/cypress run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "../node_modules/.bin/check-coverage misc.js math.js && ../node_modules/.bin/only-covered misc.js math.js"
+  }
+}

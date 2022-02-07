@@ -151,8 +151,11 @@ workflows:
           store_artifacts: true
           post-checkout:
             - run:
-                name: Install latest npm
-                command: npm i -g npm@latest --force
+                name: Install node 16
+                command: nvm install 16.13.2
+            - run:
+                name: Use node 16
+                command: nvm use 16.13.2
             - run:
                 name: Install deps for code coverage
                 command: npm ci

@@ -16,7 +16,7 @@ Add to your project's [support file](https://on.cypress.io/support-file)
 import '@cypress/code-coverage/support'
 ```
 
-### Prior to 10.0
+### Prior to Cypress 10.0
 
 Register tasks in your `cypress/plugins/index.js` file
 
@@ -32,7 +32,7 @@ module.exports = (on, config) => {
 }
 ```
 
-### 10.0 and Beyond
+### Cypress 10.0 and Beyond
 
 In your project's [cypress config](https://on.cypress.io/plugins-api):
 
@@ -147,7 +147,7 @@ Set your `.babelrc` file
 }
 ```
 
-### Prior to 10.0
+### Prior to Cypress 10.0
 
 Put the following in `cypress/plugins/index.js` file to use `.babelrc` file
 
@@ -159,7 +159,7 @@ module.exports = (on, config) => {
 }
 ```
 
-### 10 and Beyond
+### Cypress 10 and Beyond
 
 ```js
 const { defineConfig } = require('cypress')
@@ -190,7 +190,7 @@ Find example of a just the unit tests and JavaScript source files with collected
 
 If you cannot use `.babelrc` for some reason (maybe it is used by other tools?), try using the Browserify transformer included with this module in `use-browserify-istanbul` file.
 
-### Prior to 10.0
+### Prior to Cypress 10.0
 
 ```js
 module.exports = (on, config) => {
@@ -203,7 +203,7 @@ module.exports = (on, config) => {
 }
 ```
 
-### 10.0 and Beyond
+### Cypress 10.0 and Beyond
 
 ```js
 const { defineConfig } = require('cypress')

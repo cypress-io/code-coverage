@@ -151,6 +151,12 @@ workflows:
           store_artifacts: true
           post-checkout:
             - run:
+                name: Install latest npm
+                command: npm i -g npm@latest
+            - run:
+                name: Install deps for code coverage
+                command: npm ci
+            - run:
                 name: Install deps for examples/old-cypress-config
                 command: npm ci
                 working_directory: examples/old-cypress-config

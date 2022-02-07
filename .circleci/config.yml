@@ -159,10 +159,11 @@ workflows:
             - run:
                 name: Install deps for code coverage
                 command: npm ci
+          post-install:
             - run:
                 name: Install deps for examples/old-cypress-config
                 command: npm ci
-                working_directory: examples/old-cypress-config
+                working_directory: examples/old-cypress-config            
           post-steps:
             # store the created coverage report folder
             # you can click on it in the CircleCI UI

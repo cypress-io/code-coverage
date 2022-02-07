@@ -146,7 +146,7 @@ workflows:
           no-workspace: true
           start: npm run start:windows --prefix examples/old-cypress-config/all-files
           wait-on: 'http://localhost:1234'
-          command: npx cypress run --project examples/all-files
+          command: npx cypress run --project examples/old-cypress-config/all-files
           # store screenshots and videos
           store_artifacts: true
           post-steps:

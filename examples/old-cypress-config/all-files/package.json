@@ -10,7 +10,7 @@
     "test": "../node_modules/.bin/start-test 1234 cy:run",
     "coverage:verify": "npx nyc report --check-coverage true --lines 100",
     "coverage:check-files": "../node_modules/.bin/check-coverage main.js && ../node_modules/.bin/check-coverage second.js && ../node_modules/.bin/check-coverage not-covered.js && ../node_modules/.bin/only-covered --from coverage/coverage-final.json main.js second.js not-covered.js",
-    "coverage:check-files:windows": "npx bin-up && ../node_modules/.bin/check-coverage main.js && ../node_modules/.bin/check-coverage second.js && ../node_modules/.bin/check-coverage not-covered.js && ../node_modules/.bin/only-covered --from coverage/coverage-final.json main.js second.js not-covered.js"
+    "coverage:check-files:windows": "check-coverage main.js && check-coverage second.js && check-coverage not-covered.js && only-covered --from coverage/coverage-final.json main.js second.js not-covered.js"
   },
   "nyc": {
     "all": true,

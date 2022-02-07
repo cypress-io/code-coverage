@@ -152,7 +152,7 @@ workflows:
           post-checkout:
             - run:
                 name: Install latest npm
-                command: npm i -g npm@latest
+                command: npm i -g npm@latest --force
             - run:
                 name: Install deps for code coverage
                 command: npm ci

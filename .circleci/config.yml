@@ -139,8 +139,6 @@ workflows:
 
       - cypress/run:
           name: Windows test
-          requires:
-            - cypress/install
           executor:
             # executor comes from the "windows" orb
             name: win/default
@@ -151,6 +149,11 @@ workflows:
           command: npx cypress run --project examples/old-cypress-config/all-files
           # store screenshots and videos
           store_artifacts: true
+          post-checkout:
+            - run:
+                name: Install deps for examples/old-cypress-config
+                command: npm ci
+                working_directory: examples/old-cypress-config
           post-steps:
             # store the created coverage report folder
             # you can click on it in the CircleCI UI

@@ -61,7 +61,7 @@ jobs:
           # we will check the final coverage report
           # to make sure it only has files we are interested in
           # because there are files covered at 0 in the report
-          command: npm run coverage:check-files:windows
+          command: npm run coverage:check-files
           working_directory: examples/<< parameters.jobname >>
 
   test-code-coverage-plugin:
@@ -167,7 +167,7 @@ workflows:
                 # we will check the final coverage report
                 # to make sure it only has files we are interested in
                 # because there are files covered at 0 in the report
-                command: npm run coverage:check-files
+                command: npm run coverage:check-files:windows
                 working_directory: examples/old-cypress-config/all-files
 
       - publish:

@@ -15,10 +15,12 @@ jobs:
           CYPRESS_INSTALL_BINARY: '0'
     steps:
       - attach_workspace:
-          at: ~/ 
+          at: ~/
       - run:
           name: Code style check 🧹
           command: npm run format:check
+      - run: npm run check:markdown
+
   publish:
     description: Publishes the new version of the plugin to NPM
     docker:
@@ -32,19 +34,19 @@ jobs:
       CIRCLE_PULL_REQUEST: ''
       CI_PULL_REQUEST: ''
     steps:
-      - checkout
-      - run: npm ci
+      - attach_workspace:
+          at: ~/
       - run: npm run semantic-release
-  
+
   cyrun:
     docker:
       - image: cypress/base:16.13.2
     parameters:
-          jobname:
-            type: string
+      jobname:
+        type: string
     steps:
       - attach_workspace:
-              at: ~/ 
+          at: ~/
       - run:
           command: npm run test
           working_directory: test-apps/<< parameters.jobname >>
@@ -67,7 +69,7 @@ jobs:
       - image: cypress/base:16.13.2
     steps:
       - attach_workspace:
-          at: ~/ 
+          at: ~/
       - run:
           command: npm run test
       - store_artifacts:
@@ -78,8 +80,7 @@ jobs:
 
 workflows:
   build:
-    jobs:      
-
+    jobs:
       - cypress/install:
           cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}'
           pre-steps:
@@ -94,7 +95,7 @@ workflows:
                 command: npm ci
                 working_directory: test-apps/new-cypress-config
           post-steps:
-            - run: npm run check:markdown  
+            - run: npm run check:markdown 
 
       - lint:
           requires:
@@ -102,15 +103,15 @@ workflows:
 
       - test-code-coverage-plugin:
           requires:
-            - cypress/install  
+            - cypress/install
 
       - cyrun:
           name: test-<< matrix.jobname>>
-          requires: 
+          requires:
             - cypress/install
           matrix:
             parameters:
-              jobname: 
+              jobname:
                 - old-cypress-config/all-files
                 - old-cypress-config/backend
                 - old-cypress-config/before-all-visit
@@ -137,62 +138,89 @@ workflows:
                 - new-cypress-config/ts-example
                 - new-cypress-config/unit-tests-js
                 - new-cypress-config/use-webpack
-     
-         # - cypress/run:
-      #     name: Windows test
-      #     executor:
-      #       # executor comes from the "windows" orb
-      #       name: win/default
-      #       shell: bash.exe
-      #     no-workspace: true
-      #     start: npm run start:windows --prefix test-apps/old-cypress-config/all-files
-      #     wait-on: 'http://localhost:1234'
-      #     command: ../node_modules/.bin/cypress run
-      #     # store screenshots and videos
-      #     store_artifacts: true
-      #     post-steps:
-      #       - run: cat test-apps/old-cypress-config/all-files/.nyc_output/out.json
-      #       - run: cat test-apps/old-cypress-config/all-files/coverage/coverage-final.json
-      #       # store the created coverage report folder
-      #       # you can click on it in the CircleCI UI
-      #       # to see live static HTML site
-      #       - store_artifacts:
-      #           path: test-apps/old-cypress-config/all-files/coverage
-      #       # make sure the test-apps captures 100% of code
-      #       - run:
-      #           command: npx nyc report --check-coverage true --lines 100
-      #           working_directory: test-apps/old-cypress-config/all-files
-      #       - run:
-      #           name: Check code coverage 📈
-      #           # we will check the final coverage report
-      #           # to make sure it only has files we are interested in
-      #           # because there are files covered at 0 in the report
-      #           command: |
-      #             ../../node_modules/.bin/check-coverage main.js
-      #             ../../node_modules/.bin/check-coverage second.js
-      #             ../../node_modules/.bin/check-coverage not-covered.js
-      #             ../../node_modules/.bin/only-covered --from coverage/coverage-final.json main.js second.js not-covered.js
-      #           working_directory: test-apps/old-cypress-config/all-files
 
-      # - publish:
-      #     filters:
-      #       branches:
-      #         only:
-      #           - master
-      #           - beta
-      #     requires:
-      #       - unit
-      #       - backend coverage
-      #       - fullstack coverage
-      #       - example-before-each-visit
-      #       - example-before-all-visit
-      #       - example-ts-example
-      #       - example-same-folder
-      #       - example-support-files
-      #       - example-use-plugins-and-support
-      #       - example-exclude-files
-      #       - example-docker-paths
-      #       - example-use-webpack
-      #       - example-all-files
-      #       - example-unit-tests-js
-      #       - Windows test
+      - cypress/run:
+          name: Windows test
+          executor:
+            # executor comes from the "windows" orb
+            name: win/default
+            shell: bash.exe
+          no-workspace: true
+          start: npm run start:windows --prefix test-apps/old-cypress-config/all-files
+          wait-on: 'http://localhost:1234'
+          command: npx cypress run --project test-apps/old-cypress-config/all-files
+          # store screenshots and videos
+          store_artifacts: true
+          cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}'
+          post-checkout:
+            - run:
+                name: Install node 16
+                command: nvm install 16.13.2
+            - run:
+                name: Use node 16
+                command: nvm use 16.13.2
+            - run:
+                name: Install deps for code coverage
+                command: npm ci
+          post-install:
+            - run:
+                name: Install deps for test-apps/old-cypress-config
+                command: npm ci
+                working_directory: test-apps/old-cypress-config            
+          post-steps:
+            # store the created coverage report folder
+            # you can click on it in the CircleCI UI
+            # to see live static HTML site
+            - store_artifacts:
+                path: test-apps/old-cypress-config/all-files/coverage
+            # make sure the examples captures 100% of code
+            - run:
+                name: Verify Code Coverage
+                command: npm run coverage:verify
+                working_directory: test-apps/old-cypress-config/all-files
+            - run:
+                name: Check code coverage files 📈
+                # we will check the final coverage report
+                # to make sure it only has files we are interested in
+                # because there are files covered at 0 in the report
+                command: npm i -D check-code-coverage && npm run coverage:check-files:windows
+                working_directory: test-apps/old-cypress-config/all-files
+
+      - publish:
+          filters:
+            branches:
+              only:
+                - master
+                - beta
+                - next
+                - dev
+          requires:
+            - lint
+            - test-code-coverage-plugin
+            - test-old-cypress-config/all-files
+            - test-old-cypress-config/backend
+            - test-old-cypress-config/before-all-visit
+            - test-old-cypress-config/before-each-visit
+            - test-old-cypress-config/exclude-files
+            - test-old-cypress-config/frontend
+            - test-old-cypress-config/fullstack
+            - test-old-cypress-config/one-spec
+            - test-old-cypress-config/same-folder
+            - test-old-cypress-config/support-files
+            - test-old-cypress-config/ts-example
+            - test-old-cypress-config/unit-tests-js
+            - test-old-cypress-config/use-webpack
+            - test-new-cypress-config/all-files
+            - test-new-cypress-config/backend
+            - test-new-cypress-config/before-all-visit
+            - test-new-cypress-config/before-each-visit
+            - test-new-cypress-config/exclude-files
+            - test-new-cypress-config/frontend
+            - test-new-cypress-config/fullstack
+            - test-new-cypress-config/one-spec
+            - test-new-cypress-config/same-folder
+            - test-new-cypress-config/support-files
+            - test-new-cypress-config/ts-example
+            - test-new-cypress-config/unit-tests-js
+            - test-new-cypress-config/use-webpack
+            - Windows test

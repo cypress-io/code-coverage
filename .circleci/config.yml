@@ -96,7 +96,7 @@ workflows:
                 working_directory: test-apps/new-cypress-config
             - run: 
                 name: Install custom cypress package (if available)
-                command: commit-message-install --else "echo no custom cypress package to install"
+                command: npx commit-message-install --else "echo no custom cypress package to install"
                 working_directory: test-apps/new-cypress-config
           post-steps:
             - run: npm run check:markdown 

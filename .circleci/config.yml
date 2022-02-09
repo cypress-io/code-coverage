@@ -94,6 +94,10 @@ workflows:
                 name: Install deps for test-apps/new-cypress-config
                 command: npm ci
                 working_directory: test-apps/new-cypress-config
+            - run: 
+                name: Install custom cypress package (if available)
+                command: commit-message-install --else "echo no custom cypress package to install"
+                working_directory: test-apps/new-cypress-config
           post-steps:
             - run: npm run check:markdown 
 

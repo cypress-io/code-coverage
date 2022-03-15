@@ -166,11 +166,19 @@ const registerHooks = () => {
     const baseUrl = Cypress.config('baseUrl') || cy.state('window').origin
     // @ts-ignore
     const runningEndToEndTests = baseUrl !== Cypress.config('proxyUrl')
-    const expectFrontendCoverageOnly = Cypress._.get(Cypress.env('codeCoverage'), 'expectFrontendCoverageOnly', false)
+    const expectFrontendCoverageOnly = Cypress._.get(
+      Cypress.env('codeCoverage'),
+      'expectFrontendCoverageOnly',
+      false
+    )
     const specType = Cypress._.get(Cypress.spec, 'specType', 'integration')
     const isIntegrationSpec = specType === 'integration'
 
-    if (!expectFrontendCoverageOnly && runningEndToEndTests && isIntegrationSpec) {
+    if (
+      !expectFrontendCoverageOnly &&
+      runningEndToEndTests &&
+      isIntegrationSpec
+    ) {
       // we can only request server-side code coverage
       // if we are running end-to-end tests,
       // otherwise where do we send the request?

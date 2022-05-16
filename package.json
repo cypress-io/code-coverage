@@ -60,7 +60,7 @@
   "devDependencies": {
     "@babel/core": "7.17.10",
     "@babel/preset-typescript": "7.16.7",
-    "@cypress/webpack-preprocessor": "5.10.0",
+    "@cypress/webpack-preprocessor": "5.11.1",
     "babel-loader": "8.2.5",
     "babel-plugin-istanbul": "6.1.1",
     "browserify-istanbul": "3.0.1",

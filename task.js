@@ -13,6 +13,7 @@ const {
 } = require('./task-utils')
 const { fixSourcePaths } = require('./support-utils')
 const { removePlaceholders } = require('./common-utils')
+const lockfile = require('proper-lockfile')
 
 const debug = require('debug')('code-coverage')
 
@@ -142,27 +143,34 @@ const tasks = {
    * @param {string} sentCoverage Stringified coverage object sent by the test runner
    * @returns {null} Nothing is returned from this task
    */
-  combineCoverage(sentCoverage) {
+  async combineCoverage(sentCoverage) {
     const coverage = JSON.parse(sentCoverage)
     debug('parsed sent coverage')
 
     fixSourcePaths(coverage)
 
-    const previousCoverage = existsSync(nycFilename)
-      ? JSON.parse(readFileSync(nycFilename, 'utf8'))
-      : {}
+    try {
+      const release = await lockfile.lock(nycFilename, {retries: 20})
+      const previousCoverage = existsSync(nycFilename)
+        ? JSON.parse(readFileSync(nycFilename, 'utf8'))
+        : {}
 
-    // previous code coverage object might have placeholder entries
-    // for files that we have not seen yet,
-    // but the user expects to include in the coverage report
-    // the merge function messes up, so we should remove any placeholder entries
-    // and re-insert them again when creating the report
-    removePlaceholders(previousCoverage)
+      // previous code coverage object might have placeholder entries
+      // for files that we have not seen yet,
+      // but the user expects to include in the coverage report
+      // the merge function messes up, so we should remove any placeholder entries
+      // and re-insert them again when creating the report
+      removePlaceholders(previousCoverage)
 
-    const coverageMap = istanbul.createCoverageMap(previousCoverage)
-    coverageMap.merge(coverage)
-    saveCoverage(coverageMap)
-    debug('wrote coverage file %s', nycFilename)
+      const coverageMap = istanbul.createCoverageMap(previousCoverage)
+      coverageMap.merge(coverage)
+      saveCoverage(coverageMap)
+      debug('wrote coverage file %s', nycFilename)
+      await release()
+    }
+    catch(e) {
+      console.error(e)
+    }
 
     return null
   },

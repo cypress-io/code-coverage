@@ -3,7 +3,7 @@
 
 const dayjs = require('dayjs')
 var duration = require('dayjs/plugin/duration')
-const { filterFilesFromCoverage } = require('./support-utils')
+const { filterSpecsFromCoverage } = require('./support-utils')
 
 dayjs.extend(duration)
 
@@ -14,10 +14,11 @@ dayjs.extend(duration)
 const sendCoverage = (coverage, pathname = '/') => {
   logMessage(`Saving code coverage for **${pathname}**`)
 
-  const totalCoverage = filterFilesFromCoverage(coverage)
+  const withoutSpecs = filterSpecsFromCoverage(coverage)
+  const appCoverageOnly = filterSupportFilesFromCoverage(withoutSpecs)
 
   // stringify coverage object for speed
-  cy.task('combineCoverage', JSON.stringify(totalCoverage), {
+  cy.task('combineCoverage', JSON.stringify(appCoverageOnly), {
     log: false
   })
 }
@@ -29,6 +30,37 @@ const sendCoverage = (coverage, pathname = '/') => {
  */
 const logMessage = (s) => {
   cy.log(`${s} \`[@cypress/code-coverage]\``)
+}
+
+/**
+ * Removes support file from the coverage object.
+ * If there are more files loaded from support folder, also removes them
+ */
+const filterSupportFilesFromCoverage = (totalCoverage) => {
+  const integrationFolder = Cypress.config('integrationFolder')
+  const supportFile = Cypress.config('supportFile')
+
+  /** @type {string} Cypress run-time config has the support folder string */
+  // @ts-ignore
+  const supportFolder = Cypress.config('supportFolder')
+
+  const isSupportFile = (filename) => filename === supportFile
+
+  let coverage = Cypress._.omitBy(totalCoverage, (fileCoverage, filename) =>
+    isSupportFile(filename)
+  )
+
+  // check the edge case
+  //   if we have files from support folder AND the support folder is not same
+  //   as the integration, or its prefix (this might remove all app source files)
+  //   then remove all files from the support folder
+  if (!integrationFolder.startsWith(supportFolder)) {
+    // remove all covered files from support folder
+    coverage = Cypress._.omitBy(totalCoverage, (fileCoverage, filename) =>
+      filename.startsWith(supportFolder)
+    )
+  }
+  return coverage
 }
 
 const registerHooks = () => {

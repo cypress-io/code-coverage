@@ -1,0 +1,9 @@
+{
+  "fixturesFolder": false,
+  "baseUrl": "http://localhost:1234",
+  "env": {
+    "codeCoverage": {
+      "url": "http://localhost:1234/__coverage__"
+    }
+  }
+}

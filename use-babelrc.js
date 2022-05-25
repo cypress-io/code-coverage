@@ -1,9 +1,5 @@
-const browserify = require('@cypress/browserify-preprocessor')
-
-// TODO check if there is .babelrc file
-// if not, maybe create one?
-
-// Tells Cypress to use .babelrc when bundling spec code
-const options = browserify.defaultOptions
-options.browserifyOptions.transform[1][1].babelrc = true
-module.exports = browserify(options)
+const webpackPreprocessor = require('@cypress/webpack-preprocessor')
+const defaults = webpackPreprocessor.defaultOptions
+// remove presets so the babelrc file will be used
+delete defaults.webpackOptions.module.rules[0].use[0].options.presets
+module.exports = webpackPreprocessor(defaults)

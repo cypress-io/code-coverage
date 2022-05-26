@@ -40,7 +40,7 @@ This plugin **DOES NOT** instrument your code. You have to instrument it yoursel
 }
 ```
 
-Please see the [Examples](#examples) section down below, you can probably find a linked project matching your situation to see how to instrument your application's source code before running end-to-end tests to get the code coverage.
+Please see the [Test Apps](#test-apps) section down below, you can probably find a linked project matching your situation to see how to instrument your application's source code before running end-to-end tests to get the code coverage.
 
 If your application has been instrumented correctly, then you should see additional counters and instructions in the application's JavaScript resources, like the image down below shows.
 
@@ -66,7 +66,7 @@ That should be it! You should see messages from this plugin in the Cypress Comma
 
 ### App vs unit tests
 
-You need to instrument your web application. This means that when the test does `cy.visit('localhost:3000')` any code the `index.html` requests should be instrumented by YOU. See [Examples](#examples) section for advice, usually you need to stick `babel-plugin-istanbul` into your pipeline somewhere.
+You need to instrument your web application. This means that when the test does `cy.visit('localhost:3000')` any code the `index.html` requests should be instrumented by YOU. See [Test Apps](#test-apps) section for advice, usually you need to stick `babel-plugin-istanbul` into your pipeline somewhere.
 
 If you are testing individual functions from your application code by importing them directly into Cypress spec files, this is called "unit tests" and Cypress can instrument this scenario for you. See [Instrument unit tests](#instrument-unit-tests) section.
 
@@ -136,7 +136,7 @@ module.exports = (on, config) => {
 
 Now the code coverage from spec files will be combined with end-to-end coverage.
 
-Find example of a just the unit tests and JavaScript source files with collected code coverage in [examples/unit-tests-js](./examples/unit-tests-js).
+Find example of a just the unit tests and JavaScript source files with collected code coverage in [test-apps/new-cypress-config/unit-tests-js](./test-apps/new-cypress-config/unit-tests-js).
 
 ### Alternative for unit tests
 
@@ -155,7 +155,7 @@ module.exports = (on, config) => {
 
 ## Instrument backend code
 
-Example in [examples/backend](examples/backend) folder.
+Example in [test-apps/new-cypress-config/backend](test-apps/backend) folder.
 
 You can also instrument your server-side code and produce combined coverage report that covers both the backend and frontend code
 
@@ -275,7 +275,7 @@ Sometimes NYC tool might be installed in a different folder not in the current o
 
 TypeScript source files should be automatically included in the report, if they are instrumented.
 
-See [examples/ts-example](examples/ts-example), [bahmutov/cra-ts-code-coverage-example](https://github.com/bahmutov/cra-ts-code-coverage-example) or [bahmutov/cypress-angular-coverage-example](https://github.com/bahmutov/cypress-angular-coverage-example).
+See [test-apps/new-cypress-config/ts-example](test-apps/ts-example), [bahmutov/cra-ts-code-coverage-example](https://github.com/bahmutov/cra-ts-code-coverage-example) or [bahmutov/cypress-angular-coverage-example](https://github.com/bahmutov/cypress-angular-coverage-example).
 
 ## Include code
 
@@ -292,7 +292,7 @@ For example, if you want to make sure the final report includes all JS files fro
 }
 ```
 
-See example [examples/all-files](./examples/all-files)
+See example [test-app/all-files](./test-apps/new-cypress-config/all-files)
 
 ## Exclude code
 
@@ -335,7 +335,20 @@ switch (foo) {
 
 ### Exclude files and folders
 
-See [`nyc` configuration](https://github.com/istanbuljs/nyc#common-configuration-options) and [ include and exclude options](https://github.com/istanbuljs/nyc#using-include-and-exclude-arrays). You can include and exclude files using `minimatch` patterns in `.nycrc` file or using "nyc" object inside your `package.json` file.
+The code coverage plugin will automatically exclude any test/spec files you have defined in `testFiles` (Cypress < v10) or `specPattern` (Cypress >= v10) configuration options. Additionaly, you can set the `exclude` pattern glob in the code coverage environment variable to specify additional files to be excluded:
+
+```javascript
+// cypress.config.js or cypress.json
+env: {
+  codeCoverage: {
+    exclude: ['cypress/**/*.*'],
+  },
+},
+```
+
+Cypress 10 and later users should set the `exclude` option to exclude any items from the `cypress` folder they don't want to be included in the coverage reports. 
+
+Additionaly, you can use [`nyc` configuration](https://github.com/istanbuljs/nyc#common-configuration-options) and [include and exclude options](https://github.com/istanbuljs/nyc#using-include-and-exclude-arrays). You can include and exclude files using `minimatch` patterns in `.nycrc` file or using "nyc" object inside your `package.json` file.
 
 For example, if you want to only include files in the `app` folder, but exclude `app/util.js` file, you can set in your `package.json`
 
@@ -350,7 +363,7 @@ For example, if you want to only include files in the `app` folder, but exclude 
 
 **Note:** if you have `all: true` NYC option set, this plugin will check the produced `.nyc_output/out.json` before generating the final report. If the `out.json` file does not have information for some files that should be there according to `include` list, then an empty placeholder will be included, see [PR 208](https://github.com/cypress-io/code-coverage/pull/208).
 
-Another important option is `excludeAfterRemap`. By default it is false, which might let excluded files through. If you are excluding the files, and the instrumenter does not respect the `nyc.exclude` setting, then add `excludeAfterRemap: true` to tell `nyc report` to exclude files. See [examples/exclude-files](examples/exclude-files).
+Another important option is `excludeAfterRemap`. By default it is false, which might let excluded files through. If you are excluding the files, and the instrumenter does not respect the `nyc.exclude` setting, then add `excludeAfterRemap: true` to tell `nyc report` to exclude files. See [test-apps/exclude-files](test-apps/new-cypress-config/exclude-files).
 
 ## Disable plugin
 
@@ -392,19 +405,19 @@ npm run dev:no:coverage
 
 ## Examples
 
-### Internal examples
+### Internal test apps
 
 Full examples we use for testing in this repository:
 
-- [examples/backend](examples/backend) only instruments the backend Node server and saves the coverage report
-- [examples/fullstack](examples/fullstack) instruments and merges backend, e2e and unit test coverage into a single report
-- [examples/before-all-visit](examples/before-all-visit) checks if code coverage works when `cy.visit` is made once in the `before` hook
-- [examples/before-each-visit](examples/before-each-visit) checks if code coverage correctly keeps track of code when doing `cy.visit` before each test
-- [examples/one-spec.js](examples/one-spec.js) confirms that coverage is collected and filtered correctly if the user only executes a single Cypress test
-- [examples/ts-example](examples/ts-example) uses Babel + Parcel to instrument and serve TypeScript file
-- [examples/use-webpack](examples/use-webpack) shows Webpack build with source maps and Babel
-- [examples/unit-tests-js](examples/unit-tests-js) runs just the unit tests and reports code coverage (JavaScript source code)
-- [examples/unit-tests-ts](examples/unit-tests-ts) **NOT WORKING** runs just the unit tests and reports code coverage (TypeScript source code)
+- [test-apps/backend](test-apps/new-cypress-config/backend) only instruments the backend Node server and saves the coverage report
+- [test-apps/fullstack](test-apps/new-cypress-config/fullstack) instruments and merges backend, e2e and unit test coverage into a single report
+- [test-apps/before-all-visit](test-apps/new-cypress-config/before-all-visit) checks if code coverage works when `cy.visit` is made once in the `before` hook
+- [test-apps/before-each-visit](test-apps/new-cypress-config/before-each-visit) checks if code coverage correctly keeps track of code when doing `cy.visit` before each test
+- [test-apps/one-spec.js](test-apps/new-cypress-config/one-spec.js) confirms that coverage is collected and filtered correctly if the user only executes a single Cypress test
+- [test-apps/ts-example](test-apps/new-cypress-config/ts-example) uses Babel + Parcel to instrument and serve TypeScript file
+- [test-apps/use-webpack](test-apps/new-cypress-config/use-webpack) shows Webpack build with source maps and Babel
+- [test-apps/unit-tests-js](test-apps/new-cypress-config/unit-tests-js) runs just the unit tests and reports code coverage (JavaScript source code)
+- [test-apps/unit-tests-ts](test-apps/new-cypress-config/unit-tests-ts) **NOT WORKING** runs just the unit tests and reports code coverage (TypeScript source code)
 
 ### External examples
 
@@ -459,7 +472,7 @@ module.exports = (on, config) => {
 }
 ```
 
-See [examples/use-plugins-and-support](examples/use-plugins-and-support)
+See [test-apps/use-plugins-and-support](test-apps/new-cypress-config/use-plugins-and-support)
 
 ## Debugging
 

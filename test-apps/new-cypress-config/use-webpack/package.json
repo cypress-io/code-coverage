@@ -1,0 +1,18 @@
+{
+  "name": "example-use-webpack",
+  "version": "1.0.0",
+  "description": "Code coverage from webpack",
+  "private": true,
+  "scripts": {
+    "cy:run": "../node_modules/.bin/cypress run",
+    "build": "../node_modules/.bin/webpack && cp ./index.html ./dist/index.html",
+    "start": "../node_modules/.bin/serve -p 1234 dist",
+    "pretest": "rimraf .nyc_output .cache coverage dist",
+    "test": "npm run build && ../node_modules/.bin/start-test 1234 cy:run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "../node_modules/.bin/check-coverage src/index.js && ../node_modules/.bin/check-coverage src/calc.js && ../node_modules/.bin/only-covered src/index.js src/calc.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -2,39 +2,29 @@
 version: 2.1
 orbs:
   # https://github.com/cypress-io/circleci-orb
-  cypress: cypress-io/cypress@1.26.0 # used to run e2e tests
-  node: circleci/node@1.1.6 # used to publish new NPM version
+  cypress: cypress-io/cypress@1.29.0 # used to run e2e tests
   win: circleci/windows@2 # run a test job on Windows
 
 jobs:
-  unit:
+  lint:
     description: Checks the code formatting
-    executor:
-      name: node/default
-      tag: '12'
-    environment:
-      # we don't need Cypress to check code style
-      CYPRESS_INSTALL_BINARY: '0'
+    docker:
+      - image: cimg/node:16.9.1
+        environment:
+          # we don't need Cypress to check code styl
+          CYPRESS_INSTALL_BINARY: '0'
     steps:
-      - checkout
-      - node/with-cache:
-          steps:
-            - run:
-                name: Install dependencies 📦
-                # installs NPM dependencies but skips Cypress
-                command: CYPRESS_INSTALL_BINARY=0 npm ci
+      - attach_workspace:
+          at: ~/
       - run:
           name: Code style check 🧹
           command: npm run format:check
-      - run:
-          name: Types lint 🧹
-          command: npm run types
+      - run: npm run check:markdown
 
   publish:
     description: Publishes the new version of the plugin to NPM
-    executor:
-      name: node/default
-      tag: '12'
+    docker:
+      - image: cimg/node:16.9.1
     environment:
       # we don't need Cypress to do the release
       CYPRESS_INSTALL_BINARY: '0'
@@ -44,511 +34,113 @@ jobs:
       CIRCLE_PULL_REQUEST: ''
       CI_PULL_REQUEST: ''
     steps:
-      - checkout
-      - node/with-cache:
-          steps:
-            - run: npm ci
+      - attach_workspace:
+          at: ~/
       - run: npm run semantic-release
+
+  cyrun:
+    docker:
+      - image: cypress/base:16.13.2
+    parameters:
+      jobname:
+        type: string
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          command: npm run test
+          working_directory: test-apps/<< parameters.jobname >>
+      - store_artifacts:
+          path: test-apps/<< parameters.jobname >>/coverage
+      - run:
+          name: Verify Code Coverage
+          command: npm run coverage:verify
+          working_directory: test-apps/<< parameters.jobname >>
+      - run:
+          name: Check code coverage files 📈
+          # we will check the final coverage report
+          # to make sure it only has files we are interested in
+          # because there are files covered at 0 in the report
+          command: npm run coverage:check-files
+          working_directory: test-apps/<< parameters.jobname >>
+
+  test-code-coverage-plugin:
+    docker:
+      - image: cypress/base:16.13.2
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install deps
+          command: npm ci
+      - run:
+          command: npm run test
+      - store_artifacts:
+          path: coverage
+      - run:
+          name: Verify Code Coverage
+          command: npm run coverage:verify
 
 workflows:
   build:
     jobs:
-      - unit
-
       - cypress/install:
+          cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}'
+          pre-steps:
+            - run: npm i -g npm@latest
+          post-install:
+            - run:
+                name: Install deps for test-apps/old-cypress-config
+                command: npm ci
+                working_directory: test-apps/old-cypress-config
+            - run:
+                name: Install deps for test-apps/new-cypress-config
+                command: npm ci
+                working_directory: test-apps/new-cypress-config
           post-steps:
-            - run: npm run check:markdown
+            - run: npm run check:markdown 
 
-      - cypress/run:
-          name: frontend coverage
+      - lint:
           requires:
             - cypress/install
-          # grab the workspace created by cypress/install job
-          attach-workspace: true
-          # we need to start the web application
-          start: npm start
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          post-steps:
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: coverage
-            # print code coverage summary to the terminal
-            # and make sure there the coverage is above certain limit
-            - run: npx nyc report --check-coverage true --lines 80
-            # make sure second page (about.html) has its JavaScript counted and covered
-            - run: npx nyc report --check-coverage true --lines 100 --include cypress/about.js
-            # make sure unit tests are covered
-            - run: npx nyc report --check-coverage true --lines 100 --include cypress/unit.js
 
-      - cypress/run:
-          name: backend coverage
+      - test-code-coverage-plugin:
           requires:
             - cypress/install
-          # grab the workspace created by cypress/install job
-          attach-workspace: true
-          working_directory: examples/backend
-          start: npm start
-          wait-on: 'http://localhost:3003'
-          command: '../../node_modules/.bin/cypress run'
 
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          post-steps:
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/backend/coverage
-            - run:
-                command: npm run coverage:report
-                working_directory: examples/backend
-            - run:
-                name: Check code coverage 📈
-                command: |
-                  ../../node_modules/.bin/check-coverage server.js
-                  ../../node_modules/.bin/only-covered server.js
-                working_directory: examples/backend
-
-      - cypress/run:
-          name: fullstack coverage
+      - cyrun:
+          name: test-<< matrix.jobname>>
           requires:
             - cypress/install
-          # grab the workspace created by cypress/install job
-          attach-workspace: true
-          working_directory: examples/fullstack
-          start: npm start
-          wait-on: 'http://localhost:3003'
-          command: '../../node_modules/.bin/cypress run'
-
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          post-steps:
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/backend/coverage
-            - run:
-                command: npm run report
-                working_directory: examples/fullstack
-            - run:
-                name: Check code coverage 📈
-                command: |
-                  ../../node_modules/.bin/check-coverage fullstack/server/server.js
-                  ../../node_modules/.bin/check-coverage fullstack/main.js
-                  ../../node_modules/.bin/check-coverage fullstack/string-utils.js
-                  ../../node_modules/.bin/only-covered server.js main.js string-utils.js
-                working_directory: examples/fullstack
-
-      - cypress/run:
-          attach-workspace: true
-          name: example-before-each-visit
-          requires:
-            - cypress/install
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          command: npx cypress run --project examples/before-each-visit
-          # store screenshots and videos
-          store_artifacts: true
-          post-steps:
-            - run: cat examples/before-each-visit/.nyc_output/out.json
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/before-each-visit/coverage
-            # make sure the examples captures 100% of code
-            - run:
-                command: npx nyc report --check-coverage true --lines 100
-                working_directory: examples/before-each-visit
-            - run:
-                name: Check code coverage 📈
-                command: |
-                  ../../node_modules/.bin/check-coverage main.js
-                  ../../node_modules/.bin/only-covered main.js
-                working_directory: examples/before-each-visit
-
-      - cypress/run:
-          attach-workspace: true
-          name: example-before-all-visit
-          requires:
-            - cypress/install
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          command: npx cypress run --project examples/before-all-visit
-          # store screenshots and videos
-          store_artifacts: true
-          post-steps:
-            - run: cat examples/before-all-visit/.nyc_output/out.json
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/before-all-visit/coverage
-            # make sure the examples captures 100% of code
-            - run:
-                command: npx nyc report --check-coverage true --lines 100
-                working_directory: examples/before-all-visit
-            - run:
-                name: Check code coverage 📈
-                command: |
-                  ../../node_modules/.bin/check-coverage main.js
-                  ../../node_modules/.bin/only-covered main.js
-                working_directory: examples/before-all-visit
-
-      - cypress/run:
-          attach-workspace: true
-          name: example-docker-paths
-          requires:
-            - cypress/install
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          working_directory: examples/docker-paths
-          command: '../../node_modules/.bin/cypress run'
-          post-steps:
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/docker-paths/coverage
-            - run:
-                name: Check code coverage 📈
-                command: |
-                  ../../node_modules/.bin/check-coverage main.js
-                  ../../node_modules/.bin/check-coverage second.js
-                  ../../node_modules/.bin/only-covered main.js second.js
-                working_directory: examples/docker-paths
-
-      - cypress/run:
-          attach-workspace: true
-          name: example-ts-example
-          requires:
-            - cypress/install
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          working_directory: examples/ts-example
-          start: npm start
-          wait-on: 'http://localhost:1234'
-          command: '../../node_modules/.bin/cypress run'
-          post-steps:
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/ts-example/coverage
-            - run:
-                command: npm run coverage:check
-                working_directory: examples/ts-example
-            - run:
-                name: Check code coverage 📈
-                command: |
-                  ../../node_modules/.bin/check-coverage main.ts
-                  ../../node_modules/.bin/check-coverage calc.ts
-                  ../../node_modules/.bin/only-covered main.ts calc.ts
-                working_directory: examples/ts-example
-
-      - cypress/run:
-          attach-workspace: true
-          name: example-use-webpack
-          requires:
-            - cypress/install
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          working_directory: examples/use-webpack
-          build: npm run build
-          start: npm start
-          wait-on: 'http://localhost:5000'
-          command: '../../node_modules/.bin/cypress run'
-          # wrong path when using working_directory
-          # https://github.com/cypress-io/circleci-orb/issues/265
-          # store screenshots and videos
-          # store_artifacts: true
-          post-steps:
-            - store_artifacts:
-                path: examples/use-webpack/cypress/videos
-            - store_artifacts:
-                path: examples/use-webpack/cypress/screenshots
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/use-webpack/coverage
-            - run:
-                name: Check code coverage 📈
-                command: |
-                  ../../node_modules/.bin/check-coverage src/index.js
-                  ../../node_modules/.bin/check-coverage src/calc.js
-                  ../../node_modules/.bin/only-covered src/index.js src/calc.js
-                working_directory: examples/use-webpack
-
-      - cypress/run:
-          attach-workspace: true
-          name: example-same-folder
-          requires:
-            - cypress/install
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          command: npx cypress run --project examples/same-folder
-          # store screenshots and videos
-          store_artifacts: true
-          post-steps:
-            - run: cat examples/same-folder/.nyc_output/out.json
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/same-folder/coverage
-            # make sure the examples captures 100% of code
-            - run:
-                command: npx nyc report --check-coverage true --lines 100
-                working_directory: examples/same-folder
-            - run:
-                command: npx nyc report --check-coverage true --lines 100 --include unit-utils.js
-                working_directory: examples/same-folder
-            - run:
-                name: Check code coverage 📈
-                command: |
-                  ../../node_modules/.bin/check-coverage main.js
-                  ../../node_modules/.bin/check-coverage unit-utils.js
-                  ../../node_modules/.bin/only-covered main.js unit-utils.js
-                working_directory: examples/same-folder
-
-      - cypress/run:
-          attach-workspace: true
-          name: example-support-files
-          requires:
-            - cypress/install
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          start: npm start --prefix examples/support-files
-          wait-on: 'http://localhost:1234'
-          command: npx cypress run --project examples/support-files
-          # store screenshots and videos
-          store_artifacts: true
-          post-steps:
-            - run: cat examples/support-files/.nyc_output/out.json
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/support-files/coverage
-            # make sure the examples captures 100% of code
-            - run:
-                command: npx nyc report --check-coverage true --lines 100
-                working_directory: examples/support-files
-            - run:
-                name: Check code coverage 📈
-                command: |
-                  ../../node_modules/.bin/check-coverage main.js
-                  ../../node_modules/.bin/only-covered main.js
-                working_directory: examples/support-files
-
-      - cypress/run:
-          attach-workspace: true
-          name: example-all-files
-          requires:
-            - cypress/install
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          start: npm start --prefix examples/all-files
-          wait-on: 'http://localhost:1234'
-          command: npx cypress run --project examples/all-files
-          # store screenshots and videos
-          store_artifacts: true
-          post-steps:
-            - run: cat examples/all-files/.nyc_output/out.json
-            - run: cat examples/all-files/coverage/coverage-final.json
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/all-files/coverage
-            # make sure the examples captures 100% of code
-            - run:
-                command: npx nyc report --check-coverage true --lines 100
-                working_directory: examples/all-files
-            - run:
-                name: Check code coverage 📈
-                # we will check the final coverage report
-                # to make sure it only has files we are interested in
-                # because there are files covered at 0 in the report
-                command: |
-                  ../../node_modules/.bin/check-coverage main.js
-                  ../../node_modules/.bin/check-coverage second.js
-                  ../../node_modules/.bin/check-coverage not-covered.js
-                  ../../node_modules/.bin/only-covered --from coverage/coverage-final.json main.js second.js not-covered.js
-                working_directory: examples/all-files
-
-      - cypress/run:
-          attach-workspace: true
-          name: example-placeholders
-          requires:
-            - cypress/install
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          command: npx cypress run --project examples/placeholders
-          # store screenshots and videos
-          store_artifacts: true
-          post-steps:
-            - run: cat examples/placeholders/.nyc_output/out.json
-            - run: cat examples/placeholders/coverage/coverage-final.json
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/placeholders/coverage
-            # make sure the examples captures 100% of code
-            - run:
-                command: npx nyc report --check-coverage true --lines 100
-                working_directory: examples/placeholders
-            - run:
-                name: Check code coverage 📈
-                # we will check the final coverage report
-                # to make sure it only has files we are interested in
-                # because there are files covered at 0 in the report
-                command: |
-                  ../../node_modules/.bin/check-coverage src/a.js
-                  ../../node_modules/.bin/check-coverage src/a.js
-                  ../../node_modules/.bin/only-covered --from coverage/coverage-final.json src/a.js src/b.js
-                working_directory: examples/placeholders
-
-      - cypress/run:
-          attach-workspace: true
-          name: example-exclude-files
-          requires:
-            - cypress/install
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          start: npm start --prefix examples/exclude-files
-          wait-on: 'http://localhost:1234'
-          command: npx cypress run --project examples/exclude-files
-          # store screenshots and videos
-          store_artifacts: true
-          post-steps:
-            - run: cat examples/exclude-files/.nyc_output/out.json
-            - run: cat examples/exclude-files/coverage/coverage-final.json
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/exclude-files/coverage
-            # make sure the examples captures 100% of code
-            - run:
-                command: npx nyc report --check-coverage true --lines 100
-                working_directory: examples/exclude-files
-            - run:
-                name: Check code coverage 📈
-                # we will check the final coverage report
-                # to make sure it only has files we are interested in
-                command: |
-                  ../../node_modules/.bin/check-coverage main.js
-                  ../../node_modules/.bin/only-covered --from coverage/coverage-final.json main.js
-                working_directory: examples/exclude-files
-
-      - cypress/run:
-          attach-workspace: true
-          name: example-use-plugins-and-support
-          requires:
-            - cypress/install
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          command: npx cypress run --project examples/use-plugins-and-support
-          # store screenshots and videos
-          store_artifacts: true
-          post-steps:
-            - run: cat examples/use-plugins-and-support/.nyc_output/out.json
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/use-plugins-and-support/coverage
-            # make sure the examples captures 100% of code
-            - run:
-                command: npx nyc report --check-coverage true --lines 100
-                working_directory: examples/use-plugins-and-support
-            - run:
-                name: Check code coverage 📈
-                command: |
-                  ../../node_modules/.bin/check-coverage main.js
-                  ../../node_modules/.bin/only-covered main.js
-                working_directory: examples/use-plugins-and-support
-
-      - cypress/run:
-          attach-workspace: true
-          name: example-one-spec
-          requires:
-            - cypress/install
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          command: npx cypress run --project examples/one-spec
-          # store screenshots and videos
-          store_artifacts: true
-          post-steps:
-            - run: cat examples/one-spec/.nyc_output/out.json
-            - run: cat examples/one-spec/coverage/coverage-summary.json
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/one-spec/coverage
-            # make sure the examples captures 100% of code
-            - run:
-                command: npx nyc report --check-coverage true --lines 100
-                working_directory: examples/one-spec
-            - run:
-                name: Check code coverage 📈
-                command: |
-                  ../../node_modules/.bin/check-coverage main.js
-                  ../../node_modules/.bin/only-covered main.js
-                working_directory: examples/one-spec
-
-      - cypress/run:
-          attach-workspace: true
-          name: example-unit-tests-js
-          requires:
-            - cypress/install
-          # there are no jobs to follow this one
-          # so no need to save the workspace files (saves time)
-          no-workspace: true
-          command: npx cypress run --project examples/unit-tests-js
-          # store screenshots and videos
-          store_artifacts: true
-          post-steps:
-            - run: cat examples/unit-tests-js/.nyc_output/out.json
-            - run: cat examples/unit-tests-js/coverage/coverage-summary.json
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: examples/unit-tests-js/coverage
-            # make sure the examples captures 100% of code
-            - run:
-                command: npx nyc report --check-coverage true --lines 100
-                working_directory: examples/unit-tests-js
-            - run:
-                name: Check code coverage 📈
-                command: |
-                  ../../node_modules/.bin/check-coverage misc.js
-                  ../../node_modules/.bin/only-covered misc.js
-                working_directory: examples/unit-tests-js
+          matrix:
+            parameters:
+              jobname:
+                - old-cypress-config/all-files
+                - old-cypress-config/backend
+                - old-cypress-config/before-all-visit
+                - old-cypress-config/before-each-visit
+                - old-cypress-config/exclude-files
+                - old-cypress-config/frontend
+                - old-cypress-config/fullstack
+                - old-cypress-config/one-spec
+                - old-cypress-config/same-folder
+                - old-cypress-config/support-files
+                - old-cypress-config/ts-example
+                - old-cypress-config/unit-tests-js
+                - old-cypress-config/use-webpack
+                - new-cypress-config/all-files
+                - new-cypress-config/backend
+                - new-cypress-config/before-all-visit
+                - new-cypress-config/before-each-visit
+                - new-cypress-config/exclude-files
+                - new-cypress-config/frontend
+                - new-cypress-config/fullstack
+                - new-cypress-config/one-spec
+                - new-cypress-config/same-folder
+                - new-cypress-config/support-files
+                - new-cypress-config/ts-example
+                - new-cypress-config/unit-tests-js
+                - new-cypress-config/use-webpack
 
       - cypress/run:
           name: Windows test
@@ -557,34 +149,45 @@ workflows:
             name: win/default
             shell: bash.exe
           no-workspace: true
-          start: npm run start:windows --prefix examples/all-files
+          start: npm run start:windows --prefix test-apps/old-cypress-config/all-files
           wait-on: 'http://localhost:1234'
-          command: npx cypress run --project examples/all-files
+          command: npx cypress run --project test-apps/old-cypress-config/all-files
           # store screenshots and videos
           store_artifacts: true
+          cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}'
+          post-checkout:
+            - run:
+                name: Install node 16
+                command: nvm install 16.13.2
+            - run:
+                name: Use node 16
+                command: nvm use 16.13.2
+            - run:
+                name: Install deps for code coverage
+                command: npm ci
+          post-install:
+            - run:
+                name: Install deps for test-apps/old-cypress-config
+                command: npm ci
+                working_directory: test-apps/old-cypress-config            
           post-steps:
-            - run: cat examples/all-files/.nyc_output/out.json
-            - run: cat examples/all-files/coverage/coverage-final.json
             # store the created coverage report folder
             # you can click on it in the CircleCI UI
             # to see live static HTML site
             - store_artifacts:
-                path: examples/all-files/coverage
+                path: test-apps/old-cypress-config/all-files/coverage
             # make sure the examples captures 100% of code
             - run:
-                command: npx nyc report --check-coverage true --lines 100
-                working_directory: examples/all-files
+                name: Verify Code Coverage
+                command: npm run coverage:verify
+                working_directory: test-apps/old-cypress-config/all-files
             - run:
-                name: Check code coverage 📈
+                name: Check code coverage files 📈
                 # we will check the final coverage report
                 # to make sure it only has files we are interested in
                 # because there are files covered at 0 in the report
-                command: |
-                  ../../node_modules/.bin/check-coverage main.js
-                  ../../node_modules/.bin/check-coverage second.js
-                  ../../node_modules/.bin/check-coverage not-covered.js
-                  ../../node_modules/.bin/only-covered --from coverage/coverage-final.json main.js second.js not-covered.js
-                working_directory: examples/all-files
+                command: npm i -D check-code-coverage && npm run coverage:check-files:windows
+                working_directory: test-apps/old-cypress-config/all-files
 
       - publish:
           filters:
@@ -592,22 +195,35 @@ workflows:
               only:
                 - master
                 - beta
+                - next
+                - dev
           requires:
-            - unit
-            - frontend coverage
-            - backend coverage
-            - fullstack coverage
-            - example-before-each-visit
-            - example-before-all-visit
-            - example-ts-example
-            - example-same-folder
-            - example-support-files
-            - example-use-plugins-and-support
-            - example-one-spec
-            - example-exclude-files
-            - example-docker-paths
-            - example-use-webpack
-            - example-all-files
-            - example-placeholders
-            - example-unit-tests-js
+            - lint
+            - test-code-coverage-plugin
+            - test-old-cypress-config/all-files
+            - test-old-cypress-config/backend
+            - test-old-cypress-config/before-all-visit
+            - test-old-cypress-config/before-each-visit
+            - test-old-cypress-config/exclude-files
+            - test-old-cypress-config/frontend
+            - test-old-cypress-config/fullstack
+            - test-old-cypress-config/one-spec
+            - test-old-cypress-config/same-folder
+            - test-old-cypress-config/support-files
+            - test-old-cypress-config/ts-example
+            - test-old-cypress-config/unit-tests-js
+            - test-old-cypress-config/use-webpack
+            - test-new-cypress-config/all-files
+            - test-new-cypress-config/backend
+            - test-new-cypress-config/before-all-visit
+            - test-new-cypress-config/before-each-visit
+            - test-new-cypress-config/exclude-files
+            - test-new-cypress-config/frontend
+            - test-new-cypress-config/fullstack
+            - test-new-cypress-config/one-spec
+            - test-new-cypress-config/same-folder
+            - test-new-cypress-config/support-files
+            - test-new-cypress-config/ts-example
+            - test-new-cypress-config/unit-tests-js
+            - test-new-cypress-config/use-webpack
             - Windows test

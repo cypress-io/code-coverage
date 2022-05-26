@@ -1,0 +1,21 @@
+{
+  "name": "example-exclude-files",
+  "description": "Exclude some files from final coverage report",
+  "scripts": {
+    "cy:run": "../node_modules/.bin/cypress run",
+    "start": "../node_modules/.bin/parcel serve index.html",
+    "pretest": "rimraf .nyc_output .cache coverage dist",
+    "test": "../node_modules/.bin/start-test 1234 cy:run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "../node_modules/.bin/check-coverage main.js && ../node_modules/.bin/only-covered --from coverage/coverage-final.json main.js"
+  },
+  "nyc": {
+    "exclude": [
+      "second.js"
+    ],
+    "excludeAfterRemap": true
+  },
+  "devDependencies": {
+    "@babel/core": "7.9.0"
+  }
+}

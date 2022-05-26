@@ -1,7 +1,0 @@
-{
-  "name": "example-one-spec",
-  "description": "Only running a single spec",
-  "scripts": {
-    "cy:open": "../../node_modules/.bin/cypress open"
-  }
-}

@@ -1,0 +1,15 @@
+{
+  "name": "example-before-each-visit",
+  "description": "Getting code coverage when cy.visit is used in beforeEach hook",
+  "devDependencies": {
+    "@babel/core": "^7.16.12"
+  },
+  "scripts": {
+    "cy:run": "../node_modules/.bin/cypress run",
+    "start": "../node_modules/.bin/parcel serve index.html",
+    "pretest": "rimraf .nyc_output .cache coverage dist",
+    "test": "../node_modules/.bin/start-test 1234 cy:run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "../node_modules/.bin/check-coverage main.ts && ../node_modules/.bin/check-coverage calc.ts && ../node_modules/.bin/only-covered main.ts calc.ts"
+  }
+}

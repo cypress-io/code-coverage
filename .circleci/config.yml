@@ -71,6 +71,9 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
+          name: Install deps
+          command: npm ci
+      - run:
           command: npm run test
       - store_artifacts:
           path: coverage

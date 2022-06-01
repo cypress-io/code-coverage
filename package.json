@@ -18,7 +18,11 @@
     "effective:config": "circleci config process .circleci/config.yml | sed /^#/d"
   },
   "peerDependencies": {
-    "cypress": "*"
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "babel-loader": "^8.0.0",
+    "cypress": "*",
+    "webpack": "^5.0.0"
   },
   "repository": {
     "type": "git",

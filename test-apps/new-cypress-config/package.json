@@ -12,7 +12,7 @@
     "babel-loader": "^8.2.3",
     "babel-plugin-istanbul": "^6.1.1",
     "check-code-coverage": "^1.10.0",
-    "cypress": "https://cdn.cypress.io/beta/npm/10.0.0/darwin-x64/develop-e6b2466f7b219a86da46c1ac720432ef75193ca4/cypress.tgz",
+    "cypress": "^10.0.3",
     "nyc": "^15.1.0",
     "parcel-bundler": "^1.12.5",
     "serve": "^13.0.2",

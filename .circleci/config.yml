@@ -132,6 +132,7 @@ workflows:
                 - new-cypress-config/backend
                 - new-cypress-config/before-all-visit
                 - new-cypress-config/before-each-visit
+                - new-cypress-config/cra-e2e-and-ct
                 - new-cypress-config/exclude-files
                 - new-cypress-config/frontend
                 - new-cypress-config/fullstack
@@ -217,6 +218,7 @@ workflows:
             - test-new-cypress-config/backend
             - test-new-cypress-config/before-all-visit
             - test-new-cypress-config/before-each-visit
+            - test-new-cypress-config/cra-e2e-and-ct
             - test-new-cypress-config/exclude-files
             - test-new-cypress-config/frontend
             - test-new-cypress-config/fullstack

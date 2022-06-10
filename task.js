@@ -14,6 +14,7 @@ const {
 const { fixSourcePaths } = require('./support-utils')
 const { removePlaceholders } = require('./common-utils')
 const lockfile = require('proper-lockfile')
+const fs = require('fs')
 
 const debug = require('debug')('code-coverage')
 
@@ -150,7 +151,13 @@ const tasks = {
     fixSourcePaths(coverage)
 
     try {
-      const release = await lockfile.lock(nycFilename, {retries: 20})
+      if(!fs.existsSync(nycReportOptions['temp-dir'])) {
+        fs.mkdirSync(nycReportOptions['temp-dir'], {recursive: true})
+      }
+      const release = await lockfile.lock(nycReportOptions['temp-dir'], {
+        retries: 20,
+        lockfilePath: nycReportOptions['temp-dir'] + '/dir.lock'
+      })
       const previousCoverage = existsSync(nycFilename)
         ? JSON.parse(readFileSync(nycFilename, 'utf8'))
         : {}

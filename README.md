@@ -40,7 +40,7 @@ This plugin **DOES NOT** instrument your code. You have to instrument it yoursel
 }
 ```
 
-Please see the [Test Apps](#examples) section down below, you can probably find a linked project matching your situation to see how to instrument your application's source code before running end-to-end tests to get the code coverage.
+Please see the [Test Apps](#internal-test-apps) section down below, you can probably find a linked project matching your situation to see how to instrument your application's source code before running end-to-end tests to get the code coverage.
 
 If your application has been instrumented correctly, then you should see additional counters and instructions in the application's JavaScript resources, like the image down below shows.
 

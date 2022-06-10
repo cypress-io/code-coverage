@@ -151,8 +151,8 @@ const tasks = {
     fixSourcePaths(coverage)
 
     try {
-      if(!fs.existsSync(nycReportOptions['temp-dir'])) {
-        fs.mkdirSync(nycReportOptions['temp-dir'], {recursive: true})
+      if (!fs.existsSync(nycReportOptions['temp-dir'])) {
+        fs.mkdirSync(nycReportOptions['temp-dir'], { recursive: true })
       }
       const release = await lockfile.lock(nycReportOptions['temp-dir'], {
         retries: 20,
@@ -174,8 +174,7 @@ const tasks = {
       saveCoverage(coverageMap)
       debug('wrote coverage file %s', nycFilename)
       await release()
-    }
-    catch(e) {
+    } catch (e) {
       console.error(e)
     }
 

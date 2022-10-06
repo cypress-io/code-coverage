@@ -1,0 +1,14 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.25.0
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-LODASH-567746:
+    - '@cypress/code-coverage > lodash':
+        patched: '2022-10-06T22:48:03.744Z'
+    - '@cypress/code-coverage > check-code-coverage > lodash':
+        patched: '2022-10-06T22:48:03.744Z'
+    - '@cypress/code-coverage > parcel-bundler > babylon-walk > babel-types > lodash':
+        patched: '2022-10-06T22:48:03.744Z'
+    - '@cypress/code-coverage > parcel-bundler > htmlnano > uncss > lodash':
+        patched: '2022-10-06T22:48:03.744Z'

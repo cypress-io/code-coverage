@@ -66,7 +66,7 @@ That should be it! You should see messages from this plugin in the Cypress Comma
 
 ### App vs unit tests
 
-You need to instrument your web application. This means that when the test does `cy.visit('localhost:3000')` any code the `index.html` requests should be instrumented by YOU. See [Test Apps](#test-apps) section for advice, usually you need to stick `babel-plugin-istanbul` into your pipeline somewhere.
+You need to instrument your web application. This means that when the test does `cy.visit('localhost:3000')` any code the `index.html` requests should be instrumented by YOU. See [Test Apps](#internal-test-apps) section for advice, usually you need to stick `babel-plugin-istanbul` into your pipeline somewhere.
 
 If you are testing individual functions from your application code by importing them directly into Cypress spec files, this is called "unit tests" and Cypress can instrument this scenario for you. See [Instrument unit tests](#instrument-unit-tests) section.
 

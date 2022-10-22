@@ -57,19 +57,19 @@
     "nyc": "15.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.16.0",
-    "@babel/preset-env": "^7.16.11",
-    "babel-loader": "^8.2.3",
+    "@babel/core": "7.16.0",
+    "@babel/preset-env": "7.16.11",
+    "babel-loader": "8.2.3",
     "babel-plugin-istanbul": "6.1.1",
     "check-code-coverage": "1.10.0",
     "console-log-div": "0.6.3",
-    "cypress": "^9.7.0",
+    "cypress": "9.7.0",
     "lodash": "4.17.21",
     "markdown-link-check": "3.9.0",
     "parcel-bundler": "1.12.5",
     "prettier": "2.6.2",
     "semantic-release": "17.4.7",
     "start-server-and-test": "1.14.0",
-    "webpack": "^5.68.0"
+    "webpack": "5.68.0"
   }
 }

@@ -2,7 +2,7 @@
   "name": "example-same-folder",
   "description": "Check if test files are correctly filtered out",
   "devDependencies": {
-    "@babel/core": "^7.16.12"
+    "@babel/core": "7.16.12"
   },
   "scripts": {
     "cy:run": "../node_modules/.bin/cypress run",

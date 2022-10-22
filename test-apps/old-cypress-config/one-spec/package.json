@@ -10,6 +10,6 @@
     "coverage:check-files": "../node_modules/.bin/check-coverage main.js && ../node_modules/.bin/only-covered main.js"
   },
   "devDependencies": {
-    "@babel/core": "^7.16.12"
+    "@babel/core": "7.16.12"
   }
 }

@@ -2,7 +2,7 @@
   "name": "example-before-all-visit",
   "description": "Getting code coverage when cy.visit is used in before hook",
   "devDependencies": {
-    "@babel/core": "^7.16.12"
+    "@babel/core": "7.19.6"
   },
   "scripts": {
     "start": "../node_modules/.bin/parcel serve index.html",

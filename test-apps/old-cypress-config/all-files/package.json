@@ -17,6 +17,6 @@
     "include": "*.js"
   },
   "devDependencies": {
-    "@babel/core": "^7.16.12"
+    "@babel/core": "7.19.6"
   }
 }

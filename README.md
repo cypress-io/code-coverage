@@ -155,7 +155,7 @@ module.exports = (on, config) => {
 
 ## Instrument backend code
 
-Example in [test-apps/new-cypress-config/backend](test-apps/backend) folder.
+Example in [test-apps/new-cypress-config/backend](test-apps/new-cypress-config/backend) folder.
 
 You can also instrument your server-side code and produce combined coverage report that covers both the backend and frontend code
 

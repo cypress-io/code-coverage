@@ -214,7 +214,7 @@ const registerHooks = () => {
 // pass environment variable coverage=false
 //  cypress run --env coverage=false
 // or
-//  CYPRESS_coverage=false cypress run
+//  CYPRESS_COVERAGE=false cypress run
 // see https://on.cypress.io/environment-variables
 
 // to avoid "coverage" env variable being case-sensitive, convert to lowercase

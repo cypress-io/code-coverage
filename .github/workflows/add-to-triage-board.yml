@@ -8,5 +8,5 @@ on:
       - opened
 jobs:
   add-to-triage-project-board:
-    uses: cypress-io/cypress/.github/workflows/triage_add_to_project.yml@master
+    uses: cypress-io/cypress/.github/workflows/triage_add_to_project.yml@develop
     secrets: inherit

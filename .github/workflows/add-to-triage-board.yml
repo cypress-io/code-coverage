@@ -1,4 +1,4 @@
-name: Add issue/PR to Triage Board
+name: 'Add issue/PR to Triage Board'
 on:
   issues:
     types:
@@ -7,6 +7,7 @@ on:
     types:
       - opened
 jobs:
+  name: 'Add to Triage Board'
   add-to-triage-project-board:
-    uses: cypress-io/cypress/.github/workflows/triage_add_to_project.yml
+    uses: cypress-io/cypress/.github/workflows/triage_add_to_project.yml@master
     secrets: inherit

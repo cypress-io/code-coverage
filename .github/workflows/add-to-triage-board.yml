@@ -9,4 +9,5 @@ on:
 jobs:
   add-to-triage-project-board:
     uses: cypress-io/cypress/.github/workflows/triage_add_to_project.yml@develop
-    secrets: inherit
+    secrets:
+      ADD_TO_PROJECT_TOKEN: ${{ secrets.ADD_TO_PROJECT_TOKEN }}

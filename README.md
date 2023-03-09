@@ -413,7 +413,7 @@ Full examples we use for testing in this repository:
 - [test-apps/fullstack](test-apps/new-cypress-config/fullstack) instruments and merges backend, e2e and unit test coverage into a single report
 - [test-apps/before-all-visit](test-apps/new-cypress-config/before-all-visit) checks if code coverage works when `cy.visit` is made once in the `before` hook
 - [test-apps/before-each-visit](test-apps/new-cypress-config/before-each-visit) checks if code coverage correctly keeps track of code when doing `cy.visit` before each test
-- [test-apps/one-spec.js](test-apps/new-cypress-config/one-spec.js) confirms that coverage is collected and filtered correctly if the user only executes a single Cypress test
+- [test-apps/one-spec](test-apps/new-cypress-config/one-spec) confirms that coverage is collected and filtered correctly if the user only executes a single Cypress test
 - [test-apps/ts-example](test-apps/new-cypress-config/ts-example) uses Babel + Parcel to instrument and serve TypeScript file
 - [test-apps/use-webpack](test-apps/new-cypress-config/use-webpack) shows Webpack build with source maps and Babel
 - [test-apps/unit-tests-js](test-apps/new-cypress-config/unit-tests-js) runs just the unit tests and reports code coverage (JavaScript source code)

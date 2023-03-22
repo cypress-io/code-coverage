@@ -19,4 +19,4 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_API_TOKEN }}
         continue-on-error: true
-        run: snyk code test  --strict-out-of-sync=false --detection-depth=6 --exclude=docker,Dockerfile --severity-threshold=high
+        run: snyk code test  --all-projects --strict-out-of-sync=false --detection-depth=6 --exclude=docker,Dockerfile --severity-threshold=high

@@ -22,4 +22,4 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_API_TOKEN }}
         with:
-          args: --debug  --all-projects --strict-out-of-sync=false --detection-depth=6 --exclude=docker,Dockerfile --severity-threshold=critical
+          args: --all-projects --strict-out-of-sync=false --detection-depth=6 --exclude=docker,Dockerfile --severity-threshold=critical

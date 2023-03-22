@@ -2,9 +2,6 @@ name: Snyk Static Analysis Scan
 # This SAST (Static Application Security Testing) scan is used to scan
 # our first-party code for security vulnerabilities
 on:
-  push:
-    branches:
-      - '*'
   pull_request:
     branches:
       - master

@@ -2,14 +2,14 @@
 version: 2.1
 orbs:
   # https://github.com/cypress-io/circleci-orb
-  cypress: cypress-io/cypress@1.29.0 # used to run e2e tests
-  win: circleci/windows@2 # run a test job on Windows
+  cypress: cypress-io/cypress@3.0.0 # used to run e2e tests
+  win: circleci/windows@5.0.0 # run a test job on Windows
 
 jobs:
   lint:
     description: Checks the code formatting
     docker:
-      - image: cimg/node:16.9.1
+      - image: cimg/node:16.16.0
         environment:
           # we don't need Cypress to check code styl
           CYPRESS_INSTALL_BINARY: '0'
@@ -20,11 +20,70 @@ jobs:
           name: Code style check 🧹
           command: npm run format:check
       - run: npm run check:markdown
+  
+  install_and_persist:
+    executor: cypress/default
+    steps:
+      - cypress/install
+      - run:
+          name: Install deps for test-apps/old-cypress-config
+          command: npm ci
+          working_directory: test-apps/old-cypress-config
+      - run:
+          name: Install deps for test-apps/new-cypress-config
+          command: npm ci
+          working_directory: test-apps/new-cypress-config
+      - run: npm run check:markdown
+      - persist_to_workspace:
+          paths:
+              - .cache/Cypress
+              - project
+          root: ~/
+
+  windows_test:
+    executor:
+      # executor comes from the "windows" orb
+      name: win/default
+      shell: bash.exe
+    steps:
+      - checkout
+      - run:
+          name: Install node 16
+          command: nvm install 16.16.0
+      - run:
+          name: Use node 16
+          command: nvm use 16.16.0
+      - run:
+          name: Install deps for code coverage
+          command: npm ci 
+      - run:
+          name: Install deps for test-apps/old-cypress-config
+          command: npm ci
+          working_directory: test-apps/old-cypress-config   
+      - cypress/run-tests:
+          # no-workspace: true
+          start-command: npm run start:windows --prefix test-apps/old-cypress-config/all-files
+          # wait-on: 'http://localhost:1234'
+          cypress-command: npx cypress run --project test-apps/old-cypress-config/all-files
+          # store screenshots and videos
+          # store_artifacts: true          
+      - run:
+          # make sure the examples captures 100% of code
+          name: Verify Code Coverage
+          command: npm run coverage:verify
+          working_directory: test-apps/old-cypress-config/all-files
+      - run:
+          name: Check code coverage files 📈
+          # we will check the final coverage report
+          # to make sure it only has files we are interested in
+          # because there are files covered at 0 in the report
+          command: npm i -D check-code-coverage && npm run coverage:check-files:windows
+          working_directory: test-apps/old-cypress-config/all-files
 
   publish:
     description: Publishes the new version of the plugin to NPM
     docker:
-      - image: cimg/node:16.9.1
+      - image: cimg/node:16.16.0
     environment:
       # we don't need Cypress to do the release
       CYPRESS_INSTALL_BINARY: '0'
@@ -40,7 +99,7 @@ jobs:
 
   cyrun:
     docker:
-      - image: cypress/base:16.13.2
+      - image: cypress/base:16.18.1
     parameters:
       jobname:
         type: string
@@ -66,13 +125,10 @@ jobs:
 
   test-code-coverage-plugin:
     docker:
-      - image: cypress/base:16.13.2
+      - image: cypress/base:16.18.1
     steps:
       - attach_workspace:
           at: ~/
-      - run:
-          name: Install deps
-          command: npm ci
       - run:
           command: npm run test
       - store_artifacts:
@@ -84,34 +140,19 @@ jobs:
 workflows:
   build:
     jobs:
-      - cypress/install:
-          cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}'
-          pre-steps:
-            - run: npm i -g npm@latest
-          post-install:
-            - run:
-                name: Install deps for test-apps/old-cypress-config
-                command: npm ci
-                working_directory: test-apps/old-cypress-config
-            - run:
-                name: Install deps for test-apps/new-cypress-config
-                command: npm ci
-                working_directory: test-apps/new-cypress-config
-          post-steps:
-            - run: npm run check:markdown 
-
+      - install_and_persist
       - lint:
           requires:
-            - cypress/install
+            - install_and_persist
 
       - test-code-coverage-plugin:
           requires:
-            - cypress/install
+            - install_and_persist
 
       - cyrun:
           name: test-<< matrix.jobname>>
           requires:
-            - cypress/install
+            - install_and_persist
           matrix:
             parameters:
               jobname:
@@ -142,54 +183,7 @@ workflows:
                 - new-cypress-config/ts-example
                 - new-cypress-config/unit-tests-js
                 - new-cypress-config/use-webpack
-
-      - cypress/run:
-          name: Windows test
-          executor:
-            # executor comes from the "windows" orb
-            name: win/default
-            shell: bash.exe
-          no-workspace: true
-          start: npm run start:windows --prefix test-apps/old-cypress-config/all-files
-          wait-on: 'http://localhost:1234'
-          command: npx cypress run --project test-apps/old-cypress-config/all-files
-          # store screenshots and videos
-          store_artifacts: true
-          cache-key: 'cache-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}'
-          post-checkout:
-            - run:
-                name: Install node 16
-                command: nvm install 16.13.2
-            - run:
-                name: Use node 16
-                command: nvm use 16.13.2
-            - run:
-                name: Install deps for code coverage
-                command: npm ci
-          post-install:
-            - run:
-                name: Install deps for test-apps/old-cypress-config
-                command: npm ci
-                working_directory: test-apps/old-cypress-config            
-          post-steps:
-            # store the created coverage report folder
-            # you can click on it in the CircleCI UI
-            # to see live static HTML site
-            - store_artifacts:
-                path: test-apps/old-cypress-config/all-files/coverage
-            # make sure the examples captures 100% of code
-            - run:
-                name: Verify Code Coverage
-                command: npm run coverage:verify
-                working_directory: test-apps/old-cypress-config/all-files
-            - run:
-                name: Check code coverage files 📈
-                # we will check the final coverage report
-                # to make sure it only has files we are interested in
-                # because there are files covered at 0 in the report
-                command: npm i -D check-code-coverage && npm run coverage:check-files:windows
-                working_directory: test-apps/old-cypress-config/all-files
-
+      - windows_test
       - publish:
           filters:
             branches:
@@ -228,4 +222,4 @@ workflows:
             - test-new-cypress-config/ts-example
             - test-new-cypress-config/unit-tests-js
             - test-new-cypress-config/use-webpack
-            - Windows test
+            - windows_test

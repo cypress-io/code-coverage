@@ -373,7 +373,7 @@ You can skip the client-side code coverage hooks by setting the environment vari
 # tell Cypress to set environment variable "coverage" to false
 cypress run --env coverage=false
 # or pass the environment variable
-CYPRESS_coverage=false cypress run
+CYPRESS_COVERAGE=false cypress run
 ```
 
 or set it to `false` in the `cypress.json` file

@@ -69,7 +69,7 @@
     "parcel-bundler": "1.12.5",
     "prettier": "2.6.2",
     "semantic-release": "17.4.7",
-    "start-server-and-test": "1.14.0",
+    "start-server-and-test": "1.15.4",
     "webpack": "^5.68.0"
   }
 }

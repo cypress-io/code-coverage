@@ -42,7 +42,7 @@ const registerHooks = () => {
   before(() => {
     // skip test coverage collection for single spec file if true 
     // @ts-ignore
-    if (this.currentTest._testConfig.unverifiedTestConfig.skipTestCoverage) {
+    if (this.currentTest?._testConfig?.unverifiedTestConfig?.skipTestCoverage) {
       return;
     }
     // we need to reset the coverage when running
@@ -68,7 +68,7 @@ const registerHooks = () => {
   beforeEach(() => {
     // skip test coverage collection for single spec file if true 
     // @ts-ignore
-    if (this.currentTest._testConfig.unverifiedTestConfig.skipTestCoverage) {
+    if (this.currentTest?._testConfig?.unverifiedTestConfig?.skipTestCoverage) {
       return;
     }
     // each object will have the coverage and url pathname
@@ -108,7 +108,7 @@ const registerHooks = () => {
   afterEach(() => {
     // skip test coverage collection for single spec file if true 
     // @ts-ignore
-    if (this.currentTest._testConfig.unverifiedTestConfig.skipTestCoverage) {
+    if (this.currentTest?._testConfig?.unverifiedTestConfig?.skipTestCoverage) {
       return;
     }
     // save coverage after the test
@@ -141,7 +141,7 @@ const registerHooks = () => {
   after(function collectBackendCoverage() {
     // skip test coverage collection for single spec file if true 
     // @ts-ignore
-    if (this.currentTest._testConfig.unverifiedTestConfig.skipTestCoverage) {
+    if (this.currentTest?._testConfig?.unverifiedTestConfig?.skipTestCoverage) {
       return;
     }
     // I wish I could fail the tests if there is no code coverage information
@@ -200,7 +200,7 @@ const registerHooks = () => {
   after(function mergeUnitTestCoverage() {
     // skip test coverage collection for single spec file if true 
     // @ts-ignore
-    if (this.currentTest._testConfig.unverifiedTestConfig.skipTestCoverage) {
+    if (this.currentTest?._testConfig?.unverifiedTestConfig?.skipTestCoverage) {
       return;
     }
     // collect and merge frontend coverage
@@ -219,7 +219,7 @@ const registerHooks = () => {
   after(function generateReport() {
     // skip test coverage collection for single spec file if true 
     // @ts-ignore
-    if (this.currentTest._testConfig.unverifiedTestConfig.skipTestCoverage) {
+    if (this.currentTest?._testConfig?.unverifiedTestConfig?.skipTestCoverage) {
       return;
     }
     // when all tests finish, lets generate the coverage report

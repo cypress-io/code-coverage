@@ -365,6 +365,23 @@ For example, if you want to only include files in the `app` folder, but exclude 
 
 Another important option is `excludeAfterRemap`. By default it is false, which might let excluded files through. If you are excluding the files, and the instrumenter does not respect the `nyc.exclude` setting, then add `excludeAfterRemap: true` to tell `nyc report` to exclude files. See [test-apps/exclude-files](test-apps/new-cypress-config/exclude-files).
 
+
+## Skip test coverage collection for single spec file
+
+Skip test coverage collection from being reported for a single spec file by using the test config object by setting `{skipTestCoverage : true}`.  This will skip the execution of all hooks associated with code coverage collection.  The test will still be included in the test suite but coverage values will not be collected or added to the code coverage report. 
+
+
+```js
+describe('excludes test from code coverage reporting', {skipTestCoverage: true}, () => {
+  it(
+    'test expects 1 to equal 1',
+    { skipTestCoverage: true },
+    () => {
+      expect(1).to.equal(1)
+    },
+  )
+})
+```
 ## Disable plugin
 
 You can skip the client-side code coverage hooks by setting the environment variable `coverage` to `false`.

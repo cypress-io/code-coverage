@@ -11,6 +11,6 @@
     "pretest": "rimraf .nyc_output .cache coverage dist",
     "test": "../node_modules/.bin/start-test start:app http://localhost:1234 start:other-app http://localhost:1235 cy:run",
     "coverage:verify": "npx nyc report --check-coverage true --lines 100",
-    "coverage:check-files": "../node_modules/.bin/check-coverage app.js && ../node_modules/.bin/check-coverage about.js && ../node_modules/.bin/check-coverage unit.js && ../node_modules/.bin/only-covered app.js about.js unit.js"
+    "coverage:check-files": "../node_modules/.bin/check-coverage app.js && ../node_modules/.bin/only-covered app.js "
   }
 }

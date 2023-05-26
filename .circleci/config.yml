@@ -183,6 +183,7 @@ workflows:
                 - new-cypress-config/ts-example
                 - new-cypress-config/unit-tests-js
                 - new-cypress-config/use-webpack
+                - new-cypress-config/returning-to-application
       - windows_test
       - publish:
           filters:

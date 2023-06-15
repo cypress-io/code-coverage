@@ -3,7 +3,7 @@ import { map } from 'lodash'
 // The redirect code needs to be un-instrumented, otherwise the statement map will be different
 // depending on which code path the redirect took. 
 // Cypress will then correctly treat them as different coverage objects and merge the code coverage.
-// If the redirect code is un-instrumented, Cypress can't tell them apart and will keep referencing to the (stale) first coverage object.
+// If the redirect code is un-instrumented, Cypress can't tell them apart and will keep referencing the (stale) first coverage object.
 // Timeouts are necessary to allow cypress to pick up the "initial" coverage object
 // and compare it to the existing coverage objects.
 eval(`

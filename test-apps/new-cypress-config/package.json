@@ -9,7 +9,7 @@
   "license": "ISC",
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^5.11.0",
-    "babel-loader": "^8.2.3",
+    "babel-loader": "^9.0.0",
     "babel-plugin-istanbul": "^6.1.1",
     "check-code-coverage": "^1.10.0",
     "cypress": "^10.0.3",

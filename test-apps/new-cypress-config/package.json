@@ -15,7 +15,7 @@
     "cypress": "^10.0.3",
     "nyc": "^15.1.0",
     "parcel-bundler": "^1.12.5",
-    "serve": "^13.0.2",
+    "serve": "^14.0.0",
     "start-server-and-test": "^1.14.0"
   },
   "dependencies": {

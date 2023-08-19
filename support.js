@@ -66,6 +66,14 @@ const registerHooks = () => {
     windowCoverageObjects = []
 
     const saveCoverageObject = (win) => {
+      // accessing win.__coverage__ will error when testing cross-origin code
+      // because we don't control cross-origin code anyway, we can safely return
+      try {
+        win.__coverage__
+      } catch {
+        return
+      }
+
       // if application code has been instrumented, the app iframe "window" has an object
       const applicationSourceCoverage = win.__coverage__
       if (!applicationSourceCoverage) {

@@ -23,7 +23,7 @@
     "@cypress/code-coverage": "file:../..",
     "express": "^4.17.2",
     "rimraf": "^3.0.2",
-    "webpack": "^4.46.0",
+    "webpack": "^5.0.0",
     "webpack-cli": "^3.3.12"
   }
 }

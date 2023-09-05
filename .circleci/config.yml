@@ -9,7 +9,7 @@ jobs:
   lint:
     description: Checks the code formatting
     docker:
-      - image: cimg/node:16.20.1
+      - image: cimg/node:18.17.1
         environment:
           # we don't need Cypress to check code styl
           CYPRESS_INSTALL_BINARY: '0'
@@ -48,11 +48,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install node 16
-          command: nvm install 16.16.0
+          name: Install node 18
+          command: nvm install 18.17.1
       - run:
-          name: Use node 16
-          command: nvm use 16.16.0
+          name: Use node 18
+          command: nvm use 18.17.1
       - run:
           name: Install deps for code coverage
           command: npm ci 
@@ -83,7 +83,7 @@ jobs:
   publish:
     description: Publishes the new version of the plugin to NPM
     docker:
-      - image: cimg/node:16.20.1
+      - image: cimg/node:18.17.1
     environment:
       # we don't need Cypress to do the release
       CYPRESS_INSTALL_BINARY: '0'
@@ -99,7 +99,7 @@ jobs:
 
   cyrun:
     docker:
-      - image: cypress/base:16.18.1
+      - image: cypress/base:18.16.1
     parameters:
       jobname:
         type: string
@@ -125,7 +125,7 @@ jobs:
 
   test-code-coverage-plugin:
     docker:
-      - image: cypress/base:16.18.1
+      - image: cypress/base:18.16.1
     steps:
       - attach_workspace:
           at: ~/

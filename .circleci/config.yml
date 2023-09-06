@@ -9,7 +9,7 @@ jobs:
   lint:
     description: Checks the code formatting
     docker:
-      - image: cimg/node:16.20.1
+      - image: cimg/node:20.5.1
         environment:
           # we don't need Cypress to check code styl
           CYPRESS_INSTALL_BINARY: '0'
@@ -25,14 +25,6 @@ jobs:
     executor: cypress/default
     steps:
       - cypress/install
-      - run:
-          name: Install deps for test-apps/old-cypress-config
-          command: npm ci
-          working_directory: test-apps/old-cypress-config
-      - run:
-          name: Install deps for test-apps/new-cypress-config
-          command: npm ci
-          working_directory: test-apps/new-cypress-config
       - run: npm run check:markdown
       - persist_to_workspace:
           paths:
@@ -55,35 +47,31 @@ jobs:
           command: nvm use 16.16.0
       - run:
           name: Install deps for code coverage
-          command: npm ci 
-      - run:
-          name: Install deps for test-apps/old-cypress-config
           command: npm ci
-          working_directory: test-apps/old-cypress-config   
       - cypress/run-tests:
           # no-workspace: true
-          start-command: npm run start:windows --prefix test-apps/old-cypress-config/all-files
+          start-command: npm run start:windows --prefix test-apps/all-files
           # wait-on: 'http://localhost:1234'
-          cypress-command: npx cypress run --project test-apps/old-cypress-config/all-files
+          cypress-command: npx cypress run --project test-apps/all-files
           # store screenshots and videos
           # store_artifacts: true          
       - run:
           # make sure the examples captures 100% of code
           name: Verify Code Coverage
           command: npm run coverage:verify
-          working_directory: test-apps/old-cypress-config/all-files
+          working_directory: test-apps/all-files
       - run:
           name: Check code coverage files 📈
           # we will check the final coverage report
           # to make sure it only has files we are interested in
           # because there are files covered at 0 in the report
-          command: npm i -D check-code-coverage && npm run coverage:check-files:windows
-          working_directory: test-apps/old-cypress-config/all-files
+          command: npm i -D check-code-coverage && npm run coverage:check-files
+          working_directory: test-apps/all-files
 
   publish:
     description: Publishes the new version of the plugin to NPM
     docker:
-      - image: cimg/node:16.20.1
+      - image: cimg/node:20.5.1
     environment:
       # we don't need Cypress to do the release
       CYPRESS_INSTALL_BINARY: '0'
@@ -156,33 +144,20 @@ workflows:
           matrix:
             parameters:
               jobname:
-                - old-cypress-config/all-files
-                - old-cypress-config/backend
-                - old-cypress-config/before-all-visit
-                - old-cypress-config/before-each-visit
-                - old-cypress-config/exclude-files
-                - old-cypress-config/frontend
-                - old-cypress-config/fullstack
-                - old-cypress-config/one-spec
-                - old-cypress-config/same-folder
-                - old-cypress-config/support-files
-                - old-cypress-config/ts-example
-                - old-cypress-config/unit-tests-js
-                - old-cypress-config/use-webpack
-                - new-cypress-config/all-files
-                - new-cypress-config/backend
-                - new-cypress-config/before-all-visit
-                - new-cypress-config/before-each-visit
-                - new-cypress-config/cra-e2e-and-ct
-                - new-cypress-config/exclude-files
-                - new-cypress-config/frontend
-                - new-cypress-config/fullstack
-                - new-cypress-config/one-spec
-                - new-cypress-config/same-folder
-                - new-cypress-config/support-files
-                - new-cypress-config/ts-example
-                - new-cypress-config/unit-tests-js
-                - new-cypress-config/use-webpack
+                - all-files
+                - backend
+                - before-all-visit
+                - before-each-visit
+                - cra-e2e-and-ct
+                - exclude-files
+                - frontend
+                - fullstack
+                - one-spec
+                - same-folder
+                - support-files
+                - ts-example
+                - unit-tests-js
+                - use-webpack
       - windows_test
       - publish:
           filters:
@@ -195,31 +170,18 @@ workflows:
           requires:
             - lint
             - test-code-coverage-plugin
-            - test-old-cypress-config/all-files
-            - test-old-cypress-config/backend
-            - test-old-cypress-config/before-all-visit
-            - test-old-cypress-config/before-each-visit
-            - test-old-cypress-config/exclude-files
-            - test-old-cypress-config/frontend
-            - test-old-cypress-config/fullstack
-            - test-old-cypress-config/one-spec
-            - test-old-cypress-config/same-folder
-            - test-old-cypress-config/support-files
-            - test-old-cypress-config/ts-example
-            - test-old-cypress-config/unit-tests-js
-            - test-old-cypress-config/use-webpack
-            - test-new-cypress-config/all-files
-            - test-new-cypress-config/backend
-            - test-new-cypress-config/before-all-visit
-            - test-new-cypress-config/before-each-visit
-            - test-new-cypress-config/cra-e2e-and-ct
-            - test-new-cypress-config/exclude-files
-            - test-new-cypress-config/frontend
-            - test-new-cypress-config/fullstack
-            - test-new-cypress-config/one-spec
-            - test-new-cypress-config/same-folder
-            - test-new-cypress-config/support-files
-            - test-new-cypress-config/ts-example
-            - test-new-cypress-config/unit-tests-js
-            - test-new-cypress-config/use-webpack
+            - test-all-files
+            - test-backend
+            - test-before-all-visit
+            - test-before-each-visit
+            - test-cra-e2e-and-ct
+            - test-exclude-files
+            - test-frontend
+            - test-fullstack
+            - test-one-spec
+            - test-same-folder
+            - test-support-files
+            - test-ts-example
+            - test-unit-tests-js
+            - test-use-webpack
             - windows_test

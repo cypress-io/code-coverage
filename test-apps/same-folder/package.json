@@ -1,0 +1,15 @@
+{
+  "name": "example-same-folder",
+  "description": "Check if test files are correctly filtered out",
+  "scripts": {
+    "cy:run": "cypress run",
+    "start": "parcel serve index.html",
+    "pretest": "rimraf .nyc_output .cache coverage dist",
+    "test": "start-test 1234 cy:run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "check-coverage main.js && check-coverage unit-utils.js && only-covered main.js unit-utils.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.15"
+  }
+}

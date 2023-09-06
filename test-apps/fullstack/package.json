@@ -1,0 +1,13 @@
+{
+  "name": "example-fullstack",
+  "description": "Combined code coverage from the backend code, and e2e and unit tests",
+  "scripts": {
+    "prestart": "parcel build index.html",
+    "start": "nyc --silent node server/server",
+    "cy:run": "cypress run",
+    "pretest": "rimraf .nyc_output .cache coverage dist",
+    "test": "start-test 1234 cy:run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "check-coverage fullstack/server/server.js && check-coverage fullstack/main.js && check-coverage fullstack/string-utils.js && only-covered server.js main.js string-utils.js"
+  }
+}

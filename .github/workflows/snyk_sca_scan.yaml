@@ -15,7 +15,7 @@ jobs:
       matrix:
         node-version: [20.x]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setting up Node
         uses: actions/setup-node@v3
         with:

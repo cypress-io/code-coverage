@@ -185,5 +185,5 @@ workflows:
             - test-ts-example
             - test-unit-tests-js
             - test-use-webpack
+            - test-redirect
             - windows_test
-            - redirect

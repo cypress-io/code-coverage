@@ -4,7 +4,8 @@ module.exports = defineConfig({
   fixturesFolder: false,
   e2e: {
     setupNodeEvents(on, config) {
-      return require('./cypress/plugins/index.js')(on, config)
+      require('@cypress/code-coverage/task')(on, config)
+      return config
     },
     baseUrl: 'http://localhost:1234',
     env: {

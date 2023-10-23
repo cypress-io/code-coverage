@@ -1,0 +1,15 @@
+{
+  "name": "example-before-all-visit",
+  "description": "Getting code coverage when cy.visit is used in before hook",
+  "scripts": {
+    "start": "parcel serve index.html",
+    "cy:run": "cypress run",
+    "pretest": "rimraf .nyc_output .cache coverage dist",
+    "test": "start-test 1234 cy:run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "check-coverage main.js && only-covered main.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.15"
+  }
+}

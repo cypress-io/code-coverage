@@ -1,6 +1,6 @@
 {
   "exclude": [
-    "task-utils.js",
-    "support.js"
+    "support.js",
+    "task-utils.js"
   ]
 }

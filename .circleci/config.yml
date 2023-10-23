@@ -11,7 +11,7 @@ jobs:
     docker:
       - image: cimg/node:20.8.0
         environment:
-          # we don't need Cypress to check code styl
+          # we don't need Cypress to check code style
           CYPRESS_INSTALL_BINARY: '0'
     steps:
       - attach_workspace:
@@ -158,7 +158,7 @@ workflows:
                 - ts-example
                 - unit-tests-js
                 - use-webpack
-                - returning-to-application
+                - redirect
       - windows_test
       - publish:
           filters:
@@ -186,3 +186,4 @@ workflows:
             - test-unit-tests-js
             - test-use-webpack
             - windows_test
+            - redirect

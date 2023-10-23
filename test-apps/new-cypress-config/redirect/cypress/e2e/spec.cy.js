@@ -5,7 +5,7 @@
 context('Page test', () => {
 
   it('logs names', function() {
-    cy.clearLocalStorage();
+    cy.clearLocalStorage()
     cy.visit("http://localhost:1234")
     cy.contains("Returned to app")
   })

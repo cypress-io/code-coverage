@@ -76,7 +76,7 @@
     "parcel-bundler": "1.12.5",
     "prettier": "3.0.3",
     "rimraf": "5.0.5",
-    "semantic-release": "17.4.7",
+    "semantic-release": "22.0.7",
     "serve": "14.2.1",
     "start-server-and-test": "2.0.1",
     "webpack": "^5.68.0",

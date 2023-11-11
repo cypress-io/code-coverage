@@ -52,7 +52,7 @@
   "private": false,
   "dependencies": {
     "@cypress/webpack-preprocessor": "^6.0.0",
-    "chalk": "4.1.2",
+    "chalk": "5.3.0",
     "dayjs": "1.11.10",
     "debug": "4.3.4",
     "execa": "4.1.0",

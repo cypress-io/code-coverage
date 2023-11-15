@@ -80,13 +80,15 @@ const registerHooks = () => {
         return
       }
 
-      if (
-        Cypress._.find(windowCoverageObjects, {
-          coverage: applicationSourceCoverage
-        })
-      ) {
+      const existingCoverage = Cypress._.find(windowCoverageObjects, {
+        coverage: applicationSourceCoverage
+      })
+      if (existingCoverage) {
         // this application code coverage object is already known
-        // which can happen when combining `window:load` and `before` callbacks
+        // which can happen when combining `window:load` and `before` callbacks,
+        // it can also happen when the user navigates away and then returns to the page
+        // in which case we need to use new applicationSourceCoverage, because the old will not be updated anymore.
+        existingCoverage.coverage = applicationSourceCoverage
         return
       }
 

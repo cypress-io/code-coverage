@@ -40,6 +40,11 @@ const registerHooks = () => {
   const hasUnitTestCoverage = () => Boolean(window.__coverage__)
 
   before(() => {
+    // skip test coverage collection for single spec file if true 
+    // @ts-ignore
+    if (this.currentTest?._testConfig?.unverifiedTestConfig?.skipTestCoverage) {
+      return;
+    }
     // we need to reset the coverage when running
     // in the interactive mode, otherwise the counters will
     // keep increasing every time we rerun the tests
@@ -61,6 +66,11 @@ const registerHooks = () => {
   })
 
   beforeEach(() => {
+    // skip test coverage collection for single spec file if true 
+    // @ts-ignore
+    if (this.currentTest?._testConfig?.unverifiedTestConfig?.skipTestCoverage) {
+      return;
+    }
     // each object will have the coverage and url pathname
     // to let the user know the coverage has been collected
     windowCoverageObjects = []
@@ -98,6 +108,11 @@ const registerHooks = () => {
   })
 
   afterEach(() => {
+    // skip test coverage collection for single spec file if true 
+    // @ts-ignore
+    if (this.currentTest?._testConfig?.unverifiedTestConfig?.skipTestCoverage) {
+      return;
+    }
     // save coverage after the test
     // because now the window coverage objects have been updated
     windowCoverageObjects.forEach((cover) => {
@@ -126,6 +141,11 @@ const registerHooks = () => {
   })
 
   after(function collectBackendCoverage() {
+    // skip test coverage collection for single spec file if true 
+    // @ts-ignore
+    if (this.currentTest?._testConfig?.unverifiedTestConfig?.skipTestCoverage) {
+      return;
+    }
     // I wish I could fail the tests if there is no code coverage information
     // but throwing an error here does not fail the test run due to
     // https://github.com/cypress-io/cypress/issues/2296
@@ -180,6 +200,11 @@ const registerHooks = () => {
   })
 
   after(function mergeUnitTestCoverage() {
+    // skip test coverage collection for single spec file if true 
+    // @ts-ignore
+    if (this.currentTest?._testConfig?.unverifiedTestConfig?.skipTestCoverage) {
+      return;
+    }
     // collect and merge frontend coverage
 
     // if spec bundle has been instrumented (using Cypress preprocessor)
@@ -194,6 +219,11 @@ const registerHooks = () => {
   })
 
   after(function generateReport() {
+    // skip test coverage collection for single spec file if true 
+    // @ts-ignore
+    if (this.currentTest?._testConfig?.unverifiedTestConfig?.skipTestCoverage) {
+      return;
+    }
     // when all tests finish, lets generate the coverage report
     const logInstance = Cypress.log({
       name: 'Coverage',

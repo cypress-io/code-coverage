@@ -67,7 +67,7 @@
     "@cypress/code-coverage": "file:.",
     "babel-loader": "^9.1.3",
     "babel-plugin-istanbul": "6.1.1",
-    "check-code-coverage": "1.10.0",
+    "check-code-coverage": "1.10.5",
     "console-log-div": "0.6.3",
     "cypress": "^13.1.0",
     "express": "^4.18.2",

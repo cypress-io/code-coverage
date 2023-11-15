@@ -62,6 +62,16 @@ function readNycOptions(workingDirectory) {
     }
   }
 
+  const nycConfigCommonJsFilename = join(workingDirectory, 'nyc.config.cjs')
+  let nycConfigCommonJs = {}
+  if (existsSync(nycConfigCommonJsFilename)) {
+    try {
+      nycConfigCommonJs = require(nycConfigCommonJsFilename)
+    } catch (error) {
+      throw new Error(`Failed to load nyc.config.cjs: ${error.message}`)
+    }
+  }
+
   const nycOptions = combineNycOptions(
     defaultNycOptions,
     nycrc,
@@ -69,6 +79,7 @@ function readNycOptions(workingDirectory) {
     nycrcYaml,
     nycrcYml,
     nycConfig,
+    nycConfigCommonJs,
     pkgNycOptions
   )
   debug('combined NYC options %o', nycOptions)

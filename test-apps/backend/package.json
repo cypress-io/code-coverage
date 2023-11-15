@@ -1,0 +1,13 @@
+{
+  "name": "example-backend",
+  "description": "Code coverage for backend",
+  "private": true,
+  "scripts": {
+    "cy:run": "cypress run",
+    "start": "nyc --silent node server/server",
+    "pretest": "rimraf .nyc_output .cache coverage dist",
+    "test": "start-test 3003 cy:run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "check-coverage server.js && only-covered server.js"
+  }
+}

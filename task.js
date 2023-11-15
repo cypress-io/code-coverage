@@ -37,7 +37,7 @@ const nycReportOptions = (function getNycOption() {
 
   if (nycReportOptions.exclude && !Array.isArray(nycReportOptions.exclude)) {
     console.error('NYC options: %o', nycReportOptions)
-    throw new Error('Expected "exclude" to by an array')
+    throw new Error('Expected "exclude" to be an array')
   }
 
   if (nycReportOptions['temp-dir']) {

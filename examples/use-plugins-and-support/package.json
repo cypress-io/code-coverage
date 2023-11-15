@@ -1,8 +1,0 @@
-{
-  "name": "use-plugins-and-support",
-  "description": "Using included plugins and support files",
-  "devDependencies": {},
-  "scripts": {
-    "cy:open": "../../node_modules/.bin/cypress open"
-  }
-}

@@ -1,12 +1,11 @@
 node_modules/
-cypress/videos
-cypress/screenshots
+**/cypress/videos
+**/cypress/screenshots
 coverage/
 .nyc_output/
 dist/
 .cache/
 .vscode/
 cypress-coverage/
-examples/*/cypress/videos
-examples/*/cypress/screenshots
 yarn.lock
+.parcel-cache

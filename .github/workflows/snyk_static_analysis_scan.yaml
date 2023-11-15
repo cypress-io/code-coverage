@@ -1,0 +1,19 @@
+name: Snyk Static Analysis Scan
+# This SAST (Static Application Security Testing) scan is used to scan
+# our first-party code for security vulnerabilities
+on:
+  pull_request:
+    branches:
+      - master
+      - develop
+jobs:
+  Snyk_SAST_Scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: snyk/actions/setup@master
+      - name: Perform Static Analysis Test
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_API_TOKEN }}
+        continue-on-error: true
+        run: snyk code test  --all-projects --strict-out-of-sync=false --detection-depth=6 --exclude=docker,Dockerfile --severity-threshold=high

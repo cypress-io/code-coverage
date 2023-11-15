@@ -1,5 +1,0 @@
-{
-  "baseUrl": "http://localhost:1234",
-  "fixturesFolder": false,
-  "testFiles": ["spec-a.js"]
-}

@@ -35,7 +35,7 @@
     "code",
     "coverage"
   ],
-  "author": "Gleb Bahmutov <gleb.bahmutov@gmail.com>",
+  "author": "Cypress <hello@cypress.io> (http://www.cypress.io/)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/cypress-io/code-coverage/issues"

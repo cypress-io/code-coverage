@@ -76,8 +76,13 @@ function readNycOptions(workingDirectory) {
   if (process.env.NYC_CONFIG) {
     try {
       nycConfigEnvVariables = JSON.parse(process.env.NYC_CONFIG)
-      if (nycConfigEnvVariables === null || typeof nycConfigEnvVariables !== 'object') {
-        throw new Error('NYC_CONFIG environment configuration is set, but it is not an object as expected')
+      if (
+        nycConfigEnvVariables === null ||
+        typeof nycConfigEnvVariables !== 'object'
+      ) {
+        throw new Error(
+          'NYC_CONFIG environment configuration is set, but it is not an object as expected'
+        )
       }
     } catch (error) {
       throw new Error(`Failed to load environment NYC_CONFIG: ${error.message}`)

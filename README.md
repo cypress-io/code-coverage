@@ -452,6 +452,46 @@ Look up the list of examples under the GitHub topic [cypress-code-coverage-examp
 
 ## Migrations
 
+### Cypress v9 to v10
+
+With the removal of the `plugins` directory in Cypress version 10+, you'll need to add all of your configuration into the configuration file (`cypress.config.js` by default).
+
+```js
+// BEFORE
+// Register tasks in your `cypress/plugins/index.js` file.
+
+module.exports = (on, config) => {
+  require('@cypress/code-coverage/task')(on, config)
+
+  // add other tasks to be registered here
+
+  // IMPORTANT to return the config object
+  // with the any changed environment variables
+  return config
+}
+```
+
+```js
+// AFTER
+// cypress.config.js
+const { defineConfig } = require('cypress')
+
+module.exports = defineConfig({
+  // setupNodeEvents can be defined in either
+  // the e2e or component configuration
+  e2e: {
+    setupNodeEvents(on, config) {
+      require('@cypress/code-coverage/task')(on, config)
+      // include any other plugin code...
+
+      // It's IMPORTANT to return the config object
+      // with any changed environment variables
+      return config
+    },
+  },
+})
+```
+
 ### v2 to v3
 
 Change the plugins file `cypress/plugins/index.js`

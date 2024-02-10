@@ -74,7 +74,7 @@
     "lodash": "4.17.21",
     "markdown-link-check": "3.11.1",
     "parcel-bundler": "1.12.5",
-    "prettier": "3.2.4",
+    "prettier": "3.2.5",
     "rimraf": "5.0.5",
     "semantic-release": "17.4.7",
     "serve": "14.2.1",

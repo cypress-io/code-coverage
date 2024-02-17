@@ -3,7 +3,7 @@
 
 const dayjs = require('dayjs')
 var duration = require('dayjs/plugin/duration')
-const { filterFilesFromCoverage } = require('./support-utils')
+const { filterFilesFromCoverage } = require('./lib/support/support-utils')
 
 dayjs.extend(duration)
 

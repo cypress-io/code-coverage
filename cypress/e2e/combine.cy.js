@@ -1,5 +1,6 @@
 /// <reference types="Cypress" />
-const { combineNycOptions, defaultNycOptions } = require('../../common-utils')
+const { combineNycOptions, defaultNycOptions } = require('../../lib/common/common-utils')
+
 describe('Combine NYC options', () => {
   it('overrides defaults', () => {
     const pkgNycOptions = {

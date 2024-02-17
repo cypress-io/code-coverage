@@ -10,9 +10,9 @@ const {
   tryFindingLocalFiles,
   readNycOptions,
   includeAllFiles
-} = require('./task-utils')
-const { fixSourcePaths } = require('./support-utils')
-const { removePlaceholders } = require('./common-utils')
+} = require('./lib/plugin/task-utils')
+const { fixSourcePaths } = require('./lib/support/support-utils')
+const { removePlaceholders } = require('./lib/common/common-utils')
 
 const debug = require('debug')('code-coverage')
 

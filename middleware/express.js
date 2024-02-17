@@ -1,9 +1,9 @@
 // @ts-check
-const { isCoverageEnabled } = require('../lib/isEnabled')
+const { isCoverageEnabled } = require('../lib/common/isEnabled')
 
 /**
  * for Express.js
- * 
+ *
  * @example Use like
  * ```ts
  * const express = require('express')
@@ -11,7 +11,7 @@ const { isCoverageEnabled } = require('../lib/isEnabled')
  * // @see https://github.com/rohit-gohri/cypress-code-coverage-v8
  * require('cypress-code-coverage-v8/middleware/express')(app)
  * ```
- * 
+ *
  * @param {import('express').Application} app
  */
 module.exports = (app) => {
@@ -25,11 +25,11 @@ module.exports = (app) => {
       return
     }
 
-    const { getCoverage } = require('../lib/getCoverage');
+    const { getCoverage } = require('../lib/register/getCoverage')
 
     try {
       res.json({
-        coverage: await getCoverage() || null
+        coverage: (await getCoverage()) || null
       })
     } catch (error) {
       return next(error)

@@ -1,4 +1,4 @@
-const { filterFilesFromCoverage } = require('../../support-utils')
+const { filterFilesFromCoverage } = require('../../lib/support/support-utils')
 
 describe('minimatch', () => {
   it('string matches', () => {

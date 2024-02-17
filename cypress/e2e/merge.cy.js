@@ -4,7 +4,7 @@ const coverage = require('../fixtures/coverage.json')
 const {
   fileCoveragePlaceholder,
   removePlaceholders
-} = require('../../common-utils')
+} = require('../../lib/common/common-utils')
 
 /**
  * Extracts just the data from the coverage map object

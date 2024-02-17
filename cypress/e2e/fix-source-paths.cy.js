@@ -1,4 +1,4 @@
-import { fixSourcePaths } from '../../support-utils'
+import { fixSourcePaths } from '../../lib/support/support-utils'
 
 describe('fixSourcePaths', () => {
   it('fixes webpack loader source-map pathes', () => {

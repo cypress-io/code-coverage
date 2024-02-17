@@ -1,8 +1,8 @@
 // common Cypress plugin file you can point at to have the
 // code coverage tasks registered correctly. From your "cypress.json" file
 // {
-//   "pluginsFile": "@cypress/code-coverage/plugins",
-//   "supportFile": "@cypress/code-coverage/support"
+//   "pluginsFile": "cypress-code-coverage-v8/plugins",
+//   "supportFile": "cypress-code-coverage-v8/support"
 // }
 //
 module.exports = (on, config) => {

@@ -9,7 +9,7 @@ export default defineConfig({
   },
   e2e: {
     setupNodeEvents(on, config) {
-      require('@cypress/code-coverage/task')(on, config)
+      require('cypress-code-coverage-v8/task')(on, config)
       return config
     }
   },
@@ -20,7 +20,7 @@ export default defineConfig({
       bundler: 'webpack'
     },
     setupNodeEvents(on, config) {
-      require('@cypress/code-coverage/task')(on, config)
+      require('cypress-code-coverage-v8/task')(on, config)
       return config
     }
   }

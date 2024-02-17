@@ -8,7 +8,7 @@ const port = 3003
 if (global.__coverage__) {
   console.log('have code coverage, will add middleware for express')
   console.log(`to fetch: GET :${port}/__coverage__`)
-  require('@cypress/code-coverage/middleware/express')(app)
+  require('cypress-code-coverage-v8/middleware/express')(app)
 }
 
 app.use(express.static(__dirname))

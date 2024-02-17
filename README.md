@@ -1,11 +1,11 @@
-# @cypress/code-coverage [![renovate-app badge][renovate-badge]][renovate-app] [![CircleCI](https://circleci.com/gh/cypress-io/code-coverage.svg?style=svg)](https://circleci.com/gh/cypress-io/code-coverage)
+# cypress-code-coverage-v8 [![renovate-app badge][renovate-badge]][renovate-app] [![CircleCI](https://circleci.com/gh/cypress-io/code-coverage.svg?style=svg)](https://circleci.com/gh/cypress-io/code-coverage)
 
 > Saves the code coverage collected during Cypress tests
 
 ## Install
 
 ```shell
-npm install -D @cypress/code-coverage
+npm install -D cypress-code-coverage-v8
 ```
 
 **Note:** This plugin assumes that `cypress` is a peer dependency already installed in your project.
@@ -14,7 +14,7 @@ Then add the code below to the `supportFile` and `setupNodeEvents` function.
 
 ```js
 // cypress/support/e2e.js
-import '@cypress/code-coverage/support'
+import 'cypress-code-coverage-v8/support'
 ```
 
 ```js
@@ -26,7 +26,7 @@ module.exports = defineConfig({
   // the e2e or component configuration
   e2e: {
     setupNodeEvents(on, config) {
-      require('@cypress/code-coverage/task')(on, config)
+      require('cypress-code-coverage-v8/task')(on, config)
       // include any other plugin code...
 
       // It's IMPORTANT to return the config object
@@ -135,8 +135,8 @@ Put the following in the `cypress/plugins/index.js` file to use the `.babelrc` f
 
 ```js
 module.exports = (on, config) => {
-  require('@cypress/code-coverage/task')(on, config)
-  on('file:preprocessor', require('@cypress/code-coverage/use-babelrc'))
+  require('cypress-code-coverage-v8/task')(on, config)
+  on('file:preprocessor', require('cypress-code-coverage-v8/use-babelrc'))
   return config
 }
 ```
@@ -151,10 +151,10 @@ If you cannot use `.babelrc` (maybe it is used by other tools?), try using the B
 
 ```js
 module.exports = (on, config) => {
-  require('@cypress/code-coverage/task')(on, config)
+  require('cypress-code-coverage-v8/task')(on, config)
   on(
     'file:preprocessor',
-    require('@cypress/code-coverage/use-browserify-istanbul')
+    require('cypress-code-coverage-v8/use-browserify-istanbul')
   )
   return config
 }
@@ -172,7 +172,7 @@ You can also instrument your server-side code and produce a combined coverage re
 ```js
 const express = require('express')
 const app = express()
-require('@cypress/code-coverage/middleware/express')(app)
+require('cypress-code-coverage-v8/middleware/express')(app)
 ```
 
 **Tip:** You can register the endpoint only if there is a global code coverage object, and you can exclude the middleware code from the coverage numbers
@@ -181,7 +181,7 @@ require('@cypress/code-coverage/middleware/express')(app)
 // https://github.com/gotwarlost/istanbul/blob/master/ignoring-code-for-coverage.md
 /* istanbul ignore next */
 if (global.__coverage__) {
-  require('@cypress/code-coverage/middleware/express')(app)
+  require('cypress-code-coverage-v8/middleware/express')(app)
 }
 ```
 
@@ -189,7 +189,7 @@ If you use a Hapi server, define the endpoint yourself and return the object.
 
 ```js
 if (global.__coverage__) {
-  require('@cypress/code-coverage/middleware/hapi')(server)
+  require('cypress-code-coverage-v8/middleware/hapi')(server)
 }
 ```
 
@@ -324,7 +324,7 @@ Often needed to skip a statement.
 ```js
 /* istanbul ignore next */
 if (global.__coverage__) {
-  require('@cypress/code-coverage/middleware/express')(app)
+  require('cypress-code-coverage-v8/middleware/express')(app)
 }
 ```
 
@@ -461,7 +461,7 @@ With the removal of the `plugins` directory in Cypress version 10+, you'll need 
 // Register tasks in your `cypress/plugins/index.js` file.
 
 module.exports = (on, config) => {
-  require('@cypress/code-coverage/task')(on, config)
+  require('cypress-code-coverage-v8/task')(on, config)
 
   // add other tasks to be registered here
 
@@ -481,7 +481,7 @@ module.exports = defineConfig({
   // the e2e or component configuration
   e2e: {
     setupNodeEvents(on, config) {
-      require('@cypress/code-coverage/task')(on, config)
+      require('cypress-code-coverage-v8/task')(on, config)
       // include any other plugin code...
 
       // It's IMPORTANT to return the config object
@@ -499,11 +499,11 @@ Change the plugins file `cypress/plugins/index.js`
 ```js
 // BEFORE
 module.exports = (on, config) => {
-  on('task', require('@cypress/code-coverage/task'))
+  on('task', require('cypress-code-coverage-v8/task'))
 }
 // AFTER
 module.exports = (on, config) => {
-  require('@cypress/code-coverage/task')(on, config)
+  require('cypress-code-coverage-v8/task')(on, config)
   // IMPORTANT to return the config object
   // with the any changed environment variables
   return config
@@ -514,8 +514,8 @@ module.exports = (on, config) => {
 
 ```json
 {
-  "pluginsFile": "node_modules/@cypress/code-coverage/plugins",
-  "supportFile": "node_modules/@cypress/code-coverage/support"
+  "pluginsFile": "node_modules/cypress-code-coverage-v8/plugins",
+  "supportFile": "node_modules/cypress-code-coverage-v8/support"
 }
 ```
 

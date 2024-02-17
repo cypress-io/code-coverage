@@ -5,7 +5,7 @@
  *
   ```
   // in your pages/api/coverage.js
-  module.exports = require('@cypress/code-coverage/middleware/nextjs')
+  module.exports = require('cypress-code-coverage-v8/middleware/nextjs')
   // then add to your cypress.json an environment variable pointing at the API
   {
     "baseUrl": "http://localhost:3000",

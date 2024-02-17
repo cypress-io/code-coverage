@@ -1,5 +1,5 @@
 {
-  "name": "@cypress/code-coverage",
+  "name": "cypress-code-coverage-v8",
   "version": "0.0.0-development",
   "description": "Saves the code coverage collected during Cypress tests",
   "main": "index.js",
@@ -64,7 +64,7 @@
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.11",
-    "@cypress/code-coverage": "file:.",
+    "cypress-code-coverage-v8": "file:.",
     "babel-loader": "^9.1.3",
     "babel-plugin-istanbul": "6.1.1",
     "check-code-coverage": "1.10.5",

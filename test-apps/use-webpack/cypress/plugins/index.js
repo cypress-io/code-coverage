@@ -13,6 +13,6 @@ module.exports = (on, config) => {
   }
   on('file:preprocessor', webpack(options))
 
-  require('@cypress/code-coverage/task')(on, config)
+  require('cypress-code-coverage-v8/task')(on, config)
   return config
 }

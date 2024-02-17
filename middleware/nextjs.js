@@ -1,3 +1,5 @@
+const { isCoverageEnabled } = require('../lib/isEnabled')
+
 /**
  * Middleware for returning server-side code coverage
  * for Next.js API route. To use, create new `pages/api/coverage.js` file
@@ -20,9 +22,17 @@
  * @see https://nextjs.org/docs#api-routes
  * @see https://github.com/rohit-gohri/cypress-code-coverage-v8
  */
-module.exports = function returnCodeCoverageNext (req, res) {
+module.exports = async function returnCodeCoverageNext (req, res) {
+  if (!isCoverageEnabled()) {
+    res.status(200).json({
+      coverage: null
+    })
+    return
+  }
+
+  const { getCoverage } = require('../lib/getCoverage');
   // only GET is supported
   res.status(200).json({
-    coverage: global.__coverage__ || null
+    coverage: await getCoverage() || null
   })
 }

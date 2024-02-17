@@ -113,54 +113,13 @@ ERROR: Coverage for lines (100%) does not meet global threshold (101%)
 
 Watch the video [How to read code coverage report](https://youtu.be/yVvCYtsmkZU) to see how to read the HTML coverage report.
 
-## Instrument unit tests
-
-If you test your application code directly from `specs`, you might want to instrument them and combine unit test code coverage with any end-to-end code coverage (from iframe). You can easily instrument spec files using [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul), for example.
-
-Install the plugin
-
-```shell
-npm i -D babel-plugin-istanbul
-```
-
-Set your `.babelrc` file.
-
-```json
-{
-  "plugins": ["istanbul"]
-}
-```
-
-Put the following in the `cypress/plugins/index.js` file to use the `.babelrc` file.
-
-```js
-module.exports = (on, config) => {
-  require('cypress-code-coverage-v8/task')(on, config)
-  on('file:preprocessor', require('cypress-code-coverage-v8/use-babelrc'))
-  return config
-}
-```
+## Unit tests
 
 The code coverage from spec files will be combined with end-to-end coverage.
 
 Find examples of just the unit tests and JavaScript source files with collected code coverage in [test-apps/unit-tests-js](./test-apps/unit-tests-js).
 
-### Alternative for unit tests
-
-If you cannot use `.babelrc` (maybe it is used by other tools?), try using the Browserify transformer included with this module in the `use-browserify-istanbul` file.
-
-```js
-module.exports = (on, config) => {
-  require('cypress-code-coverage-v8/task')(on, config)
-  on(
-    'file:preprocessor',
-    require('cypress-code-coverage-v8/use-browserify-istanbul')
-  )
-  return config
-}
-```
-
-## Instrument backend code
+## Backend code
 
 Example in [test-apps/backend](test-apps/backend) folder.
 
@@ -173,24 +132,6 @@ You can also instrument your server-side code and produce a combined coverage re
 const express = require('express')
 const app = express()
 require('cypress-code-coverage-v8/middleware/express')(app)
-```
-
-**Tip:** You can register the endpoint only if there is a global code coverage object, and you can exclude the middleware code from the coverage numbers
-
-```js
-// https://github.com/gotwarlost/istanbul/blob/master/ignoring-code-for-coverage.md
-/* istanbul ignore next */
-if (global.__coverage__) {
-  require('cypress-code-coverage-v8/middleware/express')(app)
-}
-```
-
-If you use a Hapi server, define the endpoint yourself and return the object.
-
-```js
-if (global.__coverage__) {
-  require('cypress-code-coverage-v8/middleware/hapi')(server)
-}
 ```
 
 For any other server, define the endpoint yourself and return the coverage object:
@@ -319,16 +260,7 @@ if (window.Cypress) {
 
 ### Exclude the next logical statement
 
-Often needed to skip a statement.
-
-```js
-/* istanbul ignore next */
-if (global.__coverage__) {
-  require('cypress-code-coverage-v8/middleware/express')(app)
-}
-```
-
-Or a particular `switch` case
+Often needed to skip a statement or a particular `switch` case
 
 ```js
 switch (foo) {
@@ -428,96 +360,7 @@ Full examples we use for testing in this repository:
 
 ### External examples
 
-Look up the list of examples under the GitHub topic [cypress-code-coverage-example](https://github.com/topics/cypress-code-coverage-example)
-
-- [cypress-io/cypress-realworld-app](https://github.com/cypress-io/cypress-realworld-app) is an easy to set up and run a real-world application with E2E, API, and unit tests that achieves 100% code-coverage for both front and back end code. Its CI pipeline also reports code-coverage reports across parallelized test runs to [Codecov](https://codecov.io/gh/cypress-io/cypress-realworld-app).
-- [cypress-io/cypress-example-todomvc-redux](https://github.com/cypress-io/cypress-example-todomvc-redux) is a React / Redux application with 100% code coverage.
-- [cypress-io/cypress-example-conduit-app](https://github.com/cypress-io/cypress-example-conduit-app) shows how to collect the coverage information from both back and frontend code and merge it into a single report. The E2E test step runs parallel in several CI containers, each saving just partial test coverage information. Then, a merge job runs, taking artifacts and combining coverage into the final report to be sent to an external coverage as a service app.
-- [bahmutov/code-coverage-webpack-dev-server](https://github.com/bahmutov/code-coverage-webpack-dev-server) shows how to collect code coverage from an application that uses webpack-dev-server.
-- [bahmutov/code-coverage-vue-example](https://github.com/bahmutov/code-coverage-vue-example) collects code coverage for Vue.js single file components.
-- [lluia/cypress-typescript-coverage-example](https://github.com/lluia/cypress-typescript-coverage-example) shows coverage for React App that uses TypeScript. See discussion in issue [#19](https://github.com/cypress-io/code-coverage/issues/19).
-- [bahmutov/cypress-and-jest](https://github.com/bahmutov/cypress-and-jest) shows how to run Jest unit tests and Cypress unit tests, collecting code coverage from both test runners and then producing a merged report.
-- [bahmutov/cypress-angular-coverage-example](https://github.com/bahmutov/cypress-angular-coverage-example) forked from [skylock/cypress-angular-coverage-example](https://github.com/skylock/cypress-angular-coverage-example) shows Angular 8 + TypeScript application with instrumentation done using [istanbul-instrumenter-loader](https://github.com/webpack-contrib/istanbul-instrumenter-loader).
-- [bahmutov/testing-react](https://github.com/bahmutov/testing-react) shows how to get code coverage for a React application created using [CRA v3](https://github.com/facebook/create-react-app) without ejecting `react-scripts`.
-- [bahmutov/cra-ts-code-coverage-example](https://github.com/bahmutov/cra-ts-code-coverage-example) instruments TypeScript React application on the fly without ejecting `react-scripts` by using [@cypress/instrument-cra](https://github.com/cypress-io/instrument-cra).
-- [bahmutov/next-and-cypress-example](https://github.com/bahmutov/next-and-cypress-example) shows how to get backend and frontend coverage for a [Next.js](https://nextjs.org) project. Uses [middleware/nextjs.js](middleware/nextjs.js).
-- [kylemh/next-ts-with-cypress-coverage](https://github.com/kylemh/next-ts-with-cypress-coverage) This example project contains Next.js with TypeScript, instrumented coverage reporting, @testing-library/react, and instructions on how to type custom commands.
-- [akoidan/vue-webpack-typescript](https://github.com/akoidan/vue-webpack-typescript) Pure webpack config with vue + typescript with codecov reports. This setup uses a babel-loader with a TS checker as a separate thread.
-- [bahmutov/code-coverage-subfolder-example](https://github.com/bahmutov/code-coverage-subfolder-example) shows how to instrument the `app` folder using `nyc instrument` as a separate step before running E2E tests
-- [bahmutov/docker-with-cypress-included-code-coverage-example](https://github.com/bahmutov/docker-with-cypress-included-code-coverage-example) runs tests inside pre-installed Cypress using [cypress/included:x.y.z](https://github.com/cypress-io/cypress-docker-images/tree/master/included) Docker image and reports code coverage.
-- [bahmutov/app-in-docker-coverage-example](https://github.com/bahmutov/app-in-docker-coverage-example) shows an app running inside a Docker container, while Cypress runs on the local machine. Before generating the report, Cypress can still [discover the source files](https://github.com/cypress-io/code-coverage/pull/197).
-- [bahmutov/gatsby-cypress-with-code-coverage](https://github.com/bahmutov/gatsby-cypress-with-code-coverage) shows code coverage using the official Gatsby "Hello World" starter.
-- [muratkeremozcan/angular-playground](https://github.com/muratkeremozcan/angular-playground) is an Angular TypeScript application with combined unit and E2E coverage.
-- [nefayran/cypress-react-vite](https://github.com/nefayran/cypress-react-vite) React with Vite and Istanbul plugin for code coverage.
-
-## Migrations
-
-### Cypress v9 to v10
-
-With the removal of the `plugins` directory in Cypress version 10+, you'll need to add all of your configuration into the configuration file (`cypress.config.js` by default).
-
-```js
-// BEFORE
-// Register tasks in your `cypress/plugins/index.js` file.
-
-module.exports = (on, config) => {
-  require('cypress-code-coverage-v8/task')(on, config)
-
-  // add other tasks to be registered here
-
-  // IMPORTANT to return the config object
-  // with the any changed environment variables
-  return config
-}
-```
-
-```js
-// AFTER
-// cypress.config.js
-const { defineConfig } = require('cypress')
-
-module.exports = defineConfig({
-  // setupNodeEvents can be defined in either
-  // the e2e or component configuration
-  e2e: {
-    setupNodeEvents(on, config) {
-      require('cypress-code-coverage-v8/task')(on, config)
-      // include any other plugin code...
-
-      // It's IMPORTANT to return the config object
-      // with any changed environment variables
-      return config
-    },
-  },
-})
-```
-
-### v2 to v3
-
-Change the plugins file `cypress/plugins/index.js`
-
-```js
-// BEFORE
-module.exports = (on, config) => {
-  on('task', require('cypress-code-coverage-v8/task'))
-}
-// AFTER
-module.exports = (on, config) => {
-  require('cypress-code-coverage-v8/task')(on, config)
-  // IMPORTANT to return the config object
-  // with the any changed environment variables
-  return config
-}
-```
-
-**Tip:** We include [plugins.js](plugins.js) file you can point at from your code in simple cases. From your `cypress.json` file:
-
-```json
-{
-  "pluginsFile": "node_modules/cypress-code-coverage-v8/plugins",
-  "supportFile": "node_modules/cypress-code-coverage-v8/support"
-}
-```
+Look up the list of examples under the GitHub topic [cypress-code-coverage-v8-example](https://github.com/topics/cypress-code-coverage--v8-example)
 
 ## Debugging
 
@@ -538,8 +381,6 @@ DEBUG_DEPTH=10 DEBUG=code-coverage npm run dev
 ```
 
 ### Common issues
-
-Common issue: [not instrumenting your application when running Cypress](#instrument-your-application).
 
 If the plugin worked before in version X but stopped after upgrading to version Y, please try the [released versions](https://github.com/rohit-gohri/cypress-code-coverage-v8/releases) between X and Y to see where the breaking change was.
 

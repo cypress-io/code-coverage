@@ -1,4 +1,4 @@
-# cypress-code-coverage-v8 [![renovate-app badge][renovate-badge]][renovate-app] [![CircleCI](https://circleci.com/gh/cypress-io/code-coverage.svg?style=svg)](https://circleci.com/gh/cypress-io/code-coverage)
+# cypress-code-coverage-v8
 
 > Saves the code coverage collected during Cypress tests
 
@@ -541,9 +541,9 @@ DEBUG_DEPTH=10 DEBUG=code-coverage npm run dev
 
 Common issue: [not instrumenting your application when running Cypress](#instrument-your-application).
 
-If the plugin worked before in version X but stopped after upgrading to version Y, please try the [released versions](https://github.com/cypress-io/code-coverage/releases) between X and Y to see where the breaking change was.
+If the plugin worked before in version X but stopped after upgrading to version Y, please try the [released versions](https://github.com/rohit-gohri/cypress-code-coverage-v8/releases) between X and Y to see where the breaking change was.
 
-If you decide to open an issue in this repository, please fill in all information the [issue template](https://github.com/cypress-io/code-coverage/blob/master/.github/ISSUE_TEMPLATE/bug_report.md) asks for. The issues most likely to be resolved have debug logs, screenshots, and hopefully public repository links so we can try running the tests ourselves.
+If you decide to open an issue in this repository, please fill in all information the [issue template](https://github.com/rohit-gohri/cypress-code-coverage-v8/blob/master/.github/ISSUE_TEMPLATE/bug_report.md) asks for. The issues most likely to be resolved have debug logs, screenshots, and hopefully public repository links so we can try running the tests ourselves.
 
 ## Contributing
 
@@ -570,6 +570,3 @@ npm run check:markdown
 ## License
 
 This project is licensed under the terms of the [MIT license](LICENSE.md).
-
-[renovate-badge]: https://img.shields.io/badge/renovate-app-blue.svg
-[renovate-app]: https://renovateapp.com/

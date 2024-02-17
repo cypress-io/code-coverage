@@ -18,7 +18,7 @@
   ```
  *
  * @see https://nextjs.org/docs#api-routes
- * @see https://github.com/cypress-io/code-coverage
+ * @see https://github.com/rohit-gohri/cypress-code-coverage-v8
  */
 module.exports = function returnCodeCoverageNext (req, res) {
   // only GET is supported

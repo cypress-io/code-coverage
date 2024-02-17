@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/cypress-io/code-coverage.git"
+    "url": "https://github.com/rohit-gohri/cypress-code-coverage-v8.git"
   },
   "keywords": [
     "cypress",
@@ -38,9 +38,9 @@
   "author": "Cypress <hello@cypress.io> (http://www.cypress.io/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cypress-io/code-coverage/issues"
+    "url": "https://github.com/rohit-gohri/cypress-code-coverage-v8/issues"
   },
-  "homepage": "https://github.com/cypress-io/code-coverage#readme",
+  "homepage": "https://github.com/rohit-gohri/cypress-code-coverage-v8#readme",
   "files": [
     "*.d.ts",
     "*.js",

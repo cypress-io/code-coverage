@@ -118,7 +118,7 @@ const registerHooks = () => {
             ⚠️ Could not find any coverage information in your application
             by looking at the window coverage object.
             Did you forget to instrument your application?
-            See [code-coverage#instrument-your-application](https://github.com/cypress-io/code-coverage#instrument-your-application)
+            See [code-coverage#instrument-your-application](https://github.com/rohit-gohri/cypress-code-coverage-v8#instrument-your-application)
           `)
         }
       }

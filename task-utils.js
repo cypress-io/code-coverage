@@ -124,7 +124,7 @@ function showNycInfo(nycFilename) {
     console.error(
       'Did you forget to instrument your web application? Read %s',
       chalk.blue(
-        'https://github.com/cypress-io/code-coverage#instrument-your-application'
+        'https://github.com/rohit-gohri/cypress-code-coverage-v8#instrument-your-application'
       )
     )
     return

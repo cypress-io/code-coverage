@@ -18,9 +18,6 @@
     "effective:config": "circleci config process .circleci/config.yml | sed /^#/d"
   },
   "peerDependencies": {
-    "@babel/core": "^7.0.1",
-    "@babel/preset-env": "^7.0.0",
-    "babel-loader": "^8.3 || ^9",
     "cypress": "*",
     "webpack": "^4 || ^5"
   },
@@ -69,6 +66,7 @@
     "cypress": "^13.1.0",
     "cypress-code-coverage-v8": "file:.",
     "express": "^4.18.2",
+    "koa": "2.13.4",
     "lodash": "4.17.21",
     "markdown-link-check": "3.11.1",
     "parcel-bundler": "1.12.5",

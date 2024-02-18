@@ -6,6 +6,7 @@ const { isCoverageEnabled } = require('../lib/common/isEnabled')
  *
  * @example Use like
  * ```ts
+ * require('cypress-code-coverage-v8/register');
  * const Koa = require('koa')
  * const app = new Koa();
  * // @see https://github.com/rohit-gohri/cypress-code-coverage-v8

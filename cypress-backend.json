@@ -3,7 +3,9 @@
   "integrationFolder": "cypress/test-backend",
   "env": {
     "codeCoverage": {
-      "url": "http://localhost:3003/__coverage__"
+      "timeout": 60000,
+      "url": "http://localhost:3003/__coverage__",
+      "ssr": "/api/__coverage__"
     }
   }
 }

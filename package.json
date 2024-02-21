@@ -69,6 +69,7 @@
     "koa": "2.13.4",
     "lodash": "4.17.21",
     "markdown-link-check": "3.11.1",
+    "next": "^13.0.0",
     "parcel-bundler": "1.12.5",
     "prettier": "3.2.5",
     "rimraf": "5.0.5",

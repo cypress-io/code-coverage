@@ -24,22 +24,19 @@ const logMessage = (s) => {
  * Sends collected code coverage object to the backend code
  * via "cy.task".
  */
-const sendCoverage = (coverage, url = '/') => {
-  logMessage(`Saving code coverage for **${url}**`)
+const sendCoverage = (coverage, comment = '/') => {
+  logMessage(`Saving code coverage for **${comment}**`)
 
   const totalCoverage = filterFilesFromCoverage(coverage)
 
   // stringify coverage object for speed
-  cy.task('combineCoverage', JSON.stringify(totalCoverage), {
-    log: false
-  }).then(updatedCoverage => {
-    console.warn({
-      url,
-      coverage,
-      totalCoverage,
-      updatedCoverage: JSON.parse(String(updatedCoverage)),
+  return cy
+    .task('combineCoverage', JSON.stringify(totalCoverage), {
+      log: false
     })
-  })
+    // .then((result) => {
+    //   return JSON.parse(String(result))
+    // })
 }
 
 const registerHooks = () => {
@@ -49,14 +46,13 @@ const registerHooks = () => {
   let hostObjects = []
 
   before(() => {
-    // each object will have the coverage and url pathname
-    // to let the user know the coverage has been collected
+    // each object will have the url pathname
+    // to let the user know the coverage will be collected
     hostObjects = []
     // we need to reset the coverage when running
     // in the interactive mode, otherwise the counters will
     // keep increasing every time we rerun the tests
     const logInstance = logMessage('Initialize')
-
     cy.task(
       'resetCoverage',
       {
@@ -110,7 +106,7 @@ const registerHooks = () => {
     // collect and merge frontend coverage
     cy.task('takePreciseCoverage', null, {
       timeout: dayjs.duration(3, 'minutes').asMilliseconds(),
-      log: true
+      log: false
     }).then((clientCoverage) => {
       cy.location({ log: false }).then((loc) => {
         if (clientCoverage) {
@@ -127,7 +123,7 @@ const registerHooks = () => {
     })
   })
 
-  after(function collectBackendCoverage() {
+  after(async function collectBackendCoverage() {
     // I wish I could fail the tests if there is no code coverage information
     // but throwing an error here does not fail the test run due to
     // https://github.com/cypress-io/cypress/issues/2296
@@ -162,36 +158,44 @@ const registerHooks = () => {
         })
       ].filter(Boolean)
 
-      finalUrls.forEach((url) => {
-        return cy
-          .request({
-            url,
+      await Cypress.Promise.mapSeries(finalUrls, (url) => {
+        return new Cypress.Promise((resolve, reject) => {
+          cy.request({
+            url: String(url),
             log: true,
             failOnStatusCode: false
           })
-          .then((r) => {
-            return Cypress._.get(r, 'body.coverage', null)
-          })
-          .then((coverage) => {
-            if (!coverage) {
-              // we did not get code coverage - this is the
-              // original failed request
+            .then((r) => {
+              return Cypress._.get(r, 'body.coverage', null)
+            })
+            .then((coverage) => {
+              if (coverage) {
+                sendCoverage(coverage, `server - ${url}`).then(() => {
+                  resolve()
+                })
+                return
+              }
+
+              // we did not get code coverage
               const expectBackendCoverageOnly = Cypress._.get(
                 Cypress.env('codeCoverage'),
                 'expectBackendCoverageOnly',
                 false
               )
               if (expectBackendCoverageOnly) {
-                throw new Error(
-                  `Expected to collect backend code coverage from ${url}`
+                reject(
+                  new Error(
+                    `Expected to collect backend code coverage from ${url}`
+                  )
                 )
+                return
               } else {
+                resolve()
                 // we did not really expect to collect the backend code coverage
                 return
               }
-            }
-            sendCoverage(coverage, `server - ${url}`)
-          })
+            })
+        })
       })
     }
   })

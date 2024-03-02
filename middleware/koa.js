@@ -21,7 +21,7 @@ const { debug } = require('../lib/common/common-utils');
  *   "baseUrl": "http://localhost:3000",
  *   "env": {
  *     "codeCoverage": {
- *       "api": "http://localhost:4000/__coverage__"
+ *       "api": "http://localhost:4000/api/__coverage__"
  *     }
  *   }
  * }
@@ -34,7 +34,8 @@ module.exports = (app) => {
     debug('skipping koa middleware, code coverage is not enabled')
     return
   }
-
+  debug('adding koa middleware, code coverage is enabled')
+  
   const { takePreciseCoverage } = require('../lib/register/v8Interface')
   // expose "GET __coverage__" endpoint that just returns
   // global coverage information (if the application has been instrumented)
@@ -42,6 +43,8 @@ module.exports = (app) => {
     if (ctx.path !== '/__coverage__' && ctx.method !== 'GET') {
       return next()
     }
+
+    debug('taking precise coverage')
 
     ctx.body = {
       coverage: (await takePreciseCoverage()) || null

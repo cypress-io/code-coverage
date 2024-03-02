@@ -18,8 +18,7 @@
     "effective:config": "circleci config process .circleci/config.yml | sed /^#/d"
   },
   "peerDependencies": {
-    "cypress": "*",
-    "webpack": "^4 || ^5"
+    "cypress": "*"
   },
   "repository": {
     "type": "git",
@@ -49,6 +48,7 @@
   "private": false,
   "dependencies": {
     "chalk": "4.1.2",
+    "chrome-remote-interface": "^0.33.0",
     "dayjs": "1.11.10",
     "debug": "4.3.4",
     "execa": "4.1.0",
@@ -64,7 +64,6 @@
     "check-code-coverage": "1.10.5",
     "console-log-div": "0.6.3",
     "cypress": "^13.1.0",
-    "cypress-code-coverage-v8": "file:.",
     "express": "^4.18.2",
     "koa": "2.13.4",
     "lodash": "4.17.21",

@@ -10,9 +10,10 @@ if (isCoverageEnabled()) {
  * for Next.js API route. To use, create new `pages/api/coverage.js` file
  * and re-export this default middleware function.
  *
- * @example in your pages/api/coverage.js
+ * @example in your pages/api/__coverage__.js
  * ```ts
- * module.exports = require('cypress-code-coverage-v8/middleware/nextjs')
+ * import coverageHandler from 'cypress-code-coverage-v8/middleware/nextjs';
+ * export default coverageHandler;
  * ```
  * 
  * Then add to your cypress.json an environment variable pointing at the API
@@ -21,7 +22,7 @@ if (isCoverageEnabled()) {
  *   "baseUrl": "http://localhost:3000",
  *   "env": {
  *     "codeCoverage": {
- *       "ssr": "/api/coverage"
+ *       "ssr": "/api/__coverage__"
  *     }
  *   }
  * }

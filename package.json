@@ -29,9 +29,10 @@
     "istanbul",
     "cypress-plugin",
     "code",
-    "coverage"
+    "coverage",
+    "v8"
   ],
-  "author": "Cypress <hello@cypress.io> (http://www.cypress.io/)",
+  "author": "Rohit Gohri <code@rohit.page>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/rohit-gohri/cypress-code-coverage-v8/issues"

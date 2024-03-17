@@ -1,9 +1,8 @@
-// @ts-check
 const { isCoverageEnabled } = require('../lib/common/isEnabled')
 const { debug } = require('../lib/common/common-utils');
 
 /**
- * for Express.js
+ * for Koa
  *
  * @example Use like
  * 

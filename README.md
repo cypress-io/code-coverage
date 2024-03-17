@@ -26,7 +26,7 @@ module.exports = defineConfig({
   // the e2e or component configuration
   e2e: {
     setupNodeEvents(on, config) {
-      require('cypress-code-coverage-v8/task')(on, config)
+      require('cypress-code-coverage-v8/plugins')(on, config)
       // include any other plugin code...
 
       // It's IMPORTANT to return the config object

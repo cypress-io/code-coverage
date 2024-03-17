@@ -1,6 +1,5 @@
 const debug = require('debug')('code-coverage')
 
-// @ts-check
 function stringToArray(prop, obj) {
   if (typeof obj[prop] === 'string') {
     obj[prop] = [obj[prop]]

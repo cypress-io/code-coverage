@@ -1,4 +1,3 @@
-// @ts-check
 const { isCoverageEnabled } = require('../lib/common/isEnabled')
 
 if (isCoverageEnabled()) {

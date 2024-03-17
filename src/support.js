@@ -1,6 +1,4 @@
 /// <reference types="cypress" />
-// @ts-check
-
 const dayjs = require('dayjs')
 var duration = require('dayjs/plugin/duration')
 const { filterFilesFromCoverage } = require('./lib/support/support-utils')
@@ -23,9 +21,11 @@ const logMessage = (s) => {
 /**
  * Sends collected code coverage object to the backend code
  * via "cy.task".
+ * @param {import('./lib/plugin/chromeRemoteInterface').ClientCoverageResult} coverage
+ * @param {string} comment
  */
 const sendCoverage = (coverage, comment = '/') => {
-  logMessage(`Saving code coverage for **${comment}**`)
+  const logInstance = logMessage(`Saving code coverage for **${comment}**`)
 
   const totalCoverage = filterFilesFromCoverage(coverage)
 
@@ -34,9 +34,14 @@ const sendCoverage = (coverage, comment = '/') => {
     .task('combineCoverage', JSON.stringify(totalCoverage), {
       log: false
     })
-    // .then((result) => {
-    //   return JSON.parse(String(result))
-    // })
+    .then((result) => {
+      const res = JSON.parse(String(result))
+      logInstance.set('consoleProps', () => ({
+        'collected coverage': coverage,
+        'combined report': res
+      }))
+      logInstance.end()
+    })
 }
 
 const registerHooks = () => {
@@ -56,7 +61,6 @@ const registerHooks = () => {
     cy.task(
       'resetCoverage',
       {
-        // @ts-ignore
         isInteractive: Cypress.config('isInteractive')
       },
       { log: false }
@@ -64,9 +68,7 @@ const registerHooks = () => {
     cy.task('startPreciseCoverage', null, { log: false }).then(() => {
       logInstance.end()
     })
-  })
 
-  beforeEach(() => {
     const ssr = Cypress._.get(Cypress.env('codeCoverage'), 'ssr')
 
     if (!ssr) {
@@ -107,13 +109,22 @@ const registerHooks = () => {
     cy.task('takePreciseCoverage', null, {
       timeout: dayjs.duration(3, 'minutes').asMilliseconds(),
       log: false
-    }).then((clientCoverage) => {
-      cy.location({ log: false }).then((loc) => {
-        if (clientCoverage) {
-          sendCoverage(clientCoverage, `client - ${loc.href}`)
-        }
-      })
-    })
+    }).then(
+      /**
+       * @param {any} clientCoverage 
+       */
+      (clientCoverage) => {
+        cy.location({ log: false }).then((loc) => {
+          if (clientCoverage) {
+            sendCoverage(clientCoverage, `client - ${loc.href}`)
+          } else {
+            logMessage(
+              `Could not load client coverage - ${loc.href}. ${clientCoverage}`
+            )
+          }
+        })
+      }
+    )
   })
 
   after(() => {
@@ -149,19 +160,26 @@ const registerHooks = () => {
       )
 
       /**
-       * @type {string[]}
+       * @type {{comment: string, url: string}[]}
        */
       const finalUrls = [
-        backend,
+        ...(backend
+          ? [
+              {
+                comment: 'backend',
+                url: backend
+              }
+            ]
+          : []),
         ...hostObjects.map(({ url }) => {
-          return url
+          return { comment: 'ssr', url }
         })
       ].filter(Boolean)
 
-      await Cypress.Promise.mapSeries(finalUrls, (url) => {
+      await Cypress.Promise.mapSeries(finalUrls, ({ url, comment }) => {
         return new Cypress.Promise((resolve, reject) => {
           cy.request({
-            url: String(url),
+            url,
             log: true,
             failOnStatusCode: false
           })
@@ -170,7 +188,7 @@ const registerHooks = () => {
             })
             .then((coverage) => {
               if (coverage) {
-                sendCoverage(coverage, `server - ${url}`).then(() => {
+                sendCoverage(coverage, `${comment} - ${url}`).then(() => {
                   resolve()
                 })
                 return

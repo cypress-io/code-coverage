@@ -1,7 +1,5 @@
 // helper functions to use from "task.js" plugins code
 // that need access to the file system
-
-// @ts-check
 /// <reference types="cypress" />
 const { readFileSync, writeFileSync, existsSync } = require('fs')
 const { isAbsolute, resolve, join } = require('path')
@@ -146,7 +144,7 @@ function showNycInfo(nycFilename) {
     // printing a few found keys and file paths from the coverage file
     // will make debugging any problems much much easier
     if (k < maxPrintKeys) {
-      debug('%d key %s file path %s', k + 1, key, coverage.path)
+      // debug('%d key %s file path %s', k + 1, key, coverage.path)
     }
   })
 }
@@ -172,8 +170,13 @@ function resolveRelativePaths(nycFilename) {
     const coverage = nycCoverage[key]
 
     if (!coverage.path) {
+      delete nycCoverage[key];
       debug('key %s does not have path', key)
       return
+    }
+
+    if (coverage.path.includes('node_modules')) {
+      delete nycCoverage[key];
     }
 
     if (!isAbsolute(coverage.path)) {
@@ -185,15 +188,40 @@ function resolveRelativePaths(nycFilename) {
       return
     }
 
-    // path is absolute, let's check if it exists
-    if (!existsSync(coverage.path)) {
-      debug('⚠️ cannot find file %s with hash %s', coverage.path, coverage.hash)
+    // // path is absolute, let's check if it exists
+    // if (!existsSync(coverage.path)) {
+    //   if (coverage.path.includes('.next/server/chunks')) {
+    //     const relative = coverage.path
+    //       .split('.next/server/chunks/')[1]
+    //       .split('/')
+    //       .slice(1)
+    //       .join('/')
+    //     debug('resolving next build path %s', relative)
+    //     coverage.path = resolve('..', relative)
+    //     changed = true
+    //     return;
+    //   } else if (coverage.path.includes('/.next/server/pages')) {
+    //     const [base, relative] = coverage.path.split('.next/server/pages/')
+    //     coverage.path = resolve(base, relative.split('/').slice(3).join('/'))
+    //     changed = true;
+    //     return;
+    //   } else {
+    //     debug(
+    //       '⚠️ cannot find file %s with hash %s',
+    //       coverage.path,
+    //       coverage.hash
+    //     )
+    //   }
+    // }
+
+    if (!existsSync(coverage.path) && coverage.path.includes('.next')) {
+      delete nycCoverage[key];
     }
   })
 
   if (changed) {
-    debug('resolveRelativePaths saving updated file %s', nycFilename)
-    debug('there are %d keys in the file', coverageKeys.length)
+    // debug('resolveRelativePaths saving updated file %s', nycFilename)
+    // debug('there are %d keys in the file', coverageKeys.length)
     writeFileSync(
       nycFilename,
       JSON.stringify(nycCoverage, null, 2) + '\n',
@@ -216,7 +244,7 @@ function findCommonRoot(filepaths) {
   const splitParts = filepaths.map((name) => name.split('/'))
   const lengths = splitParts.map((arr) => arr.length)
   const shortestLength = Math.min.apply(null, lengths)
-  debug('shorted file path has %d parts', shortestLength)
+  // debug('shorted file path has %d parts', shortestLength)
 
   const cwd = process.cwd()
   let commonPrefix = []
@@ -225,10 +253,10 @@ function findCommonRoot(filepaths) {
   for (let k = 0; k < shortestLength; k += 1) {
     const part = splitParts[0][k]
     const prefix = commonPrefix.concat(part).join('/')
-    debug('testing prefix %o', prefix)
+    // debug('testing prefix %o', prefix)
     const allFilesStart = filepaths.every((name) => name.startsWith(prefix))
     if (!allFilesStart) {
-      debug('stopped at non-common prefix %s', prefix)
+      // debug('stopped at non-common prefix %s', prefix)
       break
     }
 
@@ -237,13 +265,13 @@ function findCommonRoot(filepaths) {
     const removedPrefixNames = filepaths.map((filepath) =>
       filepath.slice(prefix.length)
     )
-    debug('removedPrefix %o', removedPrefixNames)
+    // debug('removedPrefix %o', removedPrefixNames)
     const foundAllPaths = removedPrefixNames.every((filepath) =>
       existsSync(join(cwd, filepath))
     )
-    debug('all files found at %s? %o', prefix, foundAllPaths)
+    // debug('all files found at %s? %o', prefix, foundAllPaths)
     if (foundAllPaths) {
-      debug('found prefix that matches current folder: %s', prefix)
+      // debug('found prefix that matches current folder: %s', prefix)
       foundCurrentFolder = prefix
       break
     }
@@ -262,11 +290,11 @@ function tryFindingLocalFiles(nycFilename) {
     return
   }
   const cwd = process.cwd()
-  debug(
-    'found common folder %s that matches current working directory %s',
-    commonFolder,
-    cwd
-  )
+  // debug(
+  //   'found common folder %s that matches current working directory %s',
+  //   commonFolder,
+  //   cwd
+  // )
   const length = commonFolder.length
   let changed
 
@@ -276,14 +304,14 @@ function tryFindingLocalFiles(nycFilename) {
       const to = join(cwd, from.slice(length))
       // ? Do we need to replace the "key" in the coverage object or can we just replace the "path"?
       nycCoverage[key].path = to
-      debug('replaced %s -> %s', from, to)
+      // debug('replaced %s -> %s', from, to)
       changed = true
     }
   })
 
   if (changed) {
-    debug('tryFindingLocalFiles saving updated file %s', nycFilename)
-    debug('there are %d keys in the file', coverageKeys.length)
+    // debug('tryFindingLocalFiles saving updated file %s', nycFilename)
+    // debug('there are %d keys in the file', coverageKeys.length)
     writeFileSync(
       nycFilename,
       JSON.stringify(nycCoverage, null, 2) + '\n',
@@ -355,7 +383,7 @@ function includeAllFiles(nycFilename, nycOptions) {
   const allFiles = findSourceFiles(nycOptions)
   if (debug.enabled) {
     debug('found %d file(s)', allFiles.length)
-    console.error(allFiles.join('\n'))
+    // console.error(allFiles.join('\n'))
   }
   if (!allFiles.length) {
     debug('no files found, hoping for the best')
@@ -381,7 +409,7 @@ function includeAllFiles(nycFilename, nycOptions) {
       // all good, this file exists in coverage object
       return
     }
-    debug('adding empty coverage for file %s', fullPath)
+    // debug('adding empty coverage for file %s', fullPath)
     changed = true
     // insert placeholder object for now
     const placeholder = fileCoveragePlaceholder(fullPath)

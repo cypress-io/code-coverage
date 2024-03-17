@@ -1,4 +1,3 @@
-// @ts-check
 /**
  * Based on
  * @see https://github.com/leftyio/v8-cypress-coverage-plugin/blob/master/src/plugin.js
@@ -8,10 +7,20 @@ const { convertProfileCoverageToIstanbul } = require('../common/v8ToIstanbul')
 const { debug } = require('../common/common-utils')
 
 /**
+ * @typedef {Awaited<ReturnType<typeof takePreciseCoverage>>} ClientCoverageResult
+ */
+
+/**
  * @type {ChromeRemoteInterface.Client | null}
  */
 let client = null
 
+/**
+ * 
+ * @param {Cypress.Browser} browser 
+ * @param {Cypress.BeforeBrowserLaunchOptions} launchOptions 
+ * @returns 
+ */
 function browserLaunchHandler(browser, launchOptions) {
   if (browser.name !== 'chrome') {
     return debug(
@@ -67,10 +76,11 @@ function takePreciseCoverage() {
     return null
   }
 
-  return client.Profiler.takePreciseCoverage().then((cov) => {
-    return convertProfileCoverageToIstanbul(cov)
-  }
-  )
+  return client.Profiler.takePreciseCoverage().then(async (cov) => {
+    const res = await convertProfileCoverageToIstanbul(cov)
+    debug("chrome coverage", cov, res)
+    return res
+  })
 }
 
 function stopPreciseCoverage() {

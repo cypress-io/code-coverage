@@ -1,4 +1,3 @@
-// @ts-check
 const istanbul = require('istanbul-lib-coverage')
 const { join, resolve } = require('path')
 const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
@@ -102,13 +101,13 @@ function maybePrintFinalCoverageFiles(folder) {
     const allCovered = coveredStatements === totalStatements
     const coverageStatus = hasStatements ? (allCovered ? '✅' : '⚠️') : '❓'
 
-    debug(
-      '%s %s statements covered %d/%d',
-      coverageStatus,
-      key,
-      coveredStatements,
-      totalStatements
-    )
+    // debug(
+    //   '%s %s statements covered %d/%d',
+    //   coverageStatus,
+    //   key,
+    //   coveredStatements,
+    //   totalStatements
+    // )
   })
 }
 

@@ -1,4 +1,3 @@
-// @ts-check
 /// <reference types="Cypress" />
 // helper functions that are safe to use in the browser
 // from support.js file - no file system access
@@ -95,39 +94,42 @@ const filterSupportFilesFromCoverage = (
   totalCoverage,
   config = Cypress.config
 ) => {
-  const integrationFolder = config('integrationFolder')
+  // /**
+  //  * 
+  //  */
+  // const integrationFolder = config('integrationFolder')
 
   /**
    * Cypress v10 doesn't have an integrationFolder config value any more, so we nope out here if its undefined.
    * Instead, we rely on the new exclude option logic done in the getCypressExcludePatterns function.
    */
-  if (!integrationFolder) {
+  // if (!integrationFolder) {
     return totalCoverage
-  }
+  // }
 
-  const supportFile = config('supportFile')
+  // const supportFile = config('supportFile')
 
-  /** @type {string} Cypress run-time config has the support folder string */
-  // @ts-ignore
-  const supportFolder = config('supportFolder')
+  // /** @type {string} Cypress run-time config has the support folder string */
+  // // @ts-ignore
+  // const supportFolder = config('supportFolder')
 
-  const isSupportFile = (filename) => filename === supportFile
+  // const isSupportFile = (filename) => filename === supportFile
 
-  let coverage = Cypress._.omitBy(totalCoverage, (fileCoverage, filename) =>
-    isSupportFile(filename)
-  )
+  // let coverage = Cypress._.omitBy(totalCoverage, (fileCoverage, filename) =>
+  //   isSupportFile(filename)
+  // )
 
-  // check the edge case
-  //   if we have files from support folder AND the support folder is not same
-  //   as the integration, or its prefix (this might remove all app source files)
-  //   then remove all files from the support folder
-  if (!integrationFolder.startsWith(supportFolder)) {
-    // remove all covered files from support folder
-    coverage = Cypress._.omitBy(totalCoverage, (fileCoverage, filename) =>
-      filename.startsWith(supportFolder)
-    )
-  }
-  return coverage
+  // // check the edge case
+  // //   if we have files from support folder AND the support folder is not same
+  // //   as the integration, or its prefix (this might remove all app source files)
+  // //   then remove all files from the support folder
+  // if (!integrationFolder.startsWith(supportFolder)) {
+  //   // remove all covered files from support folder
+  //   coverage = Cypress._.omitBy(totalCoverage, (fileCoverage, filename) =>
+  //     filename.startsWith(supportFolder)
+  //   )
+  // }
+  // return coverage
 }
 
 /**
@@ -138,7 +140,7 @@ const filterSupportFilesFromCoverage = (
 function fixSourcePaths(coverage) {
   Object.values(coverage).forEach((file) => {
     const { path: absolutePath, inputSourceMap } = file
-    const fileName = /([^\/\\]+)$/.exec(absolutePath)[1]
+    const fileName = /([^\/\\]+)$/.exec(absolutePath)?.[1]
     if (!inputSourceMap || !fileName) return
 
     if (inputSourceMap.sourceRoot) inputSourceMap.sourceRoot = ''

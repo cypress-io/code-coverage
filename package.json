@@ -4,12 +4,30 @@
   "description": "Saves the code coverage collected during Cypress tests",
   "main": "dist/support.js",
   "exports": {
-    ".": "./dist/support.js",
-    "./*": "./dist/*",
-    "./middleware/*": "./dist/middleware/*",
-    "./plugins": "./dist/plugins.js",
-    "./register": "./dist/register.js",
-    "./support": "./dist/support.js"
+    ".": {
+      "default": "./dist/support.js",
+      "types": "./dist/support.d.ts"
+    },
+    "./*": {
+      "default": "./dist/*.js",
+      "types": "./dist/*.d.ts"
+    },
+    "./middleware/*": {
+      "default": "./dist/middleware/*.js",
+      "types": "./dist/middleware/*.d.ts"
+    },
+    "./plugins": {
+      "default": "./dist/plugins.js",
+      "types": "./dist/plugins.d.ts"
+    },
+    "./register": {
+      "default": "./dist/register.js",
+      "types": "./dist/register.d.ts"
+    },
+    "./support": {
+      "default": "./dist/support.js",
+      "types": "./dist/support.d.ts"
+    }
   },
   "scripts": {
     "start": "parcel serve cypress/index.html",

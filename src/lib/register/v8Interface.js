@@ -16,7 +16,6 @@ const takePreciseCoverage = async () => {
         return
       }
       const res = await convertProfileCoverageToIstanbul(cov);
-      debug("v8 conversion", cov, res);
       resolve(res)
     })
   })

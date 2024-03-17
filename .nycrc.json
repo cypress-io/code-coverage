@@ -1,6 +1,3 @@
 {
-  "exclude": [
-    "support.js",
-    "task-utils.js"
-  ]
+  "exclude": ["src/**/*"]
 }

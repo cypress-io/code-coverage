@@ -1,13 +1,14 @@
 const { isCoverageEnabled } = require('../lib/common/isEnabled')
-const { debug } = require('../lib/common/common-utils');
+const { debug } = require('../lib/common/common-utils')
 
 /**
  * for Hapi.js
  *
  *  * @example Use like
  * ```ts
+ * require('cypress-code-coverage-v8/dist/register');
  * const Hapi = require('@hapi/hapi');
- * const coverageRoutes = require('cypress-code-coverage-v8/middleware/hapi');
+ * const coverageRoutes = require('cypress-code-coverage-v8/dist/middleware/hapi');
  *
  * const init = async () => {
  *   const server = Hapi.server({
@@ -22,7 +23,7 @@ const { debug } = require('../lib/common/common-utils');
  *   console.log('Server running on %s', server.info.uri);
  * };
  * ```
- * 
+ *
  * Then add to your cypress.json an environment variable pointing at the API
  * ```json
  * {
@@ -53,7 +54,6 @@ module.exports = (server) => {
     method: 'GET',
     path: '/__coverage__',
     async handler() {
-
       return { coverage: (await takePreciseCoverage()) || null }
     }
   })

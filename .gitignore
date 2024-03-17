@@ -8,3 +8,9 @@ dist/
 cypress-coverage/
 yarn.lock
 .parcel-cache
+
+
+# dist
+./*.js
+./middleware
+./lib

@@ -10,7 +10,7 @@ const addTasks = require('./lib/plugin/task')
     // your plugins file
     
     module.exports = (on, config) => {
-      require('cypress-code-coverage-v8/plugins').coveragePlugin(on, config)
+      require('cypress-code-coverage-v8/dist/plugins').coveragePlugin(on, config)
       // IMPORTANT to return the config object
       // with the any changed environment variables
       return config

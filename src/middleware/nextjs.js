@@ -11,10 +11,10 @@ if (isCoverageEnabled()) {
  *
  * @example in your pages/api/__coverage__.js
  * ```ts
- * import coverageHandler from 'cypress-code-coverage-v8/middleware/nextjs';
+ * import coverageHandler from 'cypress-code-coverage-v8/dist/middleware/nextjs';
  * export default coverageHandler;
  * ```
- * 
+ *
  * Then add to your cypress.json an environment variable pointing at the API
  * ```json
  * {
@@ -29,7 +29,7 @@ if (isCoverageEnabled()) {
  *
  * @see https://nextjs.org/docs#api-routes
  * @see https://github.com/rohit-gohri/cypress-code-coverage-v8
- * 
+ *
  * @param {import('next').NextApiRequest} _req
  * @param {import('next').NextApiResponse} res
  */
@@ -42,9 +42,19 @@ module.exports = async function returnCodeCoverageNext(_req, res) {
   }
 
   const { takePreciseCoverage } = require('../lib/register/v8Interface')
+  const coverage = await takePreciseCoverage()
 
-  // only GET is supported
-  res.status(200).json({
-    coverage: (await takePreciseCoverage()) || null
-  })
+  if (!coverage) {
+    // only GET is supported
+    res.status(200).json({
+      coverage: null
+    })
+  } else {
+    console.error(coverage)
+    // TODO: Convert webpack paths to files, convert package alias to file path
+    // example:
+    res.status(200).json({
+      coverage
+    })
+  }
 }

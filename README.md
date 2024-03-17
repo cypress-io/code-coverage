@@ -14,7 +14,7 @@ Then add the code below to the `supportFile` and `setupNodeEvents` function.
 
 ```js
 // cypress/support/e2e.js
-import 'cypress-code-coverage-v8/support'
+import 'cypress-code-coverage-v8/dist/support'
 ```
 
 ```js
@@ -26,7 +26,7 @@ module.exports = defineConfig({
   // the e2e or component configuration
   e2e: {
     setupNodeEvents(on, config) {
-      require('cypress-code-coverage-v8/plugins')(on, config)
+      require('cypress-code-coverage-v8/dist/plugins')(on, config)
       // include any other plugin code...
 
       // It's IMPORTANT to return the config object
@@ -131,7 +131,7 @@ You can also instrument your server-side code and produce a combined coverage re
 ```js
 const express = require('express')
 const app = express()
-require('cypress-code-coverage-v8/middleware/express')(app)
+require('cypress-code-coverage-v8/dist/middleware/express')(app)
 ```
 
 For any other server, define the endpoint yourself and return the coverage object:

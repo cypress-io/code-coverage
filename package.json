@@ -3,32 +3,6 @@
   "version": "0.0.0-development",
   "description": "Saves the code coverage collected during Cypress tests",
   "main": "dist/support.js",
-  "exports": {
-    ".": {
-      "default": "./dist/support.js",
-      "types": "./dist/support.d.ts"
-    },
-    "./*": {
-      "default": "./dist/*.js",
-      "types": "./dist/*.d.ts"
-    },
-    "./middleware/*": {
-      "default": "./dist/middleware/*.js",
-      "types": "./dist/middleware/*.d.ts"
-    },
-    "./plugins": {
-      "default": "./dist/plugins.js",
-      "types": "./dist/plugins.d.ts"
-    },
-    "./register": {
-      "default": "./dist/register.js",
-      "types": "./dist/register.d.ts"
-    },
-    "./support": {
-      "default": "./dist/support.js",
-      "types": "./dist/support.d.ts"
-    }
-  },
   "scripts": {
     "start": "parcel serve cypress/index.html",
     "coverage:verify": "npx nyc report --check-coverage true --lines 80",
@@ -91,7 +65,7 @@
     "@types/debug": "^4.1.12",
     "@types/express": "^4.17.21",
     "@types/js-yaml": "^4.0.9",
-    "@types/koa": "^2.15.0",
+    "@types/koa": "2.13.4",
     "@types/node": "^20.11.19",
     "check-code-coverage": "1.10.5",
     "console-log-div": "0.6.3",

@@ -50,7 +50,6 @@ module.exports = async function returnCodeCoverageNext(_req, res) {
       coverage: null
     })
   } else {
-    console.error(coverage)
     // TODO: Convert webpack paths to files, convert package alias to file path
     // example:
     res.status(200).json({

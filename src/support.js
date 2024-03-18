@@ -45,6 +45,9 @@ const sendCoverage = (coverage, comment = '/') => {
 }
 
 const registerHooks = () => {
+  const codeCoverageConfig = Cypress.env('codeCoverage')
+  const clientCoverageEnabled =
+    String(Cypress._.get(codeCoverageConfig, 'client', false)) !== 'false'
   /**
    * @type {{url: string}[]}
    */
@@ -65,11 +68,14 @@ const registerHooks = () => {
       },
       { log: false }
     )
-    cy.task('startPreciseCoverage', null, { log: false }).then(() => {
-      logInstance.end()
-    })
 
-    const ssr = Cypress._.get(Cypress.env('codeCoverage'), 'ssr')
+    if (clientCoverageEnabled) {
+      cy.task('startPreciseCoverage', null, { log: false }).then(() => {
+        logInstance.end()
+      })
+    }
+
+    const ssr = Cypress._.get(codeCoverageConfig, 'ssr')
 
     if (!ssr) {
       return
@@ -105,13 +111,23 @@ const registerHooks = () => {
   })
 
   afterEach(function collectClientCoverage() {
+    const hostToProjectMap = Cypress._.get(
+      codeCoverageConfig,
+      'hostToProjectMap'
+    )
     // collect and merge frontend coverage
-    cy.task('takePreciseCoverage', null, {
-      timeout: dayjs.duration(3, 'minutes').asMilliseconds(),
-      log: false
-    }).then(
+    cy.task(
+      'takePreciseCoverage',
+      {
+        hostToProjectMap
+      },
+      {
+        timeout: dayjs.duration(30, 'seconds').asMilliseconds(),
+        log: false
+      }
+    ).then(
       /**
-       * @param {any} clientCoverage 
+       * @param {any} clientCoverage
        */
       (clientCoverage) => {
         cy.location({ log: false }).then((loc) => {
@@ -127,12 +143,14 @@ const registerHooks = () => {
     )
   })
 
-  after(() => {
-    cy.task('stopPreciseCoverage', null, {
-      timeout: dayjs.duration(3, 'minutes').asMilliseconds(),
-      log: false
+  if (clientCoverageEnabled) {
+    after(() => {
+      cy.task('stopPreciseCoverage', null, {
+        timeout: dayjs.duration(1, 'minutes').asMilliseconds(),
+        log: false
+      })
     })
-  })
+  }
 
   after(async function collectBackendCoverage() {
     // I wish I could fail the tests if there is no code coverage information
@@ -153,11 +171,7 @@ const registerHooks = () => {
       // if we are running end-to-end tests,
       // otherwise where do we send the request?
       // TODO: Support array of urls
-      const backend = Cypress._.get(
-        Cypress.env('codeCoverage'),
-        'url',
-        '/__coverage__'
-      )
+      const backend = Cypress._.get(codeCoverageConfig, 'url')
 
       /**
        * @type {{comment: string, url: string}[]}
@@ -196,7 +210,7 @@ const registerHooks = () => {
 
               // we did not get code coverage
               const expectBackendCoverageOnly = Cypress._.get(
-                Cypress.env('codeCoverage'),
+                codeCoverageConfig,
                 'expectBackendCoverageOnly',
                 false
               )

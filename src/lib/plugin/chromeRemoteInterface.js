@@ -16,10 +16,10 @@ const { debug } = require('../common/common-utils')
 let client = null
 
 /**
- * 
- * @param {Cypress.Browser} browser 
- * @param {Cypress.BeforeBrowserLaunchOptions} launchOptions 
- * @returns 
+ *
+ * @param {Cypress.Browser} browser
+ * @param {Cypress.BeforeBrowserLaunchOptions} launchOptions
+ * @returns
  */
 function browserLaunchHandler(browser, launchOptions) {
   if (browser.name !== 'chrome') {
@@ -70,17 +70,22 @@ async function startPreciseCoverage() {
   })
 }
 
-function takePreciseCoverage() {
+function takePreciseCoverage({ hostToProjectMap = {} } = {}) {
   if (!client) {
     debug('no chrome client')
     return null
   }
 
-  return client.Profiler.takePreciseCoverage().then(async (cov) => {
-    const res = await convertProfileCoverageToIstanbul(cov)
-    debug("chrome coverage", cov, res)
-    return res
-  })
+  return client.Profiler.takePreciseCoverage()
+    .then(async (cov) => {
+      const res = await convertProfileCoverageToIstanbul(cov, hostToProjectMap)
+      debug('chrome coverage', cov, res)
+      return res
+    })
+    .catch((err) => {
+      console.error(err, err.stack, 'could not take coverage')
+      return null
+    })
 }
 
 function stopPreciseCoverage() {

@@ -11,6 +11,9 @@ Copyright (c) 2021 Lefty
 Copyright (c) 2019 Cypress.io <https://www.cypress.io>
 <https://github.com/cypress-io/code-coverage>
 
+Copyright JS Foundation and other contributors
+<https://github.com/webpack-contrib/source-map-loader>
+
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
 files (the "Software"), to deal in the Software without

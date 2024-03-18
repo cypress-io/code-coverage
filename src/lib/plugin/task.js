@@ -165,7 +165,7 @@ const tasks = {
 
     const coverageMap = istanbul.createCoverageMap(previousCoverage)
     coverageMap.merge(coverage)
-    const result = coverageMap.toJSON();
+    const result = coverageMap.toJSON()
     saveCoverage(result)
     debug('wrote coverage file %s', nycFilename)
 
@@ -233,7 +233,7 @@ const tasks = {
  * Registers code coverage collection and reporting tasks.
  * Sets an environment variable to tell the browser code that it can
  * send the coverage.
-*/
+ */
 function registerCodeCoverageTasks(on, config) {
   on('task', tasks)
 

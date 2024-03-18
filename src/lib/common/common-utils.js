@@ -1,4 +1,18 @@
+const fs = require('fs/promises')
+const path = require('path')
 const debug = require('debug')('code-coverage')
+
+const cacheDir = path.join(__dirname, '..', '..', '..', '.cache')
+
+/**
+ * @param {string} filename
+ */
+function exists(filename) {
+  return fs
+    .access(filename, fs.constants.F_OK)
+    .then(() => true)
+    .catch(() => false)
+}
 
 function stringToArray(prop, obj) {
   if (typeof obj[prop] === 'string') {
@@ -66,6 +80,8 @@ const removePlaceholders = (coverage) => {
 
 module.exports = {
   debug,
+  cacheDir,
+  exists,
   combineNycOptions,
   defaultNycOptions,
   fileCoveragePlaceholder,

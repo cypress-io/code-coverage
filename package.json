@@ -2,6 +2,8 @@
   "name": "@cypress/code-coverage",
   "version": "0.0.0-development",
   "description": "Saves the code coverage collected during Cypress tests",
+  "main": "index.js",
+  "targets": { "main": false },
   "scripts": {
     "start": "parcel serve cypress/index.html",
     "coverage:verify": "npx nyc report --check-coverage true --lines 80",

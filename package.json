@@ -2,7 +2,6 @@
   "name": "@cypress/code-coverage",
   "version": "0.0.0-development",
   "description": "Saves the code coverage collected during Cypress tests",
-  "main": "index.js",
   "scripts": {
     "start": "parcel serve cypress/index.html",
     "coverage:verify": "npx nyc report --check-coverage true --lines 80",
@@ -73,7 +72,7 @@
     "express": "^4.18.2",
     "lodash": "4.17.21",
     "markdown-link-check": "3.12.1",
-    "parcel-bundler": "1.12.5",
+    "parcel": "2.12.0",
     "prettier": "3.2.5",
     "rimraf": "5.0.5",
     "semantic-release": "17.4.7",

@@ -70,7 +70,9 @@ const registerHooks = () => {
       // in addition, accessing win.__coverage__ can throw when testing cross-origin code,
       // because we don't control the cross-origin code, we can safely return
       let applicationSourceCoverage
-      try { applicationSourceCoverage = win?.__coverage__ } catch {}
+      try {
+        applicationSourceCoverage = win?.__coverage__
+      } catch {}
       if (!applicationSourceCoverage) {
         return
       }

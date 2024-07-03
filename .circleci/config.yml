@@ -40,11 +40,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install node 16
-          command: nvm install 16.16.0
+          name: Install node 20
+          command: nvm install 20.12.1
       - run:
-          name: Use node 16
-          command: nvm use 16.16.0
+          name: Use node 20
+          command: nvm use 20.12.1
       - run:
           name: Install deps for code coverage
           command: npm ci

@@ -1,3 +1,4 @@
 {
-  "plugins": ["istanbul"]
+  "plugins": ["istanbul"],
+  "ignore": ["**/*.cy.js"]
 }

@@ -25,6 +25,16 @@ context('Page test', () => {
     cy.contains('h2', 'About')
     cy.contains('Est. 2019')
   })
+
+  it('loads cross origin page using cy.origin', () => {
+    cy.origin('http://foobar.com:1234', () => {
+      cy.visit('/')
+    })
+  })
+
+  it('loads cross origin page without cy.origin', () => {
+    cy.visit('http://foobar.com:1234')
+  })
 })
 
 context('Unit tests', () => {

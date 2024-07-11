@@ -6,6 +6,9 @@ module.exports = defineConfig({
     setupNodeEvents(on, config) {
       return require('./cypress/plugins/index.js')(on, config)
     },
+    hosts: {
+      'foobar.com': '127.0.0.1',
+    },
     baseUrl: 'http://localhost:1234',
     env: {
       codeCoverage: {

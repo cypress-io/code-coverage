@@ -9,6 +9,7 @@ cypress-coverage/
 yarn.lock
 .parcel-cache
 
+.DS_Store
 
 # dist
 ./*.js

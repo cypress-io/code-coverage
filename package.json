@@ -75,7 +75,7 @@
     "markdown-link-check": "3.12.2",
     "parcel-bundler": "1.12.5",
     "prettier": "3.2.5",
-    "rimraf": "5.0.8",
+    "rimraf": "5.0.9",
     "semantic-release": "17.4.7",
     "serve": "14.2.1",
     "start-server-and-test": "2.0.4",

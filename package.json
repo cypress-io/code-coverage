@@ -53,7 +53,7 @@
   "dependencies": {
     "@cypress/webpack-preprocessor": "^6.0.0",
     "chalk": "4.1.2",
-    "dayjs": "1.11.10",
+    "dayjs": "1.11.12",
     "debug": "4.3.4",
     "execa": "4.1.0",
     "globby": "11.1.0",

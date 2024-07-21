@@ -66,7 +66,7 @@
     "@babel/preset-env": "^7.16.11",
     "@cypress/code-coverage": "file:.",
     "babel-loader": "^9.1.3",
-    "babel-plugin-istanbul": "6.1.1",
+    "babel-plugin-istanbul": "7.0.0",
     "check-code-coverage": "1.10.5",
     "console-log-div": "0.6.3",
     "cypress": "^13.1.0",

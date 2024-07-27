@@ -87,7 +87,7 @@ jobs:
 
   cyrun:
     docker:
-      - image: cypress/base:16.18.1
+      - image: cypress/base:22.0.0
     parameters:
       jobname:
         type: string
@@ -113,7 +113,7 @@ jobs:
 
   test-code-coverage-plugin:
     docker:
-      - image: cypress/base:16.18.1
+      - image: cypress/base:22.0.0
     steps:
       - attach_workspace:
           at: ~/

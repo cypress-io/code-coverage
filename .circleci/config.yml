@@ -9,7 +9,7 @@ jobs:
   lint:
     description: Checks the code formatting
     docker:
-      - image: cimg/node:22.1.0
+      - image: cimg/node:22.5.1
         environment:
           # we don't need Cypress to check code style
           CYPRESS_INSTALL_BINARY: '0'
@@ -71,7 +71,7 @@ jobs:
   publish:
     description: Publishes the new version of the plugin to NPM
     docker:
-      - image: cimg/node:22.1.0
+      - image: cimg/node:22.5.1
     environment:
       # we don't need Cypress to do the release
       CYPRESS_INSTALL_BINARY: '0'

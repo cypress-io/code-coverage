@@ -16,6 +16,6 @@
     "excludeAfterRemap": true
   },
   "devDependencies": {
-    "@babel/core": "7.24.8"
+    "@babel/core": "7.25.2"
   }
 }

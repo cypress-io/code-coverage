@@ -12,9 +12,9 @@ const {
   includeAllFiles
 } = require('./task-utils')
 const { fixSourcePaths } = require('./support-utils')
-const { removePlaceholders } = require('./common-utils')
 
 const debug = require('debug')('code-coverage')
+require('debug').enable('code-coverage')
 
 // these are standard folder and file names used by NYC tools
 const processWorkingDirectory = process.cwd()
@@ -58,6 +58,13 @@ const nycReportOptions = (function getNycOption() {
 })()
 
 const nycFilename = join(nycReportOptions['temp-dir'], 'out.json')
+
+let coverageMap = (() => {
+  const previousCoverage = existsSync(nycFilename)
+    ? JSON.parse(readFileSync(nycFilename, 'utf8'))
+    : {}
+  return istanbul.createCoverageMap(previousCoverage)
+})()
 
 function saveCoverage(coverage) {
   if (!existsSync(nycReportOptions.tempDir)) {
@@ -122,7 +129,7 @@ const tasks = {
   resetCoverage({ isInteractive }) {
     if (isInteractive) {
       debug('reset code coverage in interactive mode')
-      const coverageMap = istanbul.createCoverageMap({})
+      coverageMap = istanbul.createCoverageMap({})
       saveCoverage(coverageMap)
     }
     /*
@@ -148,21 +155,9 @@ const tasks = {
 
     fixSourcePaths(coverage)
 
-    const previousCoverage = existsSync(nycFilename)
-      ? JSON.parse(readFileSync(nycFilename, 'utf8'))
-      : {}
+    console.log(coverageMap.toJSON())
 
-    // previous code coverage object might have placeholder entries
-    // for files that we have not seen yet,
-    // but the user expects to include in the coverage report
-    // the merge function messes up, so we should remove any placeholder entries
-    // and re-insert them again when creating the report
-    removePlaceholders(previousCoverage)
-
-    const coverageMap = istanbul.createCoverageMap(previousCoverage)
     coverageMap.merge(coverage)
-    saveCoverage(coverageMap)
-    debug('wrote coverage file %s', nycFilename)
 
     return null
   },
@@ -172,6 +167,7 @@ const tasks = {
    * NPM script to generate HTML report
    */
   coverageReport() {
+    saveCoverage(coverageMap)
     if (!existsSync(nycFilename)) {
       console.warn('Cannot find coverage file %s', nycFilename)
       console.warn('Skipping coverage report')

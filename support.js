@@ -17,18 +17,18 @@ const sendCoverage = (coverage, pathname = '/') => {
   const totalCoverage = filterFilesFromCoverage(coverage)
 
   const keys = Object.keys(totalCoverage)
-  const batchSize = 500;
+  const batchSize = 500
 
   for (let i = 0; i < keys.length; i += batchSize) {
     const batchKeys = keys.slice(i, i + batchSize)
     const batchCoverage = {}
 
-    batchKeys.forEach(key => {
+    batchKeys.forEach((key) => {
       batchCoverage[key] = totalCoverage[key]
     })
 
     cy.task('combineCoverage', JSON.stringify(batchCoverage), {
-      log:false
+      log: false
     })
   }
 }

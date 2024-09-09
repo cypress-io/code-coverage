@@ -14,12 +14,23 @@ dayjs.extend(duration)
 const sendCoverage = (coverage, pathname = '/') => {
   logMessage(`Saving code coverage for **${pathname}**`)
 
-  const totalCoverage = filterFilesFromCoverage(coverage)
+  let totalCoverage = filterFilesFromCoverage(coverage)
 
-  // stringify coverage object for speed
-  cy.task('combineCoverage', JSON.stringify(totalCoverage), {
-    log: false
-  })
+  const keys = Object.keys(totalCoverage)
+  const batchSize = 500;
+
+  for (let i = 0; i < keys.length; i += batchSize) {
+    const batchKeys = keys.slice(i, i + batchSize)
+    const batchCoverage = {}
+
+    batchKeys.forEach(key => {
+      batchCoverage[key] = totalCoverage[key]
+    })
+
+    cy.task('combineCoverage', JSON.stringify(batchCoverage), {
+      log:false
+    })
+  }
 }
 
 /**

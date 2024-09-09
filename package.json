@@ -54,7 +54,7 @@
     "@cypress/webpack-preprocessor": "^6.0.0",
     "chalk": "4.1.2",
     "dayjs": "1.11.13",
-    "debug": "4.3.6",
+    "debug": "4.3.7",
     "execa": "4.1.0",
     "globby": "11.1.0",
     "istanbul-lib-coverage": "^3.0.0",

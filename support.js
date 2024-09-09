@@ -14,7 +14,7 @@ dayjs.extend(duration)
 const sendCoverage = (coverage, pathname = '/') => {
   logMessage(`Saving code coverage for **${pathname}**`)
 
-  let totalCoverage = filterFilesFromCoverage(coverage)
+  const totalCoverage = filterFilesFromCoverage(coverage)
 
   const keys = Object.keys(totalCoverage)
   const batchSize = 500;

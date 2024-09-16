@@ -152,6 +152,7 @@ workflows:
                 - exclude-files
                 - frontend
                 - fullstack
+                - multiple-backend
                 - one-spec
                 - same-folder
                 - support-files

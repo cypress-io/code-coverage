@@ -1,0 +1,13 @@
+{
+  "name": "example-multiple-backends",
+  "description": "Code coverage for multiple backends",
+  "private": true,
+  "scripts": {
+    "cy:run": "cypress run",
+    "start": "nyc --silent node server/server-3003 & nyc --silent node server/server-3004",
+    "pretest": "rimraf .nyc_output .cache coverage dist",
+    "test": "start-test \"3003|3004\" cy:run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "check-coverage server-3003.js server-3004.js && only-covered server-3003.js server-3004.js"
+  }
+}

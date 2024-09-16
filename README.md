@@ -214,7 +214,7 @@ if (global.__coverage__) {
 }
 ```
 
-Or if you have multiple servers from which you are wanting to gather code coverage, you can pass any array to `url as well:
+Or if you have multiple servers from which you are wanting to gather code coverage, you can pass any array to `url` as well:
 
 ```json
 {

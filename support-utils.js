@@ -137,8 +137,9 @@ const filterSupportFilesFromCoverage = (
 function fixSourcePaths(coverage) {
   Object.values(coverage).forEach((file) => {
     const { path: absolutePath, inputSourceMap } = file
+    if (!inputSourceMap) return
     const fileName = /([^\/\\]+)$/.exec(absolutePath)[1]
-    if (!inputSourceMap || !fileName) return
+    if (!fileName) return
 
     if (inputSourceMap.sourceRoot) inputSourceMap.sourceRoot = ''
     inputSourceMap.sources = inputSourceMap.sources.map((source) =>

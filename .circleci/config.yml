@@ -152,7 +152,7 @@ workflows:
                 - exclude-files
                 - frontend
                 - fullstack
-                - multiple-backend
+                - multiple-backends
                 - one-spec
                 - same-folder
                 - support-files
@@ -180,6 +180,7 @@ workflows:
             - test-exclude-files
             - test-frontend
             - test-fullstack
+            - test-multiple-backends
             - test-one-spec
             - test-same-folder
             - test-support-files

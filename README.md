@@ -214,6 +214,18 @@ if (global.__coverage__) {
 }
 ```
 
+Or if you have multiple servers from which you are wanting to gather code coverage, you can pass any array to `url as well:
+
+```json
+{
+  "env": {
+    "codeCoverage": {
+      "url": ["http://localhost:3000/__coverage__", "http://localhost:3001/__coverage__"]
+    }
+  }
+}
+```
+
 That should be enough - the code coverage from the server will be requested at the end of the test run and merged with the client-side code coverage, producing a combined report.
 
 ### expectBackendCoverageOnly

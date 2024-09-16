@@ -71,6 +71,10 @@ const registerHooks = () => {
       // because we don't control the cross-origin code, we can safely return
       let applicationSourceCoverage
       try {
+        // Note that we are purposefully not supporting the optional chaining syntax here to
+        // support a wide range of projects (some of which are not set up to support the optional
+        // chaining syntax due to current Cypress limitations). See:
+        // https://github.com/cypress-io/cypress/issues/20753 
         if (win) {
           applicationSourceCoverage = win.__coverage__
         }

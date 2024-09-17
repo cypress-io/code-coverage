@@ -82,8 +82,15 @@ const registerHooks = () => {
       // because we don't control the cross-origin code, we can safely return
       let applicationSourceCoverage
       try {
-        applicationSourceCoverage = win?.__coverage__
+        // Note that we are purposefully not supporting the optional chaining syntax here to
+        // support a wide range of projects (some of which are not set up to support the optional
+        // chaining syntax due to current Cypress limitations). See:
+        // https://github.com/cypress-io/cypress/issues/20753
+        if (win) {
+          applicationSourceCoverage = win.__coverage__
+        }
       } catch {}
+
       if (!applicationSourceCoverage) {
         return
       }
@@ -159,39 +166,49 @@ const registerHooks = () => {
       // we can only request server-side code coverage
       // if we are running end-to-end tests,
       // otherwise where do we send the request?
-      const url = Cypress._.get(
+      const captureUrls = Cypress._.get(
         Cypress.env('codeCoverage'),
         'url',
         '/__coverage__'
       )
-      cy.request({
-        url,
-        log: false,
-        failOnStatusCode: false
-      })
-        .then((r) => {
-          return Cypress._.get(r, 'body.coverage', null)
+      function captureCoverage(url, suffix = '') {
+        cy.request({
+          url,
+          log: false,
+          failOnStatusCode: false
         })
-        .then((coverage) => {
-          if (!coverage) {
-            // we did not get code coverage - this is the
-            // original failed request
-            const expectBackendCoverageOnly = Cypress._.get(
-              Cypress.env('codeCoverage'),
-              'expectBackendCoverageOnly',
-              false
-            )
-            if (expectBackendCoverageOnly) {
-              throw new Error(
-                `Expected to collect backend code coverage from ${url}`
+          .then((r) => {
+            return Cypress._.get(r, 'body.coverage', null)
+          })
+          .then((coverage) => {
+            if (!coverage) {
+              // we did not get code coverage - this is the
+              // original failed request
+              const expectBackendCoverageOnly = Cypress._.get(
+                Cypress.env('codeCoverage'),
+                'expectBackendCoverageOnly',
+                false
               )
-            } else {
-              // we did not really expect to collect the backend code coverage
-              return
+              if (expectBackendCoverageOnly) {
+                throw new Error(
+                  `Expected to collect backend code coverage from ${url}`
+                )
+              } else {
+                // we did not really expect to collect the backend code coverage
+                return
+              }
             }
-          }
-          sendCoverage(coverage, 'backend')
-        })
+            sendCoverage(coverage, `backend${suffix}`)
+          })
+      }
+
+      if (Array.isArray(captureUrls)) {
+        for (const [index, url] of captureUrls.entries()) {
+          captureCoverage(url, `_${index}`)
+        }
+      } else {
+        captureCoverage(captureUrls)
+      }
     }
   })
 

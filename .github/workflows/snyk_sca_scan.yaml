@@ -26,6 +26,6 @@ jobs:
       - name: Perform SCA Scan
         continue-on-error: false
         run: |
-          snyk test --all-projects --detection-depth=4 --exclude=docker,Dockerfile --severity-threshold=critical
+          snyk test --all-projects --detection-depth=4 --exclude=docker,Dockerfile,test-apps --severity-threshold=critical
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_API_TOKEN }}

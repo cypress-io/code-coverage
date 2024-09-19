@@ -9,7 +9,7 @@ jobs:
   lint:
     description: Checks the code formatting
     docker:
-      - image: cimg/node:20.9.0
+      - image: cimg/node:22.8.0
         environment:
           # we don't need Cypress to check code style
           CYPRESS_INSTALL_BINARY: '0'
@@ -40,11 +40,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install node 16
-          command: nvm install 16.16.0
+          name: Install node 20
+          command: nvm install 20.12.1
       - run:
-          name: Use node 16
-          command: nvm use 16.16.0
+          name: Use node 20
+          command: nvm use 20.12.1
       - run:
           name: Install deps for code coverage
           command: npm ci
@@ -71,7 +71,7 @@ jobs:
   publish:
     description: Publishes the new version of the plugin to NPM
     docker:
-      - image: cimg/node:20.9.0
+      - image: cimg/node:22.8.0
     environment:
       # we don't need Cypress to do the release
       CYPRESS_INSTALL_BINARY: '0'
@@ -152,6 +152,7 @@ workflows:
                 - exclude-files
                 - frontend
                 - fullstack
+                - multiple-backends
                 - one-spec
                 - same-folder
                 - support-files
@@ -179,6 +180,7 @@ workflows:
             - test-exclude-files
             - test-frontend
             - test-fullstack
+            - test-multiple-backends
             - test-one-spec
             - test-same-folder
             - test-support-files

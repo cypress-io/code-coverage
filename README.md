@@ -549,13 +549,20 @@ Deeply nested objects will sometimes have `[object Object]` values printed. You 
 DEBUG_DEPTH=10 DEBUG=code-coverage npm run dev
 ```
 
-### Common issues
+## Common issues
 
 Common issue: [not instrumenting your application when running Cypress](#instrument-your-application).
 
 If the plugin worked before in version X but stopped after upgrading to version Y, please try the [released versions](https://github.com/cypress-io/code-coverage/releases) between X and Y to see where the breaking change was.
 
 If you decide to open an issue in this repository, please fill in all information the [issue template](https://github.com/cypress-io/code-coverage/blob/master/.github/ISSUE_TEMPLATE/bug_report.md) asks for. The issues most likely to be resolved have debug logs, screenshots, and hopefully public repository links so we can try running the tests ourselves.
+
+### Coverage reporting timeouts
+
+If the plugin times out when sending coverage report data to be merged, this may be due to a very large
+report being sent across processes. You can batch the report by setting the `sendCoverageBatchSize` environment
+variable in your `cypress.config.js` file's 'env' section. Assign the variable an integer value representing
+the number of report keys to send per batch.
 
 ## Contributing
 

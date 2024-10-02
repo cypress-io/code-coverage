@@ -1,0 +1,21 @@
+{
+  "name": "example-all-files",
+  "description": "Report all files",
+  "private": true,
+  "scripts": {
+    "cy:run": "cypress run",
+    "start": "parcel serve index.html",
+    "start:windows": "npx bin-up parcel serve index.html",
+    "pretest": "rimraf .nyc_output .cache coverage dist",
+    "test": "DEBUG=code-coverage DEBUG_DEPTH=10 start-test 1234 cy:run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "check-coverage main.js second.js third.js cypress.config.js --from coverage/coverage-final.json"
+  },
+  "nyc": {
+    "all": true,
+    "include": "*.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.15"
+  }
+}

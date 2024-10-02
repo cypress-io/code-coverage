@@ -3,7 +3,10 @@
 
 const dayjs = require('dayjs')
 var duration = require('dayjs/plugin/duration')
-const { filterFilesFromCoverage } = require('./support-utils')
+const {
+  filterFilesFromCoverage,
+  getSendCoverageBatchSize
+} = require('./support-utils')
 
 dayjs.extend(duration)
 
@@ -16,10 +19,37 @@ const sendCoverage = (coverage, pathname = '/') => {
 
   const totalCoverage = filterFilesFromCoverage(coverage)
 
-  // stringify coverage object for speed
-  cy.task('combineCoverage', JSON.stringify(totalCoverage), {
-    log: false
-  })
+  const envBatchSize = getSendCoverageBatchSize()
+  const keys = Object.keys(totalCoverage)
+
+  if (envBatchSize && envBatchSize < keys.length) {
+    sendBatchCoverage(totalCoverage, envBatchSize)
+  } else {
+    cy.task('combineCoverage', JSON.stringify(totalCoverage), {
+      log: false
+    })
+  }
+}
+
+/**
+ * Sends collected code coverage object to the backend code
+ * in batches via "cy.task".
+ */
+const sendBatchCoverage = (totalCoverage, batchSize) => {
+  const keys = Object.keys(totalCoverage)
+
+  for (let i = 0; i < keys.length; i += batchSize) {
+    const batchKeys = keys.slice(i, i + batchSize)
+    const batchCoverage = {}
+
+    batchKeys.forEach((key) => {
+      batchCoverage[key] = totalCoverage[key]
+    })
+
+    cy.task('combineCoverage', JSON.stringify(batchCoverage), {
+      log: false
+    })
+  }
 }
 
 /**

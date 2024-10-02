@@ -148,7 +148,19 @@ function fixSourcePaths(coverage) {
   })
 }
 
+/**
+ * Validates and returns the configured batch size for
+ * sending coverage to the backend
+ */
+function getSendCoverageBatchSize() {
+  const batchSize = Cypress.env('sendCoverageBatchSize')
+  const parsedBatchSize = parseInt(batchSize)
+  const isValid = !isNaN(parsedBatchSize) && parsedBatchSize > 0
+  return isValid ? parsedBatchSize : null
+}
+
 module.exports = {
   fixSourcePaths,
-  filterFilesFromCoverage
+  filterFilesFromCoverage,
+  getSendCoverageBatchSize
 }

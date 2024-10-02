@@ -1,0 +1,1 @@
+window.numsTimesTwo = nums => nums.map(n => n * 2)

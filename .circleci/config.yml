@@ -146,6 +146,7 @@ workflows:
               jobname:
                 - all-files
                 - backend
+                - batch-send-coverage
                 - before-all-visit
                 - before-each-visit
                 - cra-e2e-and-ct
@@ -174,6 +175,7 @@ workflows:
             - test-code-coverage-plugin
             - test-all-files
             - test-backend
+            - test-batch-send-coverage
             - test-before-all-visit
             - test-before-each-visit
             - test-cra-e2e-and-ct

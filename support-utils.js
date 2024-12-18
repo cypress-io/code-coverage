@@ -141,10 +141,12 @@ function fixSourcePaths(coverage) {
     const fileName = /([^\/\\]+)$/.exec(absolutePath)[1]
     if (!fileName) return
 
-    if (inputSourceMap.sourceRoot) inputSourceMap.sourceRoot = ''
     inputSourceMap.sources = inputSourceMap.sources.map((source) =>
-      source.includes(fileName) ? absolutePath : source
+      source.includes(fileName)
+        ? absolutePath
+        : `${inputSourceMap.sourceRoot}/${source}`
     )
+    if (inputSourceMap.sourceRoot) inputSourceMap.sourceRoot = ''
   })
 }
 

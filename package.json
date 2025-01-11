@@ -80,6 +80,6 @@
     "serve": "14.2.4",
     "start-server-and-test": "2.0.9",
     "webpack": "^5.68.0",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^6.0.0"
   }
 }

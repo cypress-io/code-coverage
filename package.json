@@ -78,7 +78,7 @@
     "rimraf": "6.0.1",
     "semantic-release": "17.4.7",
     "serve": "14.2.4",
-    "start-server-and-test": "2.0.9",
+    "start-server-and-test": "2.0.10",
     "webpack": "^5.68.0",
     "webpack-cli": "^5.1.4"
   }

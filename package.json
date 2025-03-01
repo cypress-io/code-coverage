@@ -20,7 +20,7 @@
   "peerDependencies": {
     "@babel/core": "^7.0.1",
     "@babel/preset-env": "^7.0.0",
-    "babel-loader": "^8.3 || ^9",
+    "babel-loader": "^8.3 || ^9 || ^10.0.0",
     "cypress": "*",
     "webpack": "^4 || ^5"
   },
@@ -65,7 +65,7 @@
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.11",
     "@cypress/code-coverage": "file:.",
-    "babel-loader": "^9.1.3",
+    "babel-loader": "^10.0.0",
     "babel-plugin-istanbul": "6.1.1",
     "check-code-coverage": "1.10.5",
     "console-log-div": "0.6.3",

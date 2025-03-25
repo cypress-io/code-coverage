@@ -251,6 +251,21 @@ After:
 
 ![Cypress knows to expect the backend code coverage only](./images/expect-backend.png)
 
+### expectFrontendCoverageOnly
+
+If there is ONLY frontend code coverage, set `expectFrontendCoverageOnly: true` in the `cypress.json` file. Otherwise, Cypress complains that it cannot find the frontend code coverage.
+
+```json
+{
+  "env": {
+    "codeCoverage": {
+      "url": "http://localhost:3003/__coverage__",
+      "expectFrontendCoverageOnly": true
+    }
+  }
+}
+```
+
 ## Custom report folder
 
 You can specify a custom report folder by adding `nyc` object to the `package.json` file. For example, to save reports to `cypress-coverage` folder, use:

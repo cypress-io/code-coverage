@@ -2,7 +2,6 @@
   "name": "@cypress/code-coverage",
   "version": "0.0.0-development",
   "description": "Saves the code coverage collected during Cypress tests",
-  "main": "index.js",
   "scripts": {
     "start": "parcel serve cypress/index.html",
     "coverage:verify": "npx nyc report --check-coverage true --lines 80",
@@ -23,6 +22,24 @@
     "babel-loader": "^8.3 || ^9",
     "cypress": "*",
     "webpack": "^4 || ^5"
+  },
+  "exports": {
+    "./common-utils": "./common-utils.js",
+    "./cypress-config": "./cypress-config.js",
+    "./middleware/express": "./middleware/express.js",
+    "./middleware/hapi": "./middleware/hapi.js",
+    "./middleware/nextjs": "./middleware/nextjs.js",
+    "./package.json": "./package.json",
+    "./plugins": "./plugins.js",
+    "./support-utils": "./support-utils.js",
+    "./support": "./support.js",
+    "./task-utils": "./task-utils.js",
+    "./task": {
+      "types": "./task.d.ts",
+      "default": "./task.js"
+    },
+    "./use-babelrc": "./use-babelrc.js",
+    "./*.js": "./*.js"
   },
   "repository": {
     "type": "git",

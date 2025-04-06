@@ -278,6 +278,17 @@ You can specify a custom report folder by adding `nyc` object to the `package.js
 }
 ```
 
+In cases, the report folder needs to be set programmatically or outside the root folder config, you can specify it in the plugins. You can modify `reportDir` in the config when passing it to the code-coverage task.
+
+```js
+module.exports = (on, config) => {
+  config.reportDir = 'reports/cypress-report'
+  require('@cypress/code-coverage/task')(on, config)
+  return config
+}
+```
+
+
 ## Custom reporters
 
 You can specify custom coverage reporter(s) to use. For example, to output text summary and save JSON report in the `cypress-coverage` folder set in your `package.json` folder:

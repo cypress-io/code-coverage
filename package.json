@@ -20,7 +20,7 @@
   "peerDependencies": {
     "@babel/core": "^7.0.1",
     "@babel/preset-env": "^7.0.0",
-    "babel-loader": "^8.3 || ^9",
+    "babel-loader": "^8.3 || ^9 || ^10",
     "cypress": "*",
     "webpack": "^4 || ^5"
   },

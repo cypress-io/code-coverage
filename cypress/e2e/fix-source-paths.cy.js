@@ -24,7 +24,7 @@ describe('fixSourcePaths', () => {
       '/absolute/src/component.vue': {
         path: '/absolute/src/component.vue',
         inputSourceMap: {
-          sources: ['/absolute/src/component.vue', 'otherFile.js'],
+          sources: ['/absolute/src/component.vue', 'src/otherFile.js'],
           sourceRoot: ''
         }
       },

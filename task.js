@@ -65,7 +65,7 @@ let coverageMap = (() => {
   return istanbul.createCoverageMap(previousCoverage)
 })()
 
-function saveCoverage(coverage) {
+function saveCoverage(coverage = coverageMap) {
   if (!existsSync(nycReportOptions.tempDir)) {
     mkdirSync(nycReportOptions.tempDir, { recursive: true })
     debug('created folder %s for output coverage', nycReportOptions.tempDir)

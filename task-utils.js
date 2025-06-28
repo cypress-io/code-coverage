@@ -72,8 +72,26 @@ function readNycOptions(workingDirectory) {
     }
   }
 
+  let nycConfigEnvVariables = {}
+  if (process.env.NYC_CONFIG) {
+    try {
+      nycConfigEnvVariables = JSON.parse(process.env.NYC_CONFIG)
+      if (
+        nycConfigEnvVariables === null ||
+        typeof nycConfigEnvVariables !== 'object'
+      ) {
+        throw new Error(
+          'NYC_CONFIG environment configuration is set, but it is not an object as expected'
+        )
+      }
+    } catch (error) {
+      throw new Error(`Failed to load environment NYC_CONFIG: ${error.message}`)
+    }
+  }
+
   const nycOptions = combineNycOptions(
     defaultNycOptions,
+    nycConfigEnvVariables,
     nycrc,
     nycrcJson,
     nycrcYaml,
@@ -82,6 +100,7 @@ function readNycOptions(workingDirectory) {
     nycConfigCommonJs,
     pkgNycOptions
   )
+
   debug('combined NYC options %o', nycOptions)
 
   return nycOptions

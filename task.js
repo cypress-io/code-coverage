@@ -30,7 +30,7 @@ const scripts = pkg.scripts || {}
 const DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME = 'coverage:report'
 const customNycReportScript = scripts[DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME]
 
-const nycReportOptions = (function getNycOption() {
+const nycReportOptions = (function getNycOption(a) {
   // https://github.com/istanbuljs/nyc#common-configuration-options
   const nycReportOptions = readNycOptions(processWorkingDirectory)
 
@@ -115,7 +115,7 @@ function maybePrintFinalCoverageFiles(folder) {
   })
 }
 
-const tasks = {
+const createTasks = (config) => ({
   /**
    * Clears accumulated code coverage information.
    *
@@ -200,10 +200,15 @@ const tasks = {
     debug('calling NYC reporter with options %o', nycReportOptions)
     debug('current working directory is %s', process.cwd())
     const NYC = require('nyc')
-    const nyc = new NYC(nycReportOptions)
+    const nyc = new NYC({
+      ...nycReportOptions,
+      reportDir: config.reportDir
+        ? config.reportDir
+        : nycReportOptions.reportDir
+    })
 
     const returnReportFolder = () => {
-      const reportFolder = nycReportOptions['report-dir']
+      const reportFolder = config.reportDir || nycReportOptions['report-dir']
       debug(
         'after reporting, returning the report folder name %s',
         reportFolder
@@ -215,7 +220,7 @@ const tasks = {
     }
     return nyc.report().then(returnReportFolder)
   }
-}
+})
 
 /**
  * Registers code coverage collection and reporting tasks.
@@ -233,7 +238,7 @@ const tasks = {
   ```
 */
 function registerCodeCoverageTasks(on, config) {
-  on('task', tasks)
+  on('task', createTasks(config))
 
   // set a variable to let the hooks running in the browser
   // know that they can send coverage commands

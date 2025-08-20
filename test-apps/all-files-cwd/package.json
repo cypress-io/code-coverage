@@ -8,7 +8,7 @@
     "start:windows": "npx bin-up parcel serve ../all-files/index.html",
     "pretest": "rimraf .nyc_output .cache coverage dist",
     "test": "start-test 1234 cy:run",
-    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:verify": "npx nyc report --temp-dir ../all-files-cwd/.nyc_output --check-coverage true --lines 100",
     "coverage:check-files": "check-coverage main.js && check-coverage second.js && check-coverage not-covered.js && check-coverage cypress.config.js && only-covered --from coverage/coverage-final.json main.js second.js not-covered.js cypress.config.js"
   },
   "nyc": {

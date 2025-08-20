@@ -14,8 +14,6 @@
   "nyc": {
     "all": true,
     "cwd": "../all-files",
-    "temp-dir": ".nyc_output",
-    "report-dir": "cypress-coverage",
     "include": "*.js"
   },
   "devDependencies": {

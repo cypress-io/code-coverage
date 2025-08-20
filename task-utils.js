@@ -293,6 +293,7 @@ function tryFindingLocalFiles(nycFilename) {
 function findSourceFiles(nycOptions) {
   debug('include all files options: %o', {
     all: nycOptions.all,
+    cwd: nycOptions.cwd,
     include: nycOptions.include,
     exclude: nycOptions.exclude,
     extension: nycOptions.extension
@@ -330,7 +331,12 @@ function findSourceFiles(nycOptions) {
 
   debug('searching files to include using patterns %o', patterns)
 
-  const allFiles = globby.sync(patterns, { absolute: true })
+  const globbyOptions = { absolute: true }
+  if (nycOptions.cwd) {
+    globbyOptions.cwd = nycOptions.cwd
+  }
+  const allFiles = globby.sync(patterns, globbyOptions)
+  
   return allFiles
 }
 /**

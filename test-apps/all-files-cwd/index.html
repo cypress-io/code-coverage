@@ -1,0 +1,17 @@
+<body>
+  Page body
+  <script src="main.js"></script>
+  <script src="second.js"></script>
+  <script>
+    // use functions creates in "main.js"
+    if (add(2, 3) !== 5) {
+      throw new Error('wrong addition')
+    }
+    if (sub(2, 3) !== -1) {
+      throw new Error('wrong subtraction')
+    }
+    if (reverse('foo') !== 'oof') {
+      throw new Error('wrong string reverse')
+    }
+  </script>
+</body>

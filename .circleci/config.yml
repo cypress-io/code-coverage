@@ -175,6 +175,7 @@ workflows:
             - lint
             - test-code-coverage-plugin
             - test-all-files
+            - test-all-files-cwd
             - test-backend
             - test-batch-send-coverage
             - test-before-all-visit

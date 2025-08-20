@@ -336,7 +336,7 @@ function findSourceFiles(nycOptions) {
     globbyOptions.cwd = nycOptions.cwd
   }
   const allFiles = globby.sync(patterns, globbyOptions)
-  
+
   return allFiles
 }
 /**

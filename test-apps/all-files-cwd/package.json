@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "cy:run": "cypress run",
-    "start": "parcel serve index.html",
-    "start:windows": "npx bin-up parcel serve index.html",
+    "start": "parcel serve ../all-files/index.html",
+    "start:windows": "npx bin-up parcel serve ../all-files/index.html",
     "pretest": "rimraf .nyc_output .cache coverage dist",
     "test": "start-test 1234 cy:run",
     "coverage:verify": "npx nyc report --check-coverage true --lines 100",

@@ -145,6 +145,7 @@ workflows:
             parameters:
               jobname:
                 - all-files
+                - all-files-cwd
                 - backend
                 - batch-send-coverage
                 - before-all-visit
@@ -174,6 +175,7 @@ workflows:
             - lint
             - test-code-coverage-plugin
             - test-all-files
+            - test-all-files-cwd
             - test-backend
             - test-batch-send-coverage
             - test-before-all-visit

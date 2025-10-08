@@ -7,7 +7,7 @@ const { readFileSync, writeFileSync, existsSync } = require('fs')
 const { isAbsolute, resolve, join } = require('path')
 const debug = require('debug')('code-coverage')
 const chalk = require('chalk')
-const globby = require('globby')
+const tinyglobby = require('tinyglobby')
 const yaml = require('js-yaml')
 const {
   combineNycOptions,
@@ -330,7 +330,7 @@ function findSourceFiles(nycOptions) {
 
   debug('searching files to include using patterns %o', patterns)
 
-  const allFiles = globby.sync(patterns, { absolute: true })
+  const allFiles = tinyglobby.globSync(patterns, { absolute: true })
   return allFiles
 }
 /**

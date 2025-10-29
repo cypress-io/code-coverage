@@ -163,6 +163,7 @@ workflows:
                 - redirect
       - windows_test
       - publish:
+          context: org-npm-credentials
           filters:
             branches:
               only:

@@ -202,11 +202,11 @@ if (global.__coverage__) {
 }
 ```
 
-3. Save the API coverage endpoint in the `cypress.json` file to let the plugin know where to call to receive the code coverage data from the server. Place it in `env.codeCoverage` object:
+3. Save the API coverage endpoint in the `cypress.json` file to let the plugin know where to call to receive the code coverage data from the server. Place it in `expose.codeCoverage` object:
 
 ```json
 {
-  "env": {
+  "expose": {
     "codeCoverage": {
       "url": "http://localhost:3000/__coverage__"
     }
@@ -218,7 +218,7 @@ Or if you have multiple servers from which you are wanting to gather code covera
 
 ```json
 {
-  "env": {
+  "expose": {
     "codeCoverage": {
       "url": ["http://localhost:3000/__coverage__", "http://localhost:3001/__coverage__"]
     }
@@ -373,7 +373,7 @@ The code coverage plugin will automatically exclude any test/spec files you have
 
 ```javascript
 // cypress.config.js or cypress.json
-env: {
+expose: {
   codeCoverage: {
     exclude: ['cypress/**/*.*'],
   },
@@ -405,16 +405,14 @@ You can skip the client-side code coverage hooks by setting the environment vari
 
 ```shell
 # tell Cypress to set environment variable "coverage" to false
-cypress run --env coverage=false
-# or pass the environment variable
-CYPRESS_COVERAGE=false cypress run
+cypress run --expose coverage=false
 ```
 
 Or set it to `false` in the `cypress.json` file.
 
 ```json
 {
-  "env": {
+  "expose": {
     "coverage": false
   }
 }
@@ -478,6 +476,40 @@ Look up the list of examples under the GitHub topic [cypress-code-coverage-examp
 - [nefayran/cypress-react-vite](https://github.com/nefayran/cypress-react-vite) React with Vite and Istanbul plugin for code coverage.
 
 ## Migrations
+
+### `@cypress/code-coverage` 3.x to 4.x
+
+`Cypress.env()` was deprecated in Cypress v15.10.0, and will be removed in Cypress 16. This necessitates a breaking change to how you configure `@cypress/code-coverage`.
+
+```js
+// BEFORE
+// Configure in the `env` key in your Cypress config:
+const { defineConfig } = require('cypress')
+
+module.exports = defineConfig({
+  env: {
+    codeCoverage: {
+      url: 'http://localhost:1234/__coverage__',
+      exclude: 'cypress/**/*.*'
+    }
+  }
+})
+```
+
+```js
+// AFTER
+// Configure in the `expose` key in your Cypress config:
+const { defineConfig } = require('cypress')
+
+module.exports = defineConfig({
+  expose: {
+    codeCoverage: {
+      url: 'http://localhost:1234/__coverage__',
+      exclude: 'cypress/**/*.*'
+    }
+  }
+})
+```
 
 ### Cypress v9 to v10
 

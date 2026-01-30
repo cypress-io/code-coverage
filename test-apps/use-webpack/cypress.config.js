@@ -1,6 +1,7 @@
 const { defineConfig } = require('cypress')
 
 module.exports = defineConfig({
+  allowCypressEnv: false,
   fixturesFolder: false,
   viewportHeight: 400,
   viewportWidth: 400,
@@ -9,7 +10,7 @@ module.exports = defineConfig({
       return require('./cypress/plugins/index.js')(on, config)
     },
     baseUrl: 'http://localhost:1234',
-    env: {
+    expose: {
       codeCoverage: {
         exclude: ['cypress/**/*.*']
       }

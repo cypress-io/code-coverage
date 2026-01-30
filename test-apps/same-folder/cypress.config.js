@@ -1,6 +1,7 @@
 const { defineConfig } = require('cypress')
 
 module.exports = defineConfig({
+  allowCypressEnv: false,
   e2e: {
     setupNodeEvents(on, config) {
       return require('./plugins.js')(on, config)
@@ -8,7 +9,7 @@ module.exports = defineConfig({
     specPattern: './**/spec.js',
     supportFile: 'support.js',
     baseUrl: 'http://localhost:1234',
-    env: {
+    expose: {
       codeCoverage: {
         exclude: ['spec.js', 'support.js']
       }

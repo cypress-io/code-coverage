@@ -151,7 +151,7 @@ const registerHooks = () => {
         logMessage(`👉 Only found unit test code coverage.`)
       } else {
         const expectBackendCoverageOnly = Cypress._.get(
-          Cypress.env('codeCoverage'),
+          Cypress.expose('codeCoverage'),
           'expectBackendCoverageOnly',
           false
         )
@@ -179,7 +179,7 @@ const registerHooks = () => {
     // @ts-ignore
     const runningEndToEndTests = baseUrl !== Cypress.config('proxyUrl')
     const expectFrontendCoverageOnly = Cypress._.get(
-      Cypress.env('codeCoverage'),
+      Cypress.expose('codeCoverage'),
       'expectFrontendCoverageOnly',
       false
     )
@@ -195,7 +195,7 @@ const registerHooks = () => {
       // if we are running end-to-end tests,
       // otherwise where do we send the request?
       const captureUrls = Cypress._.get(
-        Cypress.env('codeCoverage'),
+        Cypress.expose('codeCoverage'),
         'url',
         '/__coverage__'
       )
@@ -213,7 +213,7 @@ const registerHooks = () => {
               // we did not get code coverage - this is the
               // original failed request
               const expectBackendCoverageOnly = Cypress._.get(
-                Cypress.env('codeCoverage'),
+                Cypress.expose('codeCoverage'),
                 'expectBackendCoverageOnly',
                 false
               )
@@ -281,13 +281,13 @@ const registerHooks = () => {
 // see https://on.cypress.io/environment-variables
 
 // to avoid "coverage" env variable being case-sensitive, convert to lowercase
-const cyEnvs = Cypress._.mapKeys(Cypress.env(), (value, key) =>
+const cyEnvs = Cypress._.mapKeys(Cypress.expose(), (value, key) =>
   key.toLowerCase()
 )
 
 if (cyEnvs.coverage === false) {
   console.log('Skipping code coverage hooks')
-} else if (Cypress.env('codeCoverageTasksRegistered') !== true) {
+} else if (Cypress.expose('codeCoverageTasksRegistered') !== true) {
   // register a hook just to log a message
   before(() => {
     logMessage(`

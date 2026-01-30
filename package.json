@@ -11,17 +11,18 @@
     "semantic-release": "semantic-release",
     "test": "start-test 1234 'npx cypress run'",
     "report:coverage": "nyc report --reporter=html",
-    "dev:no:coverage": "start-test 1234 'cypress open --env coverage=false'",
+    "dev:no:coverage": "start-test 1234 'cypress open --expose coverage=false'",
     "format": "prettier --write '*.js'",
     "format:check": "prettier --check '*.js'",
     "check:markdown": "find *.md -exec npx markdown-link-check {} \\;",
-    "effective:config": "circleci config process .circleci/config.yml | sed /^#/d"
+    "effective:config": "circleci config process .circleci/config.yml | sed /^#/d",
+    "apps:test:coverage:verify": "./scripts/test-apps-and-verify-coverage.sh"
   },
   "peerDependencies": {
     "@babel/core": "^7.0.1",
     "@babel/preset-env": "^7.0.0",
     "babel-loader": "^8.3 || ^9 || ^10",
-    "cypress": "*",
+    "cypress": ">=15.10.0",
     "webpack": "^4 || ^5"
   },
   "repository": {
@@ -69,7 +70,7 @@
     "babel-plugin-istanbul": "6.1.1",
     "check-code-coverage": "1.10.5",
     "console-log-div": "0.6.3",
-    "cypress": "^13.1.0",
+    "cypress": "https://cdn.cypress.io/beta/npm/15.10.0/darwin-arm64/develop-88d148fbc5bfab8ce24d65f9c2f78652d38c1396/cypress.tgz",
     "express": "^4.18.2",
     "lodash": "4.17.21",
     "markdown-link-check": "3.13.6",
@@ -81,5 +82,6 @@
     "start-server-and-test": "2.0.12",
     "webpack": "^5.68.0",
     "webpack-cli": "^5.1.4"
-  }
+  },
+  "packageManager": "pnpm@8.4.0+sha1.73c608c602d520c436c7b250330315d83ffcc1ee"
 }

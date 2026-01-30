@@ -8,5 +8,8 @@
     "test": "start-test 1234 cy:run",
     "coverage:verify": "npx nyc report --check-coverage true --lines 100",
     "coverage:check-files": "check-coverage app.js && check-coverage about.js && check-coverage unit.js && only-covered app.js about.js unit.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.6"
   }
 }

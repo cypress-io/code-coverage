@@ -237,7 +237,7 @@ function registerCodeCoverageTasks(on, config) {
 
   // set a variable to let the hooks running in the browser
   // know that they can send coverage commands
-  config.env.codeCoverageTasksRegistered = true
+  config.expose.codeCoverageTasksRegistered = true
 
   return config
 }

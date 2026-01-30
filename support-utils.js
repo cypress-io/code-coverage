@@ -6,7 +6,7 @@
 const filterFilesFromCoverage = (
   totalCoverage,
   config = Cypress.config,
-  env = Cypress.env,
+  env = Cypress.expose,
   spec = Cypress.spec
 ) => {
   const withoutSpecs = filterSpecsFromCoverage(totalCoverage, config, env, spec)
@@ -21,7 +21,7 @@ const filterFilesFromCoverage = (
 const filterSpecsFromCoverage = (
   totalCoverage,
   config = Cypress.config,
-  env = Cypress.env,
+  env = Cypress.expose,
   spec = Cypress.spec
 ) => {
   const testFilePatterns = getCypressExcludePatterns(config, env, spec)
@@ -153,7 +153,7 @@ function fixSourcePaths(coverage) {
  * sending coverage to the backend
  */
 function getSendCoverageBatchSize() {
-  const batchSize = Cypress.env('sendCoverageBatchSize')
+  const batchSize = Cypress.expose('sendCoverageBatchSize')
   const parsedBatchSize = parseInt(batchSize)
   const isValid = !isNaN(parsedBatchSize) && parsedBatchSize > 0
   return isValid ? parsedBatchSize : null

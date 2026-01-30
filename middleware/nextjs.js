@@ -6,10 +6,10 @@
   ```
   // in your pages/api/coverage.js
   module.exports = require('@cypress/code-coverage/middleware/nextjs')
-  // then add to your cypress.json an environment variable pointing at the API
+  // then add an exposed config variable that points to the API to your cypress.json
   {
     "baseUrl": "http://localhost:3000",
-    "env": {
+    "expose": {
       "codeCoverage": {
         "url": "/api/coverage"
       }

@@ -6,7 +6,7 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TEST_APPS_DIR="$SCRIPT_DIR/test-apps"
+TEST_APPS_DIR="$SCRIPT_DIR/../test-apps"
 
 # Dynamically find test apps (directories with package.json containing a test script)
 TEST_APPS=()
@@ -46,9 +46,9 @@ for app in "${TEST_APPS[@]}"; do
   
   cd "$APP_DIR"
 
-  npm i
+  npm install
   
-  if npm test && npm run coverage:verify && npm run coverage:check-files; then
+  if npm run test && npm run coverage:verify && npm run coverage:check-files; then
     echo -e "${GREEN}✓ PASSED: $app${NC}"
     PASSED+=("$app")
   else

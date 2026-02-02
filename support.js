@@ -19,11 +19,11 @@ const sendCoverage = (coverage, pathname = '/') => {
 
   const totalCoverage = filterFilesFromCoverage(coverage)
 
-  const envBatchSize = getSendCoverageBatchSize()
+  const batchSize = getSendCoverageBatchSize()
   const keys = Object.keys(totalCoverage)
 
-  if (envBatchSize && envBatchSize < keys.length) {
-    sendBatchCoverage(totalCoverage, envBatchSize)
+  if (batchSize && batchSize < keys.length) {
+    sendBatchCoverage(totalCoverage, batchSize)
   } else {
     cy.task('combineCoverage', JSON.stringify(totalCoverage), {
       log: false
@@ -274,18 +274,16 @@ const registerHooks = () => {
 }
 
 // to disable code coverage commands and save time
-// pass environment variable coverage=false
-//  cypress run --env coverage=false
-// or
-//  CYPRESS_COVERAGE=false cypress run
+// pass exposed variable coverage=false
+//  cypress run --expose coverage=false
 // see https://on.cypress.io/environment-variables
 
-// to avoid "coverage" env variable being case-sensitive, convert to lowercase
-const cyEnvs = Cypress._.mapKeys(Cypress.expose(), (value, key) =>
-  key.toLowerCase()
+// to avoid "coverage" variable being case-sensitive, convert to lowercase
+const exposedValues = Object.fromEntries(
+  Object.entries(Cypress.expose()).map(([key, value]) => [key.toLowerCase(), value])
 )
 
-if (cyEnvs.coverage === false) {
+if (exposedValues.coverage === false) {
   console.log('Skipping code coverage hooks')
 } else if (Cypress.expose('codeCoverageTasksRegistered') !== true) {
   // register a hook just to log a message

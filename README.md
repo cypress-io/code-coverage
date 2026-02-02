@@ -30,7 +30,7 @@ module.exports = defineConfig({
       // include any other plugin code...
 
       // It's IMPORTANT to return the config object
-      // with any changed environment variables
+      // with any changes
       return config
     },
   },
@@ -240,7 +240,7 @@ After:
 
 ```json
 {
-  "env": {
+  "expose": {
     "codeCoverage": {
       "url": "http://localhost:3003/__coverage__",
       "expectBackendCoverageOnly": true
@@ -257,7 +257,7 @@ If there is ONLY frontend code coverage, set `expectFrontendCoverageOnly: true` 
 
 ```json
 {
-  "env": {
+  "expose": {
     "codeCoverage": {
       "url": "http://localhost:3003/__coverage__",
       "expectFrontendCoverageOnly": true
@@ -369,7 +369,7 @@ switch (foo) {
 
 ### Exclude files and folders
 
-The code coverage plugin will automatically exclude any test/spec files you have defined in the `testFiles` (Cypress < v10) or `specPattern` (Cypress >= v10) configuration options. Additionally, you can set the `exclude` pattern glob in the code coverage environment variable to specify additional files to be excluded:
+The code coverage plugin will automatically exclude any test/spec files you have defined in the `testFiles` (Cypress < v10) or `specPattern` (Cypress >= v10) configuration options. Additionally, you can set the `exclude` pattern glob in the code coverage configuration key to specify additional files to be excluded:
 
 ```javascript
 // cypress.config.js or cypress.json
@@ -401,10 +401,10 @@ Another important option is `excludeAfterRemap`. By default, it is false, which 
 
 ## Disable plugin
 
-You can skip the client-side code coverage hooks by setting the environment variable `coverage` to `false`.
+You can skip the client-side code coverage hooks by setting the exposed `coverage` value to `false`.
 
 ```shell
-# tell Cypress to set environment variable "coverage" to false
+# tell Cypress to set the exposed variable "coverage" to false
 cypress run --expose coverage=false
 ```
 
@@ -525,7 +525,7 @@ module.exports = (on, config) => {
   // add other tasks to be registered here
 
   // IMPORTANT to return the config object
-  // with the any changed environment variables
+  // with the any changes
   return config
 }
 ```
@@ -544,7 +544,7 @@ module.exports = defineConfig({
       // include any other plugin code...
 
       // It's IMPORTANT to return the config object
-      // with any changed environment variables
+      // with any changes
       return config
     },
   },
@@ -564,7 +564,7 @@ module.exports = (on, config) => {
 module.exports = (on, config) => {
   require('@cypress/code-coverage/task')(on, config)
   // IMPORTANT to return the config object
-  // with the any changed environment variables
+  // with the any changes
   return config
 }
 ```
@@ -607,8 +607,7 @@ If you decide to open an issue in this repository, please fill in all informatio
 ### Coverage reporting timeouts
 
 If the plugin times out when sending coverage report data to be merged, this may be due to a very large
-report being sent across processes. You can batch the report by setting the `sendCoverageBatchSize` environment
-variable in your `cypress.config.js` file's 'env' section. Assign the variable an integer value representing
+report being sent across processes. You can batch the report by setting the `sendCoverageBatchSize` in your `cypress.config.js` file's 'expose' section. Assign the variable an integer value representing
 the number of report keys to send per batch.
 
 ## Contributing

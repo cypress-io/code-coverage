@@ -6,10 +6,10 @@
 const filterFilesFromCoverage = (
   totalCoverage,
   config = Cypress.config,
-  env = Cypress.expose,
+  expose = Cypress.expose,
   spec = Cypress.spec
 ) => {
-  const withoutSpecs = filterSpecsFromCoverage(totalCoverage, config, env, spec)
+  const withoutSpecs = filterSpecsFromCoverage(totalCoverage, config, expose, spec)
   const appCoverageOnly = filterSupportFilesFromCoverage(withoutSpecs, config)
   return appCoverageOnly
 }
@@ -21,10 +21,10 @@ const filterFilesFromCoverage = (
 const filterSpecsFromCoverage = (
   totalCoverage,
   config = Cypress.config,
-  env = Cypress.expose,
+  expose = Cypress.expose,
   spec = Cypress.spec
 ) => {
-  const testFilePatterns = getCypressExcludePatterns(config, env, spec)
+  const testFilePatterns = getCypressExcludePatterns(config, expose, spec)
 
   const isTestFile = (_, filePath) => {
     const workingDir = spec.absolute.replace(spec.relative, '')
@@ -45,14 +45,14 @@ const filterSpecsFromCoverage = (
 /**
  * Reads Cypress config and exclude patterns and combines them into one array
  * @param {*} config
- * @param {*} env
+ * @param {*} expose
  * @returns string[]
  */
-function getCypressExcludePatterns(config, env, spec) {
+function getCypressExcludePatterns(config, expose, spec) {
   let testFilePatterns = []
 
   const testFilePattern = config('specPattern') || config('testFiles')
-  const excludePattern = env().codeCoverage && env().codeCoverage.exclude
+  const excludePattern = expose().codeCoverage && expose().codeCoverage.exclude
 
   if (Array.isArray(testFilePattern)) {
     testFilePatterns = testFilePattern

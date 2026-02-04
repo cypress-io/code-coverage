@@ -9,7 +9,12 @@ const filterFilesFromCoverage = (
   expose = Cypress.expose,
   spec = Cypress.spec
 ) => {
-  const withoutSpecs = filterSpecsFromCoverage(totalCoverage, config, expose, spec)
+  const withoutSpecs = filterSpecsFromCoverage(
+    totalCoverage,
+    config,
+    expose,
+    spec
+  )
   const appCoverageOnly = filterSupportFilesFromCoverage(withoutSpecs, config)
   return appCoverageOnly
 }

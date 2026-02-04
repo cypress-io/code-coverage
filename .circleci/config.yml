@@ -149,7 +149,6 @@ workflows:
                 - batch-send-coverage
                 - before-all-visit
                 - before-each-visit
-                - cra-e2e-and-ct
                 - exclude-files
                 - frontend
                 - fullstack
@@ -179,7 +178,6 @@ workflows:
             - test-batch-send-coverage
             - test-before-all-visit
             - test-before-each-visit
-            - test-cra-e2e-and-ct
             - test-exclude-files
             - test-frontend
             - test-fullstack

@@ -82,6 +82,5 @@
     "start-server-and-test": "2.0.12",
     "webpack": "^5.68.0",
     "webpack-cli": "^5.1.4"
-  },
-  "packageManager": "pnpm@8.4.0+sha1.73c608c602d520c436c7b250330315d83ffcc1ee"
+  }
 }

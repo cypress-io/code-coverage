@@ -280,7 +280,10 @@ const registerHooks = () => {
 
 // to avoid "coverage" variable being case-sensitive, convert to lowercase
 const exposedValues = Object.fromEntries(
-  Object.entries(Cypress.expose()).map(([key, value]) => [key.toLowerCase(), value])
+  Object.entries(Cypress.expose()).map(([key, value]) => [
+    key.toLowerCase(),
+    value
+  ])
 )
 
 if (exposedValues.coverage === false) {

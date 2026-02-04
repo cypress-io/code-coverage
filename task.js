@@ -219,15 +219,14 @@ const tasks = {
 
 /**
  * Registers code coverage collection and reporting tasks.
- * Sets an environment variable to tell the browser code that it can
+ * Sets an expose variable to tell the browser code that it can
  * send the coverage.
  * @example
   ```
     // your plugins file
     module.exports = (on, config) => {
       require('cypress/code-coverage/task')(on, config)
-      // IMPORTANT to return the config object
-      // with the any changed environment variables
+      // IMPORTANT to return the config object with any changes
       return config
     }
   ```

@@ -607,7 +607,7 @@ If you decide to open an issue in this repository, please fill in all informatio
 ### Coverage reporting timeouts
 
 If the plugin times out when sending coverage report data to be merged, this may be due to a very large
-report being sent across processes. You can batch the report by setting the `sendCoverageBatchSize` in your `cypress.config.js` file's 'expose' section. Assign the variable an integer value representing
+report being sent across processes. You can batch the report by setting the `sendCoverageBatchSize` value in your `cypress.config.js` file's `expose` section. Assign the variable an integer value representing
 the number of report keys to send per batch.
 
 ## Contributing

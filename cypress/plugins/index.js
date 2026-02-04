@@ -10,6 +10,6 @@ module.exports = (on, config) => {
   // directory to the list of babelify plugins
   // on('file:preprocessor', require('../../use-browserify-istanbul'))
 
-  // IMPORTANT to return the config object with changed environment variable
+  // IMPORTANT to return the config object with any changes
   return config
 }

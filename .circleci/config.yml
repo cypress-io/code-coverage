@@ -35,7 +35,7 @@ jobs:
   windows_test:
     executor:
       # executor comes from the "windows" orb
-      name: windows-latest
+      name: win/default
       shell: bash.exe
     steps:
       - checkout

@@ -18,6 +18,9 @@
     "effective:config": "circleci config process .circleci/config.yml | sed /^#/d",
     "apps:test:coverage:verify": "./scripts/test-apps-and-verify-coverage.sh"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "peerDependencies": {
     "@babel/core": "^7.0.1",
     "@babel/preset-env": "^7.0.0",

@@ -94,12 +94,9 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - install_dependencies:
+      - run:
           working_directory: test-apps/<< parameters.jobname >>
-          steps:
-            - run:
-                name: Install dependencies
-                command: npm i
+          command: npm i
       - run:
           command: npm run test
           working_directory: test-apps/<< parameters.jobname >>

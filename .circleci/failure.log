@@ -1,0 +1,154 @@
+
+> pretest
+> rimraf .nyc_output .cache coverage dist
+
+
+> test
+> start-test 1234 cy:run
+
+1: starting server using command "npm run start"
+and when url "[ 'http://127.0.0.1:1234' ]" is responding with HTTP status code 200
+running tests using command "npm run cy:run"
+
+
+> start
+> parcel serve index.html
+
+[0J[0J- [90m[1mBuilding index.html...[22m[39m
+
+- [90m[1mBuilding main.js...[22m[39m
+
+- [90m[1mBundling...[22m[39m
+
+- [90m[1mPackaging all-files.[hash].js...[22m[39m
+
+[34m[1mServer running at http://localhost:1234[22m[39m
+✨ [32m[1mBuilt in 959ms[22m[39m
+
+> cy:run
+> cypress run
+
+
+DevTools listening on ws://127.0.0.1:34697/devtools/browser/3887a93f-2a48-44c6-84c6-b441ec1707e1
+<<<CYPRESS.STDERR.START>>>  [35;1m************* [0mcombined NYC options { [32m'report-dir'[39m: [32m'./coverage'[39m, reporter: [ [32m'lcov'[39m, [32m'clover'[39m, [32m'json'[39m, [32m'json-summary'[39m ], extension: [ [32m'.js'[39m, [32m'.cjs'[39m, [32m'.mjs'[39m, [32m'.ts'[39m, [32m'.tsx'[39m, [32m'.jsx'[39m ], excludeAfterRemap: [33mfalse[39m, all: [33mtrue[39m, include: [32m'*.js'[39m } [35m+0ms[0m
+<<<CYPRESS.STDERR.END>>>
+[90m====================================================================================================[39m
+
+[0m  ([4m[1mRun Starting[22m[24m)[0m
+
+[90m  ┌[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m┐[39m
+[90m  │[39m [90mCypress:[39m        15.10.0                                                                        [90m│[39m
+[90m  │[39m [90mBrowser:[39m        Electron 138 [90m(headless)[39m                                                        [90m│[39m
+[90m  │[39m [90mNode Version:[39m   [0mv22.14.0 [90m(/usr/local/bin/node)[39m[0m                                                 [90m│[39m
+[90m  │[39m [90mSpecs:[39m          [0m1 found (spec.cy.js)[0m                                                           [90m│[39m
+[90m  │[39m [90mSearched:[39m       [0mcypress/e2e/**/*.cy.{js,jsx,ts,tsx}[0m                                            [90m│[39m
+[90m  └[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m┘[39m
+
+
+[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m
+                                                                                                    
+  Running:  [90mspec.cy.js[39m                                                                      [90m(1 of 1)[39m
+
+[0m[0m
+[31m  1) works[0m
+<<<CYPRESS.STDERR.START>>>  [35;1m************* [0mcreated folder /root/project/test-apps/all-files/.nyc_output for output coverage [35m+0ms[0m
+<<<CYPRESS.STDERR.END>>><<<CYPRESS.STDERR.START>>>⚠️ file [33m/root/project/test-apps/all-files/.nyc_output/out.json[39m has no coverage information
+<<<CYPRESS.STDERR.END>>><<<CYPRESS.STDERR.START>>>Did you forget to instrument your web application? Read [34mhttps://github.com/cypress-io/*************#instrument-your-application[39m
+<<<CYPRESS.STDERR.END>>><<<CYPRESS.STDERR.START>>>  [35;1m************* [0m⚠️ file /root/project/test-apps/all-files/.nyc_output/out.json has no coverage information [35m+8s[0m
+<<<CYPRESS.STDERR.END>>><<<CYPRESS.STDERR.START>>>  [35;1m************* [0m⚠️ file /root/project/test-apps/all-files/.nyc_output/out.json has no coverage information [35m+0ms[0m
+  [35;1m************* [0mnyc needs to report on all included files [35m+1ms[0m
+<<<CYPRESS.STDERR.END>>><<<CYPRESS.STDERR.START>>>  [35;1m************* [0minclude all files options: { all: [33mtrue[39m, include: [32m'*.js'[39m, exclude: [90mundefined[39m, extension: [ [32m'.js'[39m, [32m'.cjs'[39m, [32m'.mjs'[39m, [32m'.ts'[39m, [32m'.tsx'[39m, [32m'.jsx'[39m ] } [35m+1ms[0m
+<<<CYPRESS.STDERR.END>>><<<CYPRESS.STDERR.START>>>  [35;1m************* [0msearching files to include using patterns [ [32m'*.js'[39m, [32m'!**/node_modules/**'[39m ] [35m+0ms[0m
+<<<CYPRESS.STDERR.END>>><<<CYPRESS.STDERR.START>>>  [35;1m************* [0mfound 4 file(s) [35m+7ms[0m
+/root/project/test-apps/all-files/cypress.config.js
+/root/project/test-apps/all-files/main.js
+/root/project/test-apps/all-files/not-covered.js
+/root/project/test-apps/all-files/second.js
+<<<CYPRESS.STDERR.END>>><<<CYPRESS.STDERR.START>>>  [35;1m************* [0mcoverage has 0 record(s) [35m+0ms[0m
+coverage has the following first paths
+
+<<<CYPRESS.STDERR.END>>><<<CYPRESS.STDERR.START>>>  [35;1m************* [0madding empty coverage for file /root/project/test-apps/all-files/cypress.config.js [35m+0ms[0m
+  [35;1m************* [0madding empty coverage for file /root/project/test-apps/all-files/main.js [35m+0ms[0m
+  [35;1m************* [0madding empty coverage for file /root/project/test-apps/all-files/not-covered.js [35m+0ms[0m
+<<<CYPRESS.STDERR.END>>><<<CYPRESS.STDERR.START>>>  [35;1m************* [0madding empty coverage for file /root/project/test-apps/all-files/second.js [35m+0ms[0m
+  [35;1m************* [0mincludeAllFiles saving updated file /root/project/test-apps/all-files/.nyc_output/out.json [35m+0ms[0m
+  [35;1m************* [0mthere are 4 keys in the file [35m+0ms[0m
+<<<CYPRESS.STDERR.END>>><<<CYPRESS.STDERR.START>>>  [35;1m************* [0mcalling NYC reporter with options { [32m'report-dir'[39m: [32m'/root/project/test-apps/all-files/coverage'[39m, reporter: [ [32m'lcov'[39m, [32m'clover'[39m, [32m'json'[39m, [32m'json-summary'[39m ], extension: [ [32m'.js'[39m, [32m'.cjs'[39m, [32m'.mjs'[39m, [32m'.ts'[39m, [32m'.tsx'[39m, [32m'.jsx'[39m ], excludeAfterRemap: [33mfalse[39m, all: [33mtrue[39m, include: [32m'*.js'[39m, [32m'temp-dir'[39m: [32m'/root/project/test-apps/all-files/.nyc_output'[39m, tempDir: [32m'/root/project/test-apps/all-files/.nyc_output'[39m, reportDir: [32m'/root/project/test-apps/all-files/coverage'[39m } [35m+9ms[0m
+  [35;1m************* [0mcurrent working directory is /root/project/test-apps/all-files [35m+0ms[0m
+<<<CYPRESS.STDERR.END>>><<<CYPRESS.STDERR.START>>>  [35;1m************* [0mafter reporting, returning the report folder name /root/project/test-apps/all-files/coverage [35m+83ms[0m
+  [35;1m************* [0mFinal coverage in /root/project/test-apps/all-files/coverage/coverage-final.json [35m+0ms[0m
+<<<CYPRESS.STDERR.END>>><<<CYPRESS.STDERR.START>>>  [35;1m************* [0mThere are 4 key(s) in /root/project/test-apps/all-files/coverage/coverage-final.json [35m+0ms[0m
+  [35;1m************* [0m❓ /root/project/test-apps/all-files/cypress.config.js statements covered 0/0 [35m+0ms[0m
+  [35;1m************* [0m❓ /root/project/test-apps/all-files/main.js statements covered 0/0 [35m+0ms[0m
+  [35;1m************* [0m❓ /root/project/test-apps/all-files/not-covered.js statements covered 0/0 [35m+0ms[0m
+  [35;1m************* [0m❓ /root/project/test-apps/all-files/second.js statements covered 0/0 [35m+0ms[0m
+<<<CYPRESS.STDERR.END>>>
+[92m [0m[32m 0 passing[0m[90m (5s)[0m
+[31m  1 failing[0m
+
+[0m  1) works:
+[0m[31m     AssertionError: Timed out retrying after 4000ms: expected '<window>' to have property '__coverage__'[0m[90m
+      at Context.eval (webpack://example-all-files/./cypress/e2e/spec.cy.js:11:14)
+[0m
+
+
+
+[31m  ([4m[1mResults[22m[24m)[39m
+
+[90m  ┌[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m┐[39m
+[90m  │[39m [90mTests:[39m        [31m1[39m                                                                                [90m│[39m
+[90m  │[39m [90mPassing:[39m      [31m0[39m                                                                                [90m│[39m
+[90m  │[39m [90mFailing:[39m      [31m1[39m                                                                                [90m│[39m
+[90m  │[39m [90mPending:[39m      [31m0[39m                                                                                [90m│[39m
+[90m  │[39m [90mSkipped:[39m      [31m0[39m                                                                                [90m│[39m
+[90m  │[39m [90mScreenshots:[39m  [31m1[39m                                                                                [90m│[39m
+[90m  │[39m [90mVideo:[39m        [31mfalse[39m                                                                            [90m│[39m
+[90m  │[39m [90mDuration:[39m     [31m4 seconds[39m                                                                        [90m│[39m
+[90m  │[39m [90mSpec Ran:[39m     [31m[31mspec.cy.js[31m[39m                                                                       [90m│[39m
+[90m  └[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m┘[39m
+
+
+[33m  ([4m[1mScreenshots[22m[24m)[39m
+
+[90m [39m -  [0m/root/project/test-apps/all-files/cypress/screenshots/spec.cy.js/works (failed).[0m     [90m[90m(1280x720)[90m[39m
+[90m [39m    [0mpng[0m                                                                                            
+
+
+[90m====================================================================================================[39m
+
+[0m  ([4m[1mRun Finished[22m[24m)[0m
+
+
+[90m   [39m    [90mSpec[39m                                              [90mTests[39m  [90mPassing[39m  [90mFailing[39m  [90mPending[39m  [90mSkipped[39m [90m [39m
+[90m  ┌[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m┐[39m
+[90m  │[39m [31m✖[39m  [0mspec.cy.js[0m                               [90m00:04[39m        [0m1[0m        [90m-[39m        [31m1[39m        [90m-[39m        [90m-[39m [90m│[39m
+[90m  └[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m─[39m[90m┘[39m
+[90m   [39m [31m✖[39m  [31m1 of 1 failed (100%)[39m                     [90m00:04[39m        [0m1[0m        [90m-[39m        [31m1[39m        [90m-[39m        [90m-[39m [90m [39m
+
+[90m----------------------------------------------------------------------------------------------------[39m
+
+  Debug faster with full visibility.
+
+  Record to Cypress Cloud and get instant access to full test details and replays.
+  Inspect the DOM, network events, and console logs exactly as they ran in CI.
+
+  >> [36mhttps://on.cypress.io/cloud-get-started[39m
+
+[90m----------------------------------------------------------------------------------------------------[39m
+Error: Command failed with exit code 1: npm run cy:run
+    at makeError (/root/project/node_modules/[4mstart-server-and-test[24m/node_modules/[4mexeca[24m/lib/error.js:60:11)
+    at handlePromise (/root/project/node_modules/[4mstart-server-and-test[24m/node_modules/[4mexeca[24m/index.js:118:26)
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m {
+  shortMessage: [32m'Command failed with exit code 1: npm run cy:run'[39m,
+  command: [32m'npm run cy:run'[39m,
+  escapedCommand: [32m'"npm run cy:run"'[39m,
+  exitCode: [33m1[39m,
+  signal: [90mundefined[39m,
+  signalDescription: [90mundefined[39m,
+  stdout: [90mundefined[39m,
+  stderr: [90mundefined[39m,
+  failed: [33mtrue[39m,
+  timedOut: [33mfalse[39m,
+  isCanceled: [33mfalse[39m,
+  killed: [33mfalse[39m
+}

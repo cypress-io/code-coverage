@@ -65,6 +65,7 @@
     "tinyglobby": "^0.2.14"
   },
   "devDependencies": {
+    "@parcel/transformer-babel": "^2.16.4",
     "@vitest/coverage-istanbul": "^4.0.0",
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.11",

@@ -113,14 +113,16 @@ jobs:
 
   test-code-coverage-plugin:
     docker:
-      - image: cypress/base:16.18.1
+      - image: node:22.14.0
     steps:
       - attach_workspace:
           at: ~/
       - run:
+          command: npm ci
+      - run:
           command: npm run test:coverage
       - store_artifacts:
-          path: coverage
+          path: coverage/coverage-final.json
 
 workflows:
   build:

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { combineNycOptions, defaultNycOptions } from '../common-utils.js'
+import { combineNycOptions, defaultNycOptions } from '../lib/common-utils.js'
 describe('Combine NYC options', () => {
   it('overrides defaults', () => {
     const pkgNycOptions = {

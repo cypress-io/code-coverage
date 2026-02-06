@@ -118,12 +118,9 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          command: npm run test
+          command: npm run test:coverage
       - store_artifacts:
           path: coverage
-      - run:
-          name: Verify Code Coverage
-          command: npm run coverage:verify
 
 workflows:
   build:

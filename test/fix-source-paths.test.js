@@ -1,4 +1,5 @@
-import { fixSourcePaths } from '../../support-utils'
+import { describe, it, expect } from 'vitest'
+import { fixSourcePaths } from '../lib/support-utils.js'
 
 describe('fixSourcePaths', () => {
   it('fixes webpack loader source-map pathes', () => {
@@ -20,7 +21,7 @@ describe('fixSourcePaths', () => {
 
     fixSourcePaths(coverage)
 
-    expect(coverage).to.deep.eq({
+    expect(coverage).toEqual({
       '/absolute/src/component.vue': {
         path: '/absolute/src/component.vue',
         inputSourceMap: {
@@ -34,3 +35,4 @@ describe('fixSourcePaths', () => {
     })
   })
 })
+

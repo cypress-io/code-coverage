@@ -5,7 +5,7 @@ import coverage from './fixtures/coverage.json'
 import {
   fileCoveragePlaceholder,
   removePlaceholders
-} from '../lib/common-utils.js'
+} from '../common-utils.js'
 
 /**
  * Extracts just the data from the coverage map object

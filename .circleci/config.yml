@@ -95,6 +95,8 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
+          command: npm ci
+      - run:
           command: npm run test
           working_directory: test-apps/<< parameters.jobname >>
       - store_artifacts:

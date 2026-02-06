@@ -15,7 +15,7 @@ const mockCypress = {
 globalThis.Cypress = mockCypress
 
 // Now import the module that depends on Cypress
-import { filterFilesFromCoverage } from '../lib/support-utils.js'
+import { filterFilesFromCoverage } from '../support-utils.js'
 
 describe('minimatch', () => {
   it('string matches', () => {

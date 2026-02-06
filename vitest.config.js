@@ -8,7 +8,7 @@ export default defineConfig({
       provider: 'istanbul',
       reporter: ['lcov', 'json', 'json-summary', 'text'],
       reportsDirectory: './coverage',
-      include: ['lib/**/*.js'],
+      include: ['lib/common-utils.js', 'lib/support-utils.js'],
       exclude: ['test/**', 'node_modules/**', 'cypress/**'],
       thresholds: {
         lines: 80

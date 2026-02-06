@@ -2,7 +2,10 @@ import { describe, it, expect, beforeAll } from 'vitest'
 import istanbul from 'istanbul-lib-coverage'
 import _ from 'lodash'
 import coverage from './fixtures/coverage.json'
-import { fileCoveragePlaceholder, removePlaceholders } from '../lib/common-utils.js'
+import {
+  fileCoveragePlaceholder,
+  removePlaceholders
+} from '../lib/common-utils.js'
 
 /**
  * Extracts just the data from the coverage map object

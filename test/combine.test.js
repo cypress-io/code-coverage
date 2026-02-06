@@ -93,4 +93,3 @@ describe('Combine NYC options', () => {
     })
   })
 })
-

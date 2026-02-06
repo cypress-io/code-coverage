@@ -20,7 +20,7 @@
  * @see https://nextjs.org/docs#api-routes
  * @see https://github.com/cypress-io/code-coverage
  */
-module.exports = function returnCodeCoverageNext (req, res) {
+module.exports = function returnCodeCoverageNext(req, res) {
   // only GET is supported
   res.status(200).json({
     coverage: global.__coverage__ || null

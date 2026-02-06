@@ -15,8 +15,8 @@
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "semantic-release": "semantic-release",
-    "format": "prettier --write '*.js'",
-    "format:check": "prettier --check '*.js'",
+    "format": "prettier --write **/*.js",
+    "format:check": "prettier --check **/*.js",
     "check:markdown": "find *.md -exec npx markdown-link-check {} \\;"
   },
   "peerDependencies": {

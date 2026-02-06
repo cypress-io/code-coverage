@@ -1,5 +1,5 @@
 // for Hapi.js
-module.exports = server => {
+module.exports = (server) => {
   // expose "GET __coverage__" endpoint that just returns
   // global coverage information (if the application has been instrumented)
 
@@ -7,7 +7,7 @@ module.exports = server => {
   server.route({
     method: 'GET',
     path: '/__coverage__',
-    handler () {
+    handler() {
       return { coverage: global.__coverage__ }
     }
   })

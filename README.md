@@ -420,14 +420,7 @@ Or set it to `false` in the `cypress.json` file.
 }
 ```
 
-See [Cypress environment variables](https://on.cypress.io/environment-variables) and [support.js](support.js). You can try running without code coverage in this project yourself
-
-```shell
-# run with code coverage
-npm run dev
-# disable code coverage
-npm run dev:no:coverage
-```
+See [Cypress environment variables](https://on.cypress.io/environment-variables) and [lib/support.js](lib/support.js).
 
 ## Links
 
@@ -548,7 +541,7 @@ module.exports = (on, config) => {
 
 ## Debugging
 
-This plugin uses the [debug](https://github.com/visionmedia/debug) module to output additional logging messages from its [task.js](task.js) file. This can help with debugging errors while saving code coverage or reporting. To see these messages, run Cypress from the terminal with the environment variable `DEBUG=code-coverage`. Example using Unix syntax to set the variable:
+This plugin uses the [debug](https://github.com/visionmedia/debug) module to output additional logging messages from its [lib/task.js](lib/task.js) file. This can help with debugging errors while saving code coverage or reporting. To see these messages, run Cypress from the terminal with the environment variable `DEBUG=code-coverage`. Example using Unix syntax to set the variable:
 
 ```shell
 $ DEBUG=code-coverage npm run dev
@@ -581,17 +574,13 @@ the number of report keys to send per batch.
 
 ## Contributing
 
-You can test changes locally by running tests and confirming that the code coverage has been calculated and saved.
+You can test changes locally by running unit tests with coverage:
 
 ```shell
-npm run test:ci
-# now check generated coverage numbers
-npx nyc report --check-coverage true --lines 80
-npx nyc report --check-coverage true --lines 100 --include cypress/about.js
-npx nyc report --check-coverage true --lines 100 --include cypress/unit.js
+npm run test:coverage
 ```
 
-**Tip:** use [check-code-coverage](https://github.com/bahmutov/check-code-coverage) for stricter code coverage checks than `nyc report --check-coverage` allows.
+This runs Vitest with coverage enabled and will fail if line coverage drops below 80%. The 80% threshold is configured in `vitest.config.js`.
 
 ### Markdown
 

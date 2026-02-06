@@ -3,10 +3,11 @@
   "version": "0.0.0-development",
   "description": "Saves the code coverage collected during Cypress tests",
   "exports": {
+    ".": "./lib/index.js",
     "./task": "./lib/task.js",
     "./plugins": "./lib/plugins.js",
     "./support": "./lib/support.js",
-    ".": "./lib/index.js",
+    "./use-babelrc": "./lib/use-babelrc.js",
     "./middleware/express": "./middleware/express.js",
     "./middleware/hapi": "./middleware/hapi.js",
     "./middleware/nextjs": "./middleware/nextjs.js"

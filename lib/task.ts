@@ -1,19 +1,20 @@
-// @ts-check
-const istanbul = require('istanbul-lib-coverage')
-const { join, resolve } = require('path')
-const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
-const execa = require('execa')
-const {
+/// <reference types="node" />
+import { createCoverageMap, CoverageMap as IstanbulCoverageMap } from 'istanbul-lib-coverage'
+import { join, resolve } from 'path'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
+import { execa } from 'execa'
+import {
   showNycInfo,
   resolveRelativePaths,
   checkAllPathsNotFound,
   tryFindingLocalFiles,
   readNycOptions,
   includeAllFiles
-} = require('./task-utils')
-const { fixSourcePaths } = require('./support-utils')
+} from './task-utils'
+import { fixSourcePaths } from './support-utils'
+import debug from 'debug'
 
-const debug = require('debug')('code-coverage')
+const log = debug('code-coverage')
 
 // these are standard folder and file names used by NYC tools
 const processWorkingDirectory = process.cwd()
@@ -40,7 +41,7 @@ const nycReportOptions = (function getNycOption() {
   }
 
   if (nycReportOptions['temp-dir']) {
-    nycReportOptions['temp-dir'] = resolve(nycReportOptions['temp-dir'])
+    nycReportOptions['temp-dir'] = resolve(nycReportOptions['temp-dir'] as string)
   } else {
     nycReportOptions['temp-dir'] = join(processWorkingDirectory, '.nyc_output')
   }
@@ -48,7 +49,7 @@ const nycReportOptions = (function getNycOption() {
   nycReportOptions.tempDir = nycReportOptions['temp-dir']
 
   if (nycReportOptions['report-dir']) {
-    nycReportOptions['report-dir'] = resolve(nycReportOptions['report-dir'])
+    nycReportOptions['report-dir'] = resolve(nycReportOptions['report-dir'] as string)
   }
   // seems nyc API really is using camel cased version
   nycReportOptions.reportDir = nycReportOptions['report-dir']
@@ -56,35 +57,35 @@ const nycReportOptions = (function getNycOption() {
   return nycReportOptions
 })()
 
-const nycFilename = join(nycReportOptions['temp-dir'], 'out.json')
+const nycFilename = join(nycReportOptions['temp-dir'] as string, 'out.json')
 
-let coverageMap = (() => {
+let coverageMap: IstanbulCoverageMap = (() => {
   const previousCoverage = existsSync(nycFilename)
     ? JSON.parse(readFileSync(nycFilename, 'utf8'))
     : {}
-  return istanbul.createCoverageMap(previousCoverage)
+  return createCoverageMap(previousCoverage)
 })()
 
-function saveCoverage(coverage) {
-  if (!existsSync(nycReportOptions.tempDir)) {
-    mkdirSync(nycReportOptions.tempDir, { recursive: true })
-    debug('created folder %s for output coverage', nycReportOptions.tempDir)
+function saveCoverage(coverage: unknown): void {
+  if (!existsSync(nycReportOptions.tempDir as string)) {
+    mkdirSync(nycReportOptions.tempDir as string, { recursive: true })
+    log('created folder %s for output coverage', nycReportOptions.tempDir)
   }
 
   writeFileSync(nycFilename, JSON.stringify(coverage, null, 2))
 }
 
-function maybePrintFinalCoverageFiles(folder) {
+function maybePrintFinalCoverageFiles(folder: string): void {
   const jsonReportFilename = join(folder, 'coverage-final.json')
   if (!existsSync(jsonReportFilename)) {
-    debug('Did not find final coverage file %s', jsonReportFilename)
+    log('Did not find final coverage file %s', jsonReportFilename)
     return
   }
 
-  debug('Final coverage in %s', jsonReportFilename)
-  const finalCoverage = JSON.parse(readFileSync(jsonReportFilename, 'utf8'))
+  log('Final coverage in %s', jsonReportFilename)
+  const finalCoverage: Record<string, { s?: Record<string, number> }> = JSON.parse(readFileSync(jsonReportFilename, 'utf8'))
   const finalCoverageKeys = Object.keys(finalCoverage)
-  debug(
+  log(
     'There are %d key(s) in %s',
     finalCoverageKeys.length,
     jsonReportFilename
@@ -105,7 +106,7 @@ function maybePrintFinalCoverageFiles(folder) {
     const allCovered = coveredStatements === totalStatements
     const coverageStatus = hasStatements ? (allCovered ? '✅' : '⚠️') : '❓'
 
-    debug(
+    log(
       '%s %s statements covered %d/%d',
       coverageStatus,
       key,
@@ -113,6 +114,10 @@ function maybePrintFinalCoverageFiles(folder) {
       totalStatements
     )
   })
+}
+
+interface TaskParams {
+  isInteractive?: boolean
 }
 
 const tasks = {
@@ -125,10 +130,10 @@ const tasks = {
    *    - runs EACH spec separately, so we cannot reset the coverage
    *      or we will lose the coverage from previous specs.
    */
-  resetCoverage({ isInteractive }) {
+  resetCoverage({ isInteractive }: TaskParams): null {
     if (isInteractive) {
-      debug('reset code coverage in interactive mode')
-      coverageMap = istanbul.createCoverageMap({})
+      log('reset code coverage in interactive mode')
+      coverageMap = createCoverageMap({})
       saveCoverage(coverageMap)
     }
     /*
@@ -145,12 +150,12 @@ const tasks = {
    * Combines coverage information from single test
    * with previously collected coverage.
    *
-   * @param {string} sentCoverage Stringified coverage object sent by the test runner
-   * @returns {null} Nothing is returned from this task
+   * @param sentCoverage Stringified coverage object sent by the test runner
+   * @returns Nothing is returned from this task
    */
-  combineCoverage(sentCoverage) {
+  combineCoverage(sentCoverage: string): null {
     const coverage = JSON.parse(sentCoverage)
-    debug('parsed sent coverage')
+    log('parsed sent coverage')
 
     fixSourcePaths(coverage)
 
@@ -163,7 +168,7 @@ const tasks = {
    * Saves coverage information as a JSON file and calls
    * NPM script to generate HTML report
    */
-  coverageReport() {
+  coverageReport(): Promise<string | null> | null {
     saveCoverage(coverageMap)
     if (!existsSync(nycFilename)) {
       console.warn('Cannot find coverage file %s', nycFilename)
@@ -181,30 +186,30 @@ const tasks = {
     resolveRelativePaths(nycFilename)
 
     if (customNycReportScript) {
-      debug(
+      log(
         'saving coverage report using script "%s" from package.json, command: %s',
         DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME,
         customNycReportScript
       )
-      debug('current working directory is %s', process.cwd())
+      log('current working directory is %s', process.cwd())
       return execa('npm', ['run', DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME], {
         stdio: 'inherit'
-      })
+      }).then(() => null)
     }
 
     if (nycReportOptions.all) {
-      debug('nyc needs to report on all included files')
+      log('nyc needs to report on all included files')
       includeAllFiles(nycFilename, nycReportOptions)
     }
 
-    debug('calling NYC reporter with options %o', nycReportOptions)
-    debug('current working directory is %s', process.cwd())
+    log('calling NYC reporter with options %o', nycReportOptions)
+    log('current working directory is %s', process.cwd())
     const NYC = require('nyc')
     const nyc = new NYC(nycReportOptions)
 
-    const returnReportFolder = () => {
-      const reportFolder = nycReportOptions['report-dir']
-      debug(
+    const returnReportFolder = (): string => {
+      const reportFolder = nycReportOptions['report-dir'] as string
+      log(
         'after reporting, returning the report folder name %s',
         reportFolder
       )
@@ -231,7 +236,10 @@ const tasks = {
     }
   ```
 */
-function registerCodeCoverageTasks(on, config) {
+export default function registerCodeCoverageTasks(
+  on: Cypress.PluginEvents,
+  config: Cypress.PluginConfigOptions
+): Cypress.PluginConfigOptions {
   on('task', tasks)
 
   // set a variable to let the hooks running in the browser
@@ -241,4 +249,3 @@ function registerCodeCoverageTasks(on, config) {
   return config
 }
 
-module.exports = registerCodeCoverageTasks

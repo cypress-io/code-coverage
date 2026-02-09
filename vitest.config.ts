@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     coverage: {
       provider: 'v8',
-      include: ['common-utils.js', 'support-utils.js'],
+      include: ['lib/common-utils.ts', 'lib/support-utils.ts'],
       thresholds: {
         lines: 80
       }

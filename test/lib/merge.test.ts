@@ -1,17 +1,16 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 import _ from 'lodash'
-const istanbul = require('istanbul-lib-coverage')
-const coverage = require('./__fixtures__/coverage.json')
-const {
+import { createCoverageMap } from 'istanbul-lib-coverage'
+import coverage from './__fixtures__/coverage.json'
+import {
   fileCoveragePlaceholder,
   removePlaceholders
-} = require('../../lib/common-utils')
+} from '../../lib/common-utils'
 
 /**
  * Extracts just the data from the coverage map object
- * @param {*} cm
  */
-const coverageMapToCoverage = (cm) => {
+const coverageMapToCoverage = (cm: ReturnType<typeof createCoverageMap>) => {
   return JSON.parse(JSON.stringify(cm))
 }
 
@@ -23,8 +22,8 @@ describe('merging coverage', () => {
   })
 
   it('combines an empty coverage object', () => {
-    const previous = istanbul.createCoverageMap({})
-    const coverageMap = istanbul.createCoverageMap(previous)
+    const previous = createCoverageMap({})
+    const coverageMap = createCoverageMap(previous)
     coverageMap.merge(_.cloneDeep(coverage))
 
     const merged = coverageMapToCoverage(coverageMap)
@@ -33,8 +32,8 @@ describe('merging coverage', () => {
   })
 
   it('combines the same full coverage twice', () => {
-    const previous = istanbul.createCoverageMap(_.cloneDeep(coverage))
-    const coverageMap = istanbul.createCoverageMap(previous)
+    const previous = createCoverageMap(_.cloneDeep(coverage))
+    const coverageMap = createCoverageMap(previous)
     coverageMap.merge(_.cloneDeep(coverage))
 
     const merged = coverageMapToCoverage(coverageMap)
@@ -57,8 +56,8 @@ describe('merging coverage', () => {
     })
 
     // now lets merge full info
-    const previous = istanbul.createCoverageMap(coverageWithPlaceHolder)
-    const coverageMap = istanbul.createCoverageMap(previous)
+    const previous = createCoverageMap(coverageWithPlaceHolder)
+    const coverageMap = createCoverageMap(previous)
     coverageMap.merge(coverage)
 
     const merged = coverageMapToCoverage(coverageMap)

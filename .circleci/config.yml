@@ -144,14 +144,16 @@ workflows:
       - lint:
           requires:
             - install_and_persist
-
       - unit-test:
           requires:
             - install_and_persist
-
-      - verify-test-apps:
+      - build-dist:
           requires:
             - lint
+            - unit-test
+      - verify-test-apps:
+          requires:
+            - build-dist
           matrix:
             parameters:
               app:
@@ -171,13 +173,9 @@ workflows:
                 - unit-tests-js
                 - use-webpack
                 - redirect
-      - windows_test
-      - build-dist:
+      - windows_test:
           requires:
-            - lint
-            - unit-test
-            - verify-test-apps
-            - windows_test
+            - build-dist
       - publish:
           context: org-npm-credentials
           filters:
@@ -188,4 +186,5 @@ workflows:
                 - next
                 - dev
           requires:
-            - build-dist
+            - verify-test-apps
+            - windows_test

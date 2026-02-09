@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-const { fixSourcePaths } = require('../support-utils')
+const { fixSourcePaths } = require('../../lib/support-utils')
 
 describe('fixSourcePaths', () => {
   it('fixes webpack loader source-map pathes', () => {

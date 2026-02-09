@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi, beforeAll } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { minimatch } from 'minimatch'
 import _ from 'lodash'
 
@@ -10,7 +10,7 @@ global.Cypress = {
   }
 }
 
-const { filterFilesFromCoverage } = require('../support-utils')
+const { filterFilesFromCoverage } = require('../../lib/support-utils')
 
 describe('minimatch', () => {
   it('string matches', () => {

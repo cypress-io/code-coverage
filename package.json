@@ -2,7 +2,15 @@
   "name": "@cypress/code-coverage",
   "version": "0.0.0-development",
   "description": "Saves the code coverage collected during Cypress tests",
-  "main": "index.js",
+  "exports": {
+    "./task": "./lib/task.js",
+    "./use-babelrc": "./lib/use-babelrc.js",
+    "./plugins": "./lib/plugins.js",
+    "./support": "./lib/support.js",
+    "./middleware/express": "./middleware/express.js",
+    "./middleware/hapi": "./middleware/hapi.js",
+    "./middleware/nextjs": "./middleware/nextjs.js"
+  },
   "scripts": {
     "start": "parcel serve cypress/index.html",
     "cy:open": "cypress open",

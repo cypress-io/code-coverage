@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-const { combineNycOptions, defaultNycOptions } = require('../common-utils')
+const { combineNycOptions, defaultNycOptions } = require('../../lib/common-utils')
 
 describe('Combine NYC options', () => {
   it('overrides defaults', () => {

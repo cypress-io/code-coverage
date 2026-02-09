@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 import _ from 'lodash'
 const istanbul = require('istanbul-lib-coverage')
-const coverage = require('../cypress/fixtures/coverage.json')
+const coverage = require('./__fixtures__/coverage.json')
 const {
   fileCoveragePlaceholder,
   removePlaceholders
-} = require('../common-utils')
+} = require('../../lib/common-utils')
 
 /**
  * Extracts just the data from the coverage map object

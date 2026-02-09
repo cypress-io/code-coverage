@@ -145,21 +145,6 @@ The code coverage from spec files will be combined with end-to-end coverage.
 
 Find examples of just the unit tests and JavaScript source files with collected code coverage in [test-apps/unit-tests-js](./test-apps/unit-tests-js).
 
-### Alternative for unit tests
-
-If you cannot use `.babelrc` (maybe it is used by other tools?), try using the Browserify transformer included with this module in the `use-browserify-istanbul` file.
-
-```js
-module.exports = (on, config) => {
-  require('@cypress/code-coverage/task')(on, config)
-  on(
-    'file:preprocessor',
-    require('@cypress/code-coverage/use-browserify-istanbul')
-  )
-  return config
-}
-```
-
 ## Instrument backend code
 
 Example in [test-apps/backend](test-apps/backend) folder.

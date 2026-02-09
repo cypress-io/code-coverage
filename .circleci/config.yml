@@ -162,6 +162,7 @@ workflows:
                 - batch-send-coverage
                 - before-all-visit
                 - before-each-visit
+                - esm-example
                 - exclude-files
                 - frontend
                 - fullstack

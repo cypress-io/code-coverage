@@ -392,6 +392,8 @@ export function includeAllFiles(nycFilename: string, nycOptions: NycOptions): vo
     changed = true
     // insert placeholder object for now
     const placeholder = fileCoveragePlaceholder(fullPath)
+    // TODO: fix placeholder shape
+    // @ts-expect-error - placeholder doesn't match internal types yet
     nycCoverage[fullPath] = placeholder
   })
 

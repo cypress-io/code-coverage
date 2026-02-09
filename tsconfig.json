@@ -19,8 +19,6 @@
   "include": [
     "lib/**/*",
     "middleware/**/*",
-    "test/**/*",
-    "vitest.config.ts"
   ],
   "exclude": [
     "test-apps/**/*",

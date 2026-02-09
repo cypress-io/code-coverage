@@ -2,7 +2,7 @@
 import { createCoverageMap, CoverageMap as IstanbulCoverageMap } from 'istanbul-lib-coverage'
 import { join, resolve } from 'path'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
-import { execa } from 'execa'
+import execa from 'execa'
 import {
   showNycInfo,
   resolveRelativePaths,

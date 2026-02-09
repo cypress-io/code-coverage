@@ -12,6 +12,7 @@
     "./middleware/nextjs": "./dist/middleware/nextjs.js"
   },
   "scripts": {
+    "prebuild": "rimraf dist",
     "build": "tsc",
     "prepublishOnly": "npm run build",
     "start": "parcel serve cypress/index.html",
@@ -71,7 +72,6 @@
     "debug": "4.4.0",
     "execa": "4.1.0",
     "istanbul-lib-coverage": "^3.0.0",
-    "js-yaml": "4.1.0",
     "nyc": "^17.1.0",
     "tinyglobby": "^0.2.14"
   },
@@ -79,8 +79,12 @@
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.11",
     "@cypress/code-coverage": "file:.",
+    "@types/debug": "^4.1.12",
     "@types/express": "^5.0.6",
     "@types/hapi": "^18.0.15",
+    "@types/istanbul-lib-coverage": "^2.0.6",
+    "@types/js-yaml": "^4.0.9",
+    "@types/lodash": "^4.17.23",
     "@types/next": "^8.0.7",
     "@types/node": "^20.19.33",
     "@vitest/coverage-v8": "^4.0.0",
@@ -90,6 +94,7 @@
     "console-log-div": "0.6.3",
     "cypress": "^15.10.0",
     "express": "^4.18.2",
+    "js-yaml": "^4.1.1",
     "lodash": "4.17.21",
     "markdown-link-check": "3.13.6",
     "minimatch": "^10.0.0",

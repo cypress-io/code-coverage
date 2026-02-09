@@ -14,7 +14,7 @@ import {
   fileCoveragePlaceholder,
   type NycOptions
 } from './common-utils'
-
+import type { CoverageMapData, FileCoverageData } from 'istanbul-lib-coverage'
 const log = debug('code-coverage')
 
 export interface CoverageEntry {
@@ -369,7 +369,7 @@ export function includeAllFiles(nycFilename: string, nycOptions: NycOptions): vo
     return
   }
 
-  const nycCoverage: CoverageMap = JSON.parse(readFileSync(nycFilename, 'utf8'))
+  const nycCoverage: CoverageMapData = JSON.parse(readFileSync(nycFilename, 'utf8'))
   const coverageKeys = Object.keys(nycCoverage)
   const coveredPaths = coverageKeys.map((key) =>
     nycCoverage[key].path.replace(/\\/g, '/')
@@ -392,9 +392,8 @@ export function includeAllFiles(nycFilename: string, nycOptions: NycOptions): vo
     changed = true
     // insert placeholder object for now
     const placeholder = fileCoveragePlaceholder(fullPath)
-    // TODO: fix placeholder shape
-    // @ts-expect-error - placeholder doesn't match internal types yet
-    nycCoverage[fullPath] = placeholder
+
+    nycCoverage[fullPath] = placeholder as FileCoverageData
   })
 
   if (changed) {

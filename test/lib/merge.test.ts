@@ -1,44 +1,46 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 import _ from 'lodash'
-import { createCoverageMap } from 'istanbul-lib-coverage'
+import { createCoverageMap, CoverageMapData, FileCoverageData } from 'istanbul-lib-coverage'
 import coverage from './__fixtures__/coverage.json'
 import {
   fileCoveragePlaceholder,
-  removePlaceholders
+  removePlaceholders,
+  type FileCoveragePlaceholder
 } from '../../lib/common-utils'
 
-/**
- * Extracts just the data from the coverage map object
- */
-const coverageMapToCoverage = (cm: ReturnType<typeof createCoverageMap>) => {
-  return JSON.parse(JSON.stringify(cm))
+
+// CoverageMapData apparently has a getter that attempts to write to a property that only has a getter
+// this getter is accessed during expect(), so we need to normalize the data to avoid it
+function normalizeCoverageData(coverageData: CoverageMapData): CoverageMapData {
+  return JSON.parse(JSON.stringify(coverageData))
 }
 
 describe('merging coverage', () => {
   const filename = '/src/index.js'
+  const coverageFixture = coverage satisfies CoverageMapData
 
   beforeAll(() => {
-    expect(coverage).toHaveProperty(filename)
+    expect(coverageFixture).toHaveProperty(filename)
   })
 
   it('combines an empty coverage object', () => {
     const previous = createCoverageMap({})
     const coverageMap = createCoverageMap(previous)
-    coverageMap.merge(_.cloneDeep(coverage))
+    coverageMap.merge(coverageFixture)
 
-    const merged = coverageMapToCoverage(coverageMap)
+    const mergedData = normalizeCoverageData(coverageMap.data)
 
-    expect(merged).toEqual(coverage)
+    expect(mergedData).toEqual(coverageFixture)
   })
 
   it('combines the same full coverage twice', () => {
-    const previous = createCoverageMap(_.cloneDeep(coverage))
+    const previous = createCoverageMap(_.cloneDeep(coverageFixture))
     const coverageMap = createCoverageMap(previous)
-    coverageMap.merge(_.cloneDeep(coverage))
+    coverageMap.merge(_.cloneDeep(coverageFixture))
 
-    const merged = coverageMapToCoverage(coverageMap)
+    const merged = normalizeCoverageData(coverageMap.data)
     // it is almost the same - only the statement count has been doubled
-    const expected = _.cloneDeep(coverage)
+    const expected = _.cloneDeep(coverageFixture)
     expected[filename].s[0] = 2
     expect(merged).toEqual(expected)
   })
@@ -46,10 +48,10 @@ describe('merging coverage', () => {
   // This test is skipped in the vitest migration. It is testing internals
   // of nyc that have changed with nyc 17. This needs fixed before we can
   // finalize v4 of @cypress/code-coverage.
-  it.skip('does not merge correctly placeholders', () => {
-    const coverageWithPlaceHolder = _.cloneDeep(coverage)
+  it('does not merge correctly placeholders', () => {
+    const coverageWithPlaceHolder = _.cloneDeep(coverageFixture)
     const placeholder = fileCoveragePlaceholder(filename)
-    coverageWithPlaceHolder[filename] = placeholder
+    ;(coverageWithPlaceHolder as Record<string, FileCoveragePlaceholder | FileCoverageData>)[filename] = placeholder
 
     expect(coverageWithPlaceHolder).toEqual({
       [filename]: placeholder
@@ -58,28 +60,25 @@ describe('merging coverage', () => {
     // now lets merge full info
     const previous = createCoverageMap(coverageWithPlaceHolder)
     const coverageMap = createCoverageMap(previous)
-    coverageMap.merge(coverage)
+    coverageMap.merge(coverageFixture)
 
-    const merged = coverageMapToCoverage(coverageMap)
-    const expected = _.cloneDeep(coverage)
+    const merged = normalizeCoverageData(coverageMap.data)
+    const expected = _.cloneDeep(coverageFixture)
     // the merge against the placeholder without valid statement map
-    // removes the statement map and sets the counter to null
-    expected[filename].s = { 0: null }
-    expected[filename].statementMap = {}
-    // and no hashes :(
-    delete expected[filename].hash
-    delete expected[filename]._coverageSchema
+    // has no hashes 
+    delete (expected[filename] as any).hash
+    delete (expected[filename] as any)._coverageSchema
     expect(merged).toEqual(expected)
   })
 
   it('removes placeholders', () => {
-    const inputCoverage = _.cloneDeep(coverage)
+    const inputCoverage = _.cloneDeep(coverageFixture)
     removePlaceholders(inputCoverage)
-    expect(inputCoverage).toEqual(coverage)
+    expect(inputCoverage).toEqual(coverageFixture)
 
     // add placeholder
     const placeholder = fileCoveragePlaceholder(filename)
-    inputCoverage[filename] = placeholder
+    ;(inputCoverage as Record<string, FileCoveragePlaceholder | FileCoverageData>)[filename] = placeholder
 
     removePlaceholders(inputCoverage)
     expect(inputCoverage).toEqual({})

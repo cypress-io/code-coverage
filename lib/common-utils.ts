@@ -1,5 +1,6 @@
 /// <reference types="node" />
 
+
 export interface NycOptions {
   'report-dir'?: string
   reporter?: string | string[]

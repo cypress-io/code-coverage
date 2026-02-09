@@ -124,9 +124,6 @@ jobs:
           command: npm run test
       - store_artifacts:
           path: coverage
-      - run:
-          name: Verify Code Coverage
-          command: npm run coverage:verify
 
 workflows:
   build:

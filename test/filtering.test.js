@@ -1,21 +1,30 @@
-const { filterFilesFromCoverage } = require('../../support-utils')
+import { describe, it, expect, beforeEach, vi, beforeAll } from 'vitest'
+import { minimatch } from 'minimatch'
+import _ from 'lodash'
+
+// Mock Cypress globals before importing support-utils
+global.Cypress = {
+  minimatch,
+  _: {
+    omitBy: _.omitBy
+  }
+}
+
+const { filterFilesFromCoverage } = require('../support-utils')
 
 describe('minimatch', () => {
   it('string matches', () => {
     expect(
-      Cypress.minimatch('/user/app/src/codeA.js', '/user/app/src/codeA.js'),
-      'matches full strings'
-    ).to.be.true
+      minimatch('/user/app/src/codeA.js', '/user/app/src/codeA.js')
+    ).toBe(true)
 
     expect(
-      Cypress.minimatch('/user/app/src/codeA.js', 'codeA.js'),
-      'does not match just the end'
-    ).to.be.false
+      minimatch('/user/app/src/codeA.js', 'codeA.js')
+    ).toBe(false)
 
     expect(
-      Cypress.minimatch('/user/app/src/codeA.js', '**/codeA.js'),
-      'matches using **'
-    ).to.be.true
+      minimatch('/user/app/src/codeA.js', '**/codeA.js')
+    ).toBe(true)
   })
 })
 
@@ -26,16 +35,16 @@ describe('filtering specs', () => {
     let spec
 
     beforeEach(() => {
-      config = cy.stub()
-      config.withArgs('integrationFolder').returns('/user/app/cypress/integration')
-      config
-        .withArgs('supportFile')
-        .returns('/user/app/cypress/support/index.js')
-      config
-        .withArgs('supportFolder')
-        .returns('/user/app/cypress/support')
+      const configValues = {
+        integrationFolder: '/user/app/cypress/integration',
+        supportFile: '/user/app/cypress/support/index.js',
+        supportFolder: '/user/app/cypress/support'
+      }
+      config = vi.fn((key) => {
+        return configValues[key]
+      })
 
-      expose = cy.stub().returns({})
+      expose = vi.fn().mockReturnValue({})
 
       spec = {
         absolute: '/user/app/cypress/integration/test.cy.js',
@@ -44,55 +53,85 @@ describe('filtering specs', () => {
     })
 
     it('filters list of specs by single string', () => {
-      config.withArgs('testFiles').returns('specA.js')
+      config.mockImplementation((key) => {
+        if (key === 'testFiles') return 'specA.js'
+        if (key === 'integrationFolder') return '/user/app/cypress/integration'
+        if (key === 'supportFile') return '/user/app/cypress/support/index.js'
+        if (key === 'supportFolder') return '/user/app/cypress/support'
+        return undefined
+      })
       const totalCoverage = {
         '/user/app/cypress/integration/specA.js': {},
         '/user/app/cypress/integration/specB.js': {}
       }
       const result = filterFilesFromCoverage(totalCoverage, config, expose, spec)
-      expect(result).to.deep.equal({
+      expect(result).toEqual({
         '/user/app/cypress/integration/specB.js': {}
       })
     })
 
     it('filters list of specs by single string in array', () => {
-      config.withArgs('testFiles').returns(['codeA.js'])
+      config.mockImplementation((key) => {
+        if (key === 'testFiles') return ['codeA.js']
+        if (key === 'integrationFolder') return '/user/app/cypress/integration'
+        if (key === 'supportFile') return '/user/app/cypress/support/index.js'
+        if (key === 'supportFolder') return '/user/app/cypress/support'
+        return undefined
+      })
       const totalCoverage = {
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
       }
       const result = filterFilesFromCoverage(totalCoverage, config, expose, spec)
-      expect(result).to.deep.equal({
+      expect(result).toEqual({
         '/user/app/src/codeB.js': {}
       })
     })
 
     it('filters list of specs by pattern', () => {
-      config.withArgs('testFiles').returns(['**/*B.js'])
+      config.mockImplementation((key) => {
+        if (key === 'testFiles') return ['**/*B.js']
+        if (key === 'integrationFolder') return '/user/app/cypress/integration'
+        if (key === 'supportFile') return '/user/app/cypress/support/index.js'
+        if (key === 'supportFolder') return '/user/app/cypress/support'
+        return undefined
+      })
 
       const totalCoverage = {
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
       }
       const result = filterFilesFromCoverage(totalCoverage, config, expose, spec)
-      expect(result).to.deep.equal({
+      expect(result).toEqual({
         '/user/app/src/codeA.js': {}
       })
     })
 
     it('filters list of specs by pattern and single spec', () => {
-      config.withArgs('testFiles').returns(['**/*B.js', 'codeA.js'])
+      config.mockImplementation((key) => {
+        if (key === 'testFiles') return ['**/*B.js', 'codeA.js']
+        if (key === 'integrationFolder') return '/user/app/cypress/integration'
+        if (key === 'supportFile') return '/user/app/cypress/support/index.js'
+        if (key === 'supportFolder') return '/user/app/cypress/support'
+        return undefined
+      })
 
       const totalCoverage = {
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
       }
       const result = filterFilesFromCoverage(totalCoverage, config, expose, spec)
-      expect(result, 'all specs have been filtered out').to.deep.equal({})
+      expect(result).toEqual({})
     })
 
     it('filters specs from integration folder', () => {
-      config.withArgs('testFiles').returns('**/*.*') // default pattern
+      config.mockImplementation((key) => {
+        if (key === 'testFiles') return '**/*.*' // default pattern
+        if (key === 'integrationFolder') return '/user/app/cypress/integration'
+        if (key === 'supportFile') return '/user/app/cypress/support/index.js'
+        if (key === 'supportFolder') return '/user/app/cypress/support'
+        return undefined
+      })
 
       const totalCoverage = {
         '/user/app/src/codeA.js': {},
@@ -102,14 +141,20 @@ describe('filtering specs', () => {
         '/user/app/cypress/integration/spec2.js': {}
       }
       const result = filterFilesFromCoverage(totalCoverage, config, expose, spec)
-      expect(result).to.deep.equal({
+      expect(result).toEqual({
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
       })
     })
 
     it('filters list of specs when testFiles specifies folder', () => {
-      config.withArgs('testFiles').returns(['cypress/integration/**.*'])
+      config.mockImplementation((key) => {
+        if (key === 'testFiles') return ['cypress/integration/**.*']
+        if (key === 'integrationFolder') return '/user/app/cypress/integration'
+        if (key === 'supportFile') return '/user/app/cypress/support/index.js'
+        if (key === 'supportFolder') return '/user/app/cypress/support'
+        return undefined
+      })
 
       const totalCoverage = {
         '/user/app/cypress/integration/specA.js': {},
@@ -118,13 +163,19 @@ describe('filtering specs', () => {
         'src/my-code.js': {}
       }
       const result = filterFilesFromCoverage(totalCoverage, config, expose, spec)
-      expect(result).to.deep.equal({
+      expect(result).toEqual({
         'src/my-code.js': {}
       })
     })
 
     it('filters files out of cypress support directory', () => {
-      config.withArgs('testFiles').returns(['**/*.*']) // default pattern
+      config.mockImplementation((key) => {
+        if (key === 'testFiles') return ['**/*.*'] // default pattern
+        if (key === 'integrationFolder') return '/user/app/cypress/integration'
+        if (key === 'supportFile') return '/user/app/cypress/support/index.js'
+        if (key === 'supportFolder') return '/user/app/cypress/support'
+        return undefined
+      })
       const totalCoverage = {
         '/user/app/cypress/support/index.js': {},
         '/user/app/cypress/support/command.js': {},
@@ -133,7 +184,7 @@ describe('filtering specs', () => {
         'src/my-code.js': {}
       }
       const result = filterFilesFromCoverage(totalCoverage, config, expose, spec)
-      expect(result).to.deep.equal({
+      expect(result).toEqual({
         'src/my-code.js': {}
       })
     })
@@ -145,9 +196,9 @@ describe('filtering specs', () => {
     let spec
 
     beforeEach(() => {
-      config = cy.stub()
+      config = vi.fn()
 
-      expose = cy.stub().returns({
+      expose = vi.fn().mockReturnValue({
         //filter out all files in the cypress folder
         codeCoverage: {
           exclude: 'cypress/**/*.*'
@@ -161,31 +212,40 @@ describe('filtering specs', () => {
     })
 
     it('filters list of specs by single string', () => {
-      config.withArgs('specPattern').returns('specA.cy.js')
+      config.mockImplementation((key) => {
+        if (key === 'specPattern') return 'specA.cy.js'
+        return undefined
+      })
       const totalCoverage = {
         '/user/app/src/specA.cy.js': {},
         '/user/app/src/specB.cy.js': {}
       }
       const result = filterFilesFromCoverage(totalCoverage, config, expose, spec)
-      expect(result).to.deep.equal({
+      expect(result).toEqual({
         '/user/app/src/specB.cy.js': {}
       })
     })
 
     it('filters list of specs by single string in array', () => {
-      config.withArgs('specPattern').returns(['specA.cy.js'])
+      config.mockImplementation((key) => {
+        if (key === 'specPattern') return ['specA.cy.js']
+        return undefined
+      })
       const totalCoverage = {
         '/user/app/src/specA.cy.js': {},
         '/user/app/src/specB.cy.js': {}
       }
       const result = filterFilesFromCoverage(totalCoverage, config, expose, spec)
-      expect(result).to.deep.equal({
+      expect(result).toEqual({
         '/user/app/src/specB.cy.js': {}
       })
     })
 
     it('filters out file in codeCoverage.exclude', () => {
-      config.withArgs('specPattern').returns(['**/*.cy.js'])
+      config.mockImplementation((key) => {
+        if (key === 'specPattern') return ['**/*.cy.js']
+        return undefined
+      })
       const totalCoverage = {
         '/user/app/cypress/support/index.js': {},
         '/user/app/cypress/commands/index.js': {},
@@ -194,38 +254,47 @@ describe('filtering specs', () => {
         '/user/app/src/codeB.js': {}
       }
       const result = filterFilesFromCoverage(totalCoverage, config, expose, spec)
-      expect(result).to.deep.equal({
+      expect(result).toEqual({
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
       })
     })
 
     it('filters list of specs by pattern', () => {
-      config.withArgs('specPattern').returns(['**/*B.js'])
+      config.mockImplementation((key) => {
+        if (key === 'specPattern') return ['**/*B.js']
+        return undefined
+      })
 
       const totalCoverage = {
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
       }
       const result = filterFilesFromCoverage(totalCoverage, config, expose, spec)
-      expect(result).to.deep.equal({
+      expect(result).toEqual({
         '/user/app/src/codeA.js': {}
       })
     })
 
     it('filters list of specs by pattern and single spec', () => {
-      config.withArgs('specPattern').returns(['**/*B.js', 'codeA.js'])
+      config.mockImplementation((key) => {
+        if (key === 'specPattern') return ['**/*B.js', 'codeA.js']
+        return undefined
+      })
 
       const totalCoverage = {
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
       }
       const result = filterFilesFromCoverage(totalCoverage, config, expose, spec)
-      expect(result, 'all specs have been filtered out').to.deep.equal({})
+      expect(result).toEqual({})
     })
 
     it('filters list of specs in integration folder', () => {
-      config.withArgs('specPattern').returns('**/*.cy.{js,jsx,ts,tsx}') // default pattern
+      config.mockImplementation((key) => {
+        if (key === 'specPattern') return '**/*.cy.{js,jsx,ts,tsx}' // default pattern
+        return undefined
+      })
 
       const totalCoverage = {
         '/user/app/src/codeA.js': {},
@@ -235,14 +304,17 @@ describe('filtering specs', () => {
         '/user/app/cypress/integration/spec2.js': {}
       }
       const result = filterFilesFromCoverage(totalCoverage, config, expose, spec)
-      expect(result).to.deep.equal({
+      expect(result).toEqual({
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
       })
     })
 
     it('filters list of specs when specPattern specifies folder', () => {
-      config.withArgs('specPattern').returns(['src/**/*.cy.js'])
+      config.mockImplementation((key) => {
+        if (key === 'specPattern') return ['src/**/*.cy.js']
+        return undefined
+      })
 
       const totalCoverage = {
         '/user/app/src/specA.cy.js': {},
@@ -251,20 +323,23 @@ describe('filtering specs', () => {
         'src/my-code.js': {}
       }
       const result = filterFilesFromCoverage(totalCoverage, config, expose, spec)
-      expect(result).to.deep.equal({
+      expect(result).toEqual({
         'src/my-code.js': {}
       })
     })
 
     it('filters list of specs when exclude pattern is an array', () => {
-      expose = cy.stub().returns({
+      expose = vi.fn().mockReturnValue({
         //filter out a.js and b.js in cypress folder
         codeCoverage: {
           exclude: ['cypress/**/a.js', 'cypress/**/b.js']
         }
       })
 
-      config.withArgs('specPattern').returns(['src/**/*.cy.js'])
+      config.mockImplementation((key) => {
+        if (key === 'specPattern') return ['src/**/*.cy.js']
+        return undefined
+      })
 
       const totalCoverage = {
         '/user/app/cypress/a.js': {},
@@ -274,10 +349,11 @@ describe('filtering specs', () => {
         'src/my-code.js': {}
       }
       const result = filterFilesFromCoverage(totalCoverage, config, expose, spec)
-      expect(result).to.deep.equal({
+      expect(result).toEqual({
         '/user/app/cypress/c.js': {},
         'src/my-code.js': {}
       })
     })
   })
 })
+

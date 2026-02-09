@@ -1,5 +1,6 @@
-/// <reference types="Cypress" />
-const { combineNycOptions, defaultNycOptions } = require('../../common-utils')
+import { describe, it, expect } from 'vitest'
+const { combineNycOptions, defaultNycOptions } = require('../../lib/common-utils')
+
 describe('Combine NYC options', () => {
   it('overrides defaults', () => {
     const pkgNycOptions = {
@@ -7,7 +8,7 @@ describe('Combine NYC options', () => {
       all: true
     }
     const combined = combineNycOptions(defaultNycOptions, pkgNycOptions)
-    cy.wrap(combined).should('deep.equal', {
+    expect(combined).toEqual({
       extends: '@istanbuljs/nyc-config-typescript',
       all: true,
       'report-dir': './coverage',
@@ -22,7 +23,7 @@ describe('Combine NYC options', () => {
       reporter: 'text'
     }
     const combined = combineNycOptions(defaultNycOptions, pkgNycOptions)
-    cy.wrap(combined).should('deep.equal', {
+    expect(combined).toEqual({
       'report-dir': './coverage',
       reporter: ['text'],
       extension: ['.js', '.cjs', '.mjs', '.ts', '.tsx', '.jsx'],
@@ -52,7 +53,7 @@ describe('Combine NYC options', () => {
       nycConfig,
       pkgNycOptions
     )
-    cy.wrap(combined).should('deep.equal', {
+    expect(combined).toEqual({
       all: true,
       'report-dir': './report',
       reporter: ['json'],
@@ -82,7 +83,7 @@ describe('Combine NYC options', () => {
       nycrcJson,
       pkgNycOptions
     )
-    cy.wrap(combined).should('deep.equal', {
+    expect(combined).toEqual({
       all: true,
       'report-dir': './coverage',
       reporter: ['json'],
@@ -93,3 +94,4 @@ describe('Combine NYC options', () => {
     })
   })
 })
+

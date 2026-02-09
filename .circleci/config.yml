@@ -51,6 +51,10 @@ jobs:
       - run:
           name: Build project
           command: npm run build
+      - run:
+          name: Install test app deps
+          command: npm i
+          working_directory: test-apps/all-files
       - cypress/run-tests:
           # no-workspace: true
           start-command: npm run start:windows --prefix test-apps/all-files

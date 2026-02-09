@@ -13,18 +13,11 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "moduleResolution": "node",
     "types": ["node", "cypress"]
   },
   "include": [
     "lib/**/*",
     "middleware/**/*",
   ],
-  "exclude": [
-    "test-apps/**/*",
-    "node_modules",
-    "dist",
-    "coverage"
-  ]
 }
 

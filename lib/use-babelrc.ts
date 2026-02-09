@@ -12,5 +12,5 @@ if (defaults.webpackOptions?.module?.rules?.[0]?.use?.[0]?.options?.presets) {
 // @ts-ignore - we know that the use property exists
 const preprocessor = webpackPreprocessor(defaults)
 // Type assertion to avoid exposing private FileEvent type
-export default preprocessor as (file: Cypress.FileObject) => string | Promise<string>
+export = preprocessor as (file: Cypress.FileObject) => string | Promise<string>
 

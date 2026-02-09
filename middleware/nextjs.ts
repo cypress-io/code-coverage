@@ -21,7 +21,7 @@
  * @see https://github.com/cypress-io/code-coverage
  */
 
-export default function returnCodeCoverageNext(req: any, res: any): void {
+export = function returnCodeCoverageNext(req: any, res: any): void {
   // only GET is supported
   res.status(200).json({
     coverage: (global as typeof globalThis & { __coverage__?: unknown }).__coverage__ || null

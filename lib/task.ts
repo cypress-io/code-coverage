@@ -236,7 +236,7 @@ const tasks = {
     }
   ```
 */
-export default function registerCodeCoverageTasks(
+export = function registerCodeCoverageTasks(
   on: Cypress.PluginEvents,
   config: Cypress.PluginConfigOptions
 ): Cypress.PluginConfigOptions {

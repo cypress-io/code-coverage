@@ -1,6 +1,6 @@
 /// <reference types="node" />
 /// <reference types="cypress" />
-import registerCodeCoverageTasks from './task'
+import registerCodeCoverageTasks = require('./task')
 
 // common Cypress plugin file you can point at to have the
 // code coverage tasks registered correctly. From your "cypress.json" file
@@ -9,7 +9,7 @@ import registerCodeCoverageTasks from './task'
 //   "supportFile": "@cypress/code-coverage/support"
 // }
 //
-export default function plugins(on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): Cypress.PluginConfigOptions {
+export = function plugins(on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): Cypress.PluginConfigOptions {
   registerCodeCoverageTasks(on, config)
   // IMPORTANT to return the config object with any changes
   return config

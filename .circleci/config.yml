@@ -48,6 +48,9 @@ jobs:
       - run:
           name: Install deps for code coverage
           command: npm ci
+      - run:
+          name: Build project
+          command: npm run build
       - cypress/run-tests:
           # no-workspace: true
           start-command: npm run start:windows --prefix test-apps/all-files

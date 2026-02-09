@@ -77,7 +77,7 @@ jobs:
       - run: npm run build
       - persist_to_workspace:
           paths:
-            - dist
+            - project/dist
           root: ~/
 
   publish:

@@ -188,8 +188,9 @@ function registerHooks(): void {
 
     // there might be server-side code coverage information
     // we should grab it once after all tests finish
-    // @ts-ignore - state is a runtime property
+
     const baseUrl =
+      // @ts-ignore - state is a runtime property
       Cypress.config('baseUrl') || (cy.state('window') as Window).origin
     // @ts-ignore - proxyUrl is a runtime property
     const runningEndToEndTests = baseUrl !== Cypress.config('proxyUrl')

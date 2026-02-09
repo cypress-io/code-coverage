@@ -68,6 +68,18 @@ jobs:
           command: npm i -D check-code-coverage && npm run coverage:check-files
           working_directory: test-apps/all-files
 
+  build-dist:
+    docker:
+      - image: cimg/node:22.14.0
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run: npm run build
+      - persist_to_workspace:
+          paths:
+            - dist
+          root: ~/
+
   publish:
     description: Publishes the new version of the plugin to NPM
     docker:
@@ -85,36 +97,36 @@ jobs:
           at: ~/
       - run: npm run semantic-release
 
-  cyrun:
+  verify-test-apps:
     docker:
       - image: cypress/base:22.14.0
     parameters:
-      jobname:
+      app:
         type: string
     steps:
       - attach_workspace:
           at: ~/
       - run:
-          working_directory: test-apps/<< parameters.jobname >>
+          working_directory: test-apps/<< parameters.app >>
           command: npm i
       - run:
           command: npm run test
-          working_directory: test-apps/<< parameters.jobname >>
+          working_directory: test-apps/<< parameters.app >>
       - store_artifacts:
-          path: test-apps/<< parameters.jobname >>/coverage
+          path: test-apps/<< parameters.app >>/coverage
       - run:
           name: Verify Code Coverage
           command: npm run coverage:verify
-          working_directory: test-apps/<< parameters.jobname >>
+          working_directory: test-apps/<< parameters.app >>
       - run:
           name: Check code coverage files 📈
           # we will check the final coverage report
           # to make sure it only has files we are interested in
           # because there are files covered at 0 in the report
           command: npm run coverage:check-files
-          working_directory: test-apps/<< parameters.jobname >>
+          working_directory: test-apps/<< parameters.app >>
 
-  test-code-coverage-plugin:
+  unit-test:
     docker:
       - image: cypress/base:24.11.0
     steps:
@@ -133,17 +145,16 @@ workflows:
           requires:
             - install_and_persist
 
-      - test-code-coverage-plugin:
+      - unit-test:
           requires:
             - install_and_persist
 
-      - cyrun:
-          name: test-<< matrix.jobname>>
+      - verify-test-apps:
           requires:
-            - install_and_persist
+            - lint
           matrix:
             parameters:
-              jobname:
+              app:
                 - all-files
                 - backend
                 - batch-send-coverage
@@ -161,6 +172,12 @@ workflows:
                 - use-webpack
                 - redirect
       - windows_test
+      - build-dist:
+          requires:
+            - lint
+            - unit-test
+            - verify-test-apps
+            - windows_test
       - publish:
           context: org-npm-credentials
           filters:
@@ -171,22 +188,4 @@ workflows:
                 - next
                 - dev
           requires:
-            - lint
-            - test-code-coverage-plugin
-            - test-all-files
-            - test-backend
-            - test-batch-send-coverage
-            - test-before-all-visit
-            - test-before-each-visit
-            - test-exclude-files
-            - test-frontend
-            - test-fullstack
-            - test-multiple-backends
-            - test-one-spec
-            - test-same-folder
-            - test-support-files
-            - test-ts-example
-            - test-unit-tests-js
-            - test-use-webpack
-            - test-redirect
-            - windows_test
+            - build-dist

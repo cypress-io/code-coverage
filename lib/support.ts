@@ -40,7 +40,10 @@ function sendCoverage(coverage: unknown, pathname = '/'): void {
  * Sends collected code coverage object to the backend code
  * in batches via "cy.task".
  */
-function sendBatchCoverage(totalCoverage: Record<string, unknown>, batchSize: number): void {
+function sendBatchCoverage(
+  totalCoverage: Record<string, unknown>,
+  batchSize: number
+): void {
   const keys = Object.keys(totalCoverage)
 
   for (let i = 0; i < keys.length; i += batchSize) {
@@ -72,7 +75,8 @@ function registerHooks(): void {
   const hasE2ECoverage = (): boolean => Boolean(windowCoverageObjects.length)
 
   // @ts-ignore - __coverage__ is a global added by instrumentation
-  const hasUnitTestCoverage = (): boolean => Boolean((window as typeof window & { __coverage__?: unknown }).__coverage__)
+  const hasUnitTestCoverage = (): boolean =>
+    Boolean((window as typeof window & { __coverage__?: unknown }).__coverage__)
 
   before(() => {
     // we need to reset the coverage when running
@@ -112,7 +116,9 @@ function registerHooks(): void {
         // https://github.com/cypress-io/cypress/issues/20753
         if (win) {
           // @ts-ignore - __coverage__ is added by instrumentation
-          applicationSourceCoverage = (win as typeof win & { __coverage__?: unknown }).__coverage__
+          applicationSourceCoverage = (
+            win as typeof win & { __coverage__?: unknown }
+          ).__coverage__
         }
       } catch {
         // ignore cross-origin errors
@@ -183,7 +189,8 @@ function registerHooks(): void {
     // there might be server-side code coverage information
     // we should grab it once after all tests finish
     // @ts-ignore - state is a runtime property
-    const baseUrl = Cypress.config('baseUrl') || (cy.state('window') as Window).origin
+    const baseUrl =
+      Cypress.config('baseUrl') || (cy.state('window') as Window).origin
     // @ts-ignore - proxyUrl is a runtime property
     const runningEndToEndTests = baseUrl !== Cypress.config('proxyUrl')
     const expectFrontendCoverageOnly = Cypress._.get(
@@ -256,7 +263,9 @@ function registerHooks(): void {
     // NOTE: spec iframe is NOT reset between the tests, so we can grab
     // the coverage information only once after all tests have finished
     // @ts-ignore - __coverage__ is added by instrumentation
-    const unitTestCoverage = (window as typeof window & { __coverage__?: unknown }).__coverage__
+    const unitTestCoverage = (
+      window as typeof window & { __coverage__?: unknown }
+    ).__coverage__
     if (unitTestCoverage) {
       sendCoverage(unitTestCoverage, 'unit')
     }
@@ -308,4 +317,3 @@ if (exposedValues.coverage === false) {
 } else {
   registerHooks()
 }
-

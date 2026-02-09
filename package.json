@@ -24,8 +24,8 @@
     "coverage": "vitest run --coverage",
     "report:coverage": "nyc report --reporter=html",
     "dev:no:coverage": "start-test 1234 'cypress open --expose coverage=false'",
-    "format": "prettier --write '*.{js,ts}'",
-    "format:check": "prettier --check '*.{js,ts}'",
+    "format": "prettier --write '{lib,middleware,test}/**/*.{js,ts}'",
+    "format:check": "prettier --check '{lib,middleware,test}/**/*.{js,ts}'",
     "check:markdown": "find *.md -exec npx markdown-link-check {} \\;",
     "effective:config": "circleci config process .circleci/config.yml | sed /^#/d",
     "apps:test:coverage:verify": "./scripts/test-apps-and-verify-coverage.sh"

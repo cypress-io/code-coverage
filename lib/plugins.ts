@@ -9,9 +9,11 @@ import registerCodeCoverageTasks = require('./task')
 //   "supportFile": "@cypress/code-coverage/support"
 // }
 //
-export = function plugins(on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): Cypress.PluginConfigOptions {
+export = function plugins(
+  on: Cypress.PluginEvents,
+  config: Cypress.PluginConfigOptions
+): Cypress.PluginConfigOptions {
   registerCodeCoverageTasks(on, config)
   // IMPORTANT to return the config object with any changes
   return config
 }
-

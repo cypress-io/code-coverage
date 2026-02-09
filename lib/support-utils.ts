@@ -69,7 +69,9 @@ function getCypressExcludePatterns(
   spec: typeof Cypress.spec
 ): string[] {
   const testFilePattern = config('specPattern')
-  const codeCoverageConfig = expose().codeCoverage as { exclude?: string | string[] } | undefined
+  const codeCoverageConfig = expose().codeCoverage as
+    | { exclude?: string | string[] }
+    | undefined
   const excludePattern = codeCoverageConfig?.exclude
 
   let testFilePatterns: string[] = []
@@ -152,4 +154,3 @@ export function getSendCoverageBatchSize(): number | null {
   const isValid = !isNaN(parsedBatchSize) && parsedBatchSize > 0
   return isValid ? parsedBatchSize : null
 }
-

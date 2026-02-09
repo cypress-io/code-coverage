@@ -48,9 +48,13 @@ export function readNycOptions(workingDirectory: string): NycOptions {
   let nycrcYaml: NycOptions = {}
   if (existsSync(nycrcYamlFilename)) {
     try {
-      nycrcYaml = yaml.load(readFileSync(nycrcYamlFilename, 'utf8')) as NycOptions
+      nycrcYaml = yaml.load(
+        readFileSync(nycrcYamlFilename, 'utf8')
+      ) as NycOptions
     } catch (error) {
-      throw new Error(`Failed to load .nycrc.yaml: ${error instanceof Error ? error.message : String(error)}`)
+      throw new Error(
+        `Failed to load .nycrc.yaml: ${error instanceof Error ? error.message : String(error)}`
+      )
     }
   }
 
@@ -60,7 +64,9 @@ export function readNycOptions(workingDirectory: string): NycOptions {
     try {
       nycrcYml = yaml.load(readFileSync(nycrcYmlFilename, 'utf8')) as NycOptions
     } catch (error) {
-      throw new Error(`Failed to load .nycrc.yml: ${error instanceof Error ? error.message : String(error)}`)
+      throw new Error(
+        `Failed to load .nycrc.yml: ${error instanceof Error ? error.message : String(error)}`
+      )
     }
   }
 
@@ -70,7 +76,9 @@ export function readNycOptions(workingDirectory: string): NycOptions {
     try {
       nycConfig = require(nycConfigFilename) as NycOptions
     } catch (error) {
-      throw new Error(`Failed to load nyc.config.js: ${error instanceof Error ? error.message : String(error)}`)
+      throw new Error(
+        `Failed to load nyc.config.js: ${error instanceof Error ? error.message : String(error)}`
+      )
     }
   }
 
@@ -80,7 +88,9 @@ export function readNycOptions(workingDirectory: string): NycOptions {
     try {
       nycConfigCommonJs = require(nycConfigCommonJsFilename) as NycOptions
     } catch (error) {
-      throw new Error(`Failed to load nyc.config.cjs: ${error instanceof Error ? error.message : String(error)}`)
+      throw new Error(
+        `Failed to load nyc.config.cjs: ${error instanceof Error ? error.message : String(error)}`
+      )
     }
   }
 
@@ -99,7 +109,9 @@ export function readNycOptions(workingDirectory: string): NycOptions {
   return nycOptions
 }
 
-export function checkAllPathsNotFound(nycFilename: string): boolean | undefined {
+export function checkAllPathsNotFound(
+  nycFilename: string
+): boolean | undefined {
   const nycCoverage: CoverageMap = JSON.parse(readFileSync(nycFilename, 'utf8'))
 
   const coverageKeys = Object.keys(nycCoverage)
@@ -113,11 +125,7 @@ export function checkAllPathsNotFound(nycFilename: string): boolean | undefined 
     return !existsSync(coverage.path)
   })
 
-  log(
-    'in file %s all files are not found? %o',
-    nycFilename,
-    allFilesAreMissing
-  )
+  log('in file %s all files are not found? %o', nycFilename, allFilesAreMissing)
   return allFilesAreMissing
 }
 
@@ -353,7 +361,10 @@ function findSourceFiles(nycOptions: NycOptions): string[] {
  *
  * @see https://github.com/cypress-io/code-coverage/issues/207
  */
-export function includeAllFiles(nycFilename: string, nycOptions: NycOptions): void {
+export function includeAllFiles(
+  nycFilename: string,
+  nycOptions: NycOptions
+): void {
   if (!nycOptions.all) {
     log('NYC "all" option is not set, skipping including all files')
     return
@@ -369,7 +380,9 @@ export function includeAllFiles(nycFilename: string, nycOptions: NycOptions): vo
     return
   }
 
-  const nycCoverage: CoverageMapData = JSON.parse(readFileSync(nycFilename, 'utf8'))
+  const nycCoverage: CoverageMapData = JSON.parse(
+    readFileSync(nycFilename, 'utf8')
+  )
   const coverageKeys = Object.keys(nycCoverage)
   const coveredPaths = coverageKeys.map((key) =>
     nycCoverage[key].path.replace(/\\/g, '/')
@@ -407,4 +420,3 @@ export function includeAllFiles(nycFilename: string, nycOptions: NycOptions): vo
     )
   }
 }
-

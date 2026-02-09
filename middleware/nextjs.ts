@@ -24,7 +24,8 @@
 export = function returnCodeCoverageNext(req: any, res: any): void {
   // only GET is supported
   res.status(200).json({
-    coverage: (global as typeof globalThis & { __coverage__?: unknown }).__coverage__ || null
+    coverage:
+      (global as typeof globalThis & { __coverage__?: unknown }).__coverage__ ||
+      null
   })
 }
-

@@ -1,6 +1,5 @@
 /// <reference types="node" />
 
-
 export interface NycOptions {
   'report-dir'?: string
   reporter?: string | string[]
@@ -53,7 +52,9 @@ export interface FileCoveragePlaceholder {
  *
  * @param fullPath Filename
  */
-export function fileCoveragePlaceholder(fullPath: string): FileCoveragePlaceholder {
+export function fileCoveragePlaceholder(
+  fullPath: string
+): FileCoveragePlaceholder {
   return {
     path: fullPath,
     statementMap: {},
@@ -65,7 +66,9 @@ export function fileCoveragePlaceholder(fullPath: string): FileCoveragePlacehold
   }
 }
 
-function isPlaceholder(entry: FileCoveragePlaceholder | { hash?: string }): boolean {
+function isPlaceholder(
+  entry: FileCoveragePlaceholder | { hash?: string }
+): boolean {
   // when the file has been instrumented, its entry has "hash" property
   return !('hash' in entry)
 }
@@ -74,11 +77,12 @@ function isPlaceholder(entry: FileCoveragePlaceholder | { hash?: string }): bool
  * Given a coverage object with potential placeholder entries
  * inserted instead of covered files, removes them. Modifies the object in place
  */
-export function removePlaceholders(coverage: Record<string, FileCoveragePlaceholder | { hash?: string }>): void {
+export function removePlaceholders(
+  coverage: Record<string, FileCoveragePlaceholder | { hash?: string }>
+): void {
   Object.keys(coverage).forEach((key) => {
     if (isPlaceholder(coverage[key])) {
       delete coverage[key]
     }
   })
 }
-

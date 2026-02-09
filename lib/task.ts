@@ -1,5 +1,8 @@
 /// <reference types="node" />
-import { createCoverageMap, CoverageMap as IstanbulCoverageMap } from 'istanbul-lib-coverage'
+import {
+  createCoverageMap,
+  CoverageMap as IstanbulCoverageMap
+} from 'istanbul-lib-coverage'
 import { join, resolve } from 'path'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import execa from 'execa'
@@ -41,7 +44,9 @@ const nycReportOptions = (function getNycOption() {
   }
 
   if (nycReportOptions['temp-dir']) {
-    nycReportOptions['temp-dir'] = resolve(nycReportOptions['temp-dir'] as string)
+    nycReportOptions['temp-dir'] = resolve(
+      nycReportOptions['temp-dir'] as string
+    )
   } else {
     nycReportOptions['temp-dir'] = join(processWorkingDirectory, '.nyc_output')
   }
@@ -49,7 +54,9 @@ const nycReportOptions = (function getNycOption() {
   nycReportOptions.tempDir = nycReportOptions['temp-dir']
 
   if (nycReportOptions['report-dir']) {
-    nycReportOptions['report-dir'] = resolve(nycReportOptions['report-dir'] as string)
+    nycReportOptions['report-dir'] = resolve(
+      nycReportOptions['report-dir'] as string
+    )
   }
   // seems nyc API really is using camel cased version
   nycReportOptions.reportDir = nycReportOptions['report-dir']
@@ -83,13 +90,10 @@ function maybePrintFinalCoverageFiles(folder: string): void {
   }
 
   log('Final coverage in %s', jsonReportFilename)
-  const finalCoverage: Record<string, { s?: Record<string, number> }> = JSON.parse(readFileSync(jsonReportFilename, 'utf8'))
+  const finalCoverage: Record<string, { s?: Record<string, number> }> =
+    JSON.parse(readFileSync(jsonReportFilename, 'utf8'))
   const finalCoverageKeys = Object.keys(finalCoverage)
-  log(
-    'There are %d key(s) in %s',
-    finalCoverageKeys.length,
-    jsonReportFilename
-  )
+  log('There are %d key(s) in %s', finalCoverageKeys.length, jsonReportFilename)
 
   finalCoverageKeys.forEach((key) => {
     const s = finalCoverage[key].s || {}
@@ -209,10 +213,7 @@ const tasks = {
 
     const returnReportFolder = (): string => {
       const reportFolder = nycReportOptions['report-dir'] as string
-      log(
-        'after reporting, returning the report folder name %s',
-        reportFolder
-      )
+      log('after reporting, returning the report folder name %s', reportFolder)
 
       maybePrintFinalCoverageFiles(reportFolder)
 
@@ -248,4 +249,3 @@ export = function registerCodeCoverageTasks(
 
   return config
 }
-

@@ -2,6 +2,7 @@
   "name": "example-before-each-visit",
   "description": "Getting code coverage when cy.visit is used in beforeEach hook",
   "devDependencies": {
+    "@babel/core": "^7.28.6",
     "typescript": "^4.5.5"
   },
   "scripts": {

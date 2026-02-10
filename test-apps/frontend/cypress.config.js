@@ -1,6 +1,7 @@
 const { defineConfig } = require('cypress')
 
 module.exports = defineConfig({
+  allowCypressEnv: false,
   fixturesFolder: false,
   e2e: {
     setupNodeEvents(on, config) {
@@ -10,7 +11,7 @@ module.exports = defineConfig({
       'foobar.com': '127.0.0.1',
     },
     baseUrl: 'http://localhost:1234',
-    env: {
+    expose: {
       codeCoverage: {
         exclude: ['cypress/**/*.*']
       }

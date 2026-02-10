@@ -1,8 +1,9 @@
 const { defineConfig } = require('cypress')
 
 module.exports = defineConfig({
+  allowCypressEnv: false,
   fixturesFolder: false,
-  env: {
+  expose: {
     codeCoverage: {
       url: 'http://localhost:1234/__coverage__',
       exclude: 'cypress/**/*.*'

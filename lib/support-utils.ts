@@ -65,7 +65,7 @@ function filterSpecsFromCoverage(
  */
 function getCypressExcludePatterns(
   config: typeof Cypress.config,
-  expose: typeof Cypress.expose,
+  expose: typeof Cypress.expose
 ): string[] {
   const testFilePattern = config('specPattern')
   const codeCoverageConfig = expose().codeCoverage as

@@ -42,7 +42,7 @@ function filterSpecsFromCoverage(
   expose: typeof Cypress.expose = Cypress.expose,
   spec: typeof Cypress.spec = Cypress.spec
 ): CoverageObject {
-  const testFilePatterns = getCypressExcludePatterns(config, expose, spec)
+  const testFilePatterns = getCypressExcludePatterns(config, expose)
 
   const isTestFile = (_: unknown, filePath: string): boolean => {
     const workingDir = spec.absolute.replace(spec.relative, '')
@@ -66,7 +66,6 @@ function filterSpecsFromCoverage(
 function getCypressExcludePatterns(
   config: typeof Cypress.config,
   expose: typeof Cypress.expose,
-  spec: typeof Cypress.spec
 ): string[] {
   const testFilePattern = config('specPattern')
   const codeCoverageConfig = expose().codeCoverage as

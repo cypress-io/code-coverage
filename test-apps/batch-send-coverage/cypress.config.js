@@ -1,9 +1,8 @@
 const { defineConfig } = require('cypress')
 
 module.exports = defineConfig({
-  allowCypressEnv: false,
   fixturesFolder: false,
-  expose: {
+  env: {
     sendCoverageBatchSize: 1
   },
   e2e: {

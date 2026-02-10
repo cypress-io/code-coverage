@@ -30,7 +30,7 @@ module.exports = defineConfig({
       // include any other plugin code...
 
       // It's IMPORTANT to return the config object
-      // with any changes
+      // with any changed environment variables
       return config
     },
   },
@@ -145,6 +145,21 @@ The code coverage from spec files will be combined with end-to-end coverage.
 
 Find examples of just the unit tests and JavaScript source files with collected code coverage in [test-apps/unit-tests-js](./test-apps/unit-tests-js).
 
+### Alternative for unit tests
+
+If you cannot use `.babelrc` (maybe it is used by other tools?), try using the Browserify transformer included with this module in the `use-browserify-istanbul` file.
+
+```js
+module.exports = (on, config) => {
+  require('@cypress/code-coverage/task')(on, config)
+  on(
+    'file:preprocessor',
+    require('@cypress/code-coverage/use-browserify-istanbul')
+  )
+  return config
+}
+```
+
 ## Instrument backend code
 
 Example in [test-apps/backend](test-apps/backend) folder.
@@ -187,11 +202,11 @@ if (global.__coverage__) {
 }
 ```
 
-3. Save the API coverage endpoint in the `cypress.json` file to let the plugin know where to call to receive the code coverage data from the server. Place it in `expose.codeCoverage` object:
+3. Save the API coverage endpoint in the `cypress.json` file to let the plugin know where to call to receive the code coverage data from the server. Place it in `env.codeCoverage` object:
 
 ```json
 {
-  "expose": {
+  "env": {
     "codeCoverage": {
       "url": "http://localhost:3000/__coverage__"
     }
@@ -203,7 +218,7 @@ Or if you have multiple servers from which you are wanting to gather code covera
 
 ```json
 {
-  "expose": {
+  "env": {
     "codeCoverage": {
       "url": ["http://localhost:3000/__coverage__", "http://localhost:3001/__coverage__"]
     }
@@ -225,7 +240,7 @@ After:
 
 ```json
 {
-  "expose": {
+  "env": {
     "codeCoverage": {
       "url": "http://localhost:3003/__coverage__",
       "expectBackendCoverageOnly": true
@@ -242,7 +257,7 @@ If there is ONLY frontend code coverage, set `expectFrontendCoverageOnly: true` 
 
 ```json
 {
-  "expose": {
+  "env": {
     "codeCoverage": {
       "url": "http://localhost:3003/__coverage__",
       "expectFrontendCoverageOnly": true
@@ -354,11 +369,11 @@ switch (foo) {
 
 ### Exclude files and folders
 
-The code coverage plugin will automatically exclude any test/spec files you have defined in the `testFiles` (Cypress < v10) or `specPattern` (Cypress >= v10) configuration options. Additionally, you can set the `exclude` pattern glob in the code coverage configuration key to specify additional files to be excluded:
+The code coverage plugin will automatically exclude any test/spec files you have defined in the `testFiles` (Cypress < v10) or `specPattern` (Cypress >= v10) configuration options. Additionally, you can set the `exclude` pattern glob in the code coverage environment variable to specify additional files to be excluded:
 
 ```javascript
 // cypress.config.js or cypress.json
-expose: {
+env: {
   codeCoverage: {
     exclude: ['cypress/**/*.*'],
   },
@@ -386,18 +401,20 @@ Another important option is `excludeAfterRemap`. By default, it is false, which 
 
 ## Disable plugin
 
-You can skip the client-side code coverage hooks by setting the exposed `coverage` value to `false`.
+You can skip the client-side code coverage hooks by setting the environment variable `coverage` to `false`.
 
 ```shell
-# tell Cypress to set the exposed variable "coverage" to false
-cypress run --expose coverage=false
+# tell Cypress to set environment variable "coverage" to false
+cypress run --env coverage=false
+# or pass the environment variable
+CYPRESS_COVERAGE=false cypress run
 ```
 
 Or set it to `false` in the `cypress.json` file.
 
 ```json
 {
-  "expose": {
+  "env": {
     "coverage": false
   }
 }
@@ -432,7 +449,6 @@ Full examples we use for testing in this repository:
 - [test-apps/before-each-visit](test-apps/before-each-visit) checks if code coverage correctly keeps track of code when doing `cy.visit` before each test
 - [test-apps/one-spec](test-apps/one-spec) confirms that coverage is collected and filtered correctly if the user only executes a single Cypress test
 - [test-apps/ts-example](test-apps/ts-example) uses Babel + Parcel to instrument and serve TypeScript file
-- [test-apps/esm-example](test-apps/esm-example) demonstrates using ES module syntax (`import`/`export`) with the plugin
 - [test-apps/use-webpack](test-apps/use-webpack) shows Webpack build with source maps and Babel
 - [test-apps/unit-tests-js](test-apps/unit-tests-js) runs just the unit tests and reports code coverage (JavaScript source code)
 - [test-apps/unit-tests-ts](test-apps/ts-example) runs just the unit tests and reports code coverage (TypeScript source code)
@@ -463,40 +479,6 @@ Look up the list of examples under the GitHub topic [cypress-code-coverage-examp
 
 ## Migrations
 
-### `@cypress/code-coverage` 3.x to 4.x
-
-`Cypress.env()` was deprecated in Cypress v15.10.0, and will be removed in Cypress 16. This necessitates a breaking change to how you configure `@cypress/code-coverage`.
-
-```js
-// BEFORE
-// Configure in the `env` key in your Cypress config:
-const { defineConfig } = require('cypress')
-
-module.exports = defineConfig({
-  env: {
-    codeCoverage: {
-      url: 'http://localhost:1234/__coverage__',
-      exclude: 'cypress/**/*.*'
-    }
-  }
-})
-```
-
-```js
-// AFTER
-// Configure in the `expose` key in your Cypress config:
-const { defineConfig } = require('cypress')
-
-module.exports = defineConfig({
-  expose: {
-    codeCoverage: {
-      url: 'http://localhost:1234/__coverage__',
-      exclude: 'cypress/**/*.*'
-    }
-  }
-})
-```
-
 ### Cypress v9 to v10
 
 With the removal of the `plugins` directory in Cypress version 10+, you'll need to add all of your configuration into the configuration file (`cypress.config.js` by default).
@@ -511,7 +493,7 @@ module.exports = (on, config) => {
   // add other tasks to be registered here
 
   // IMPORTANT to return the config object
-  // with the any changes
+  // with the any changed environment variables
   return config
 }
 ```
@@ -530,7 +512,7 @@ module.exports = defineConfig({
       // include any other plugin code...
 
       // It's IMPORTANT to return the config object
-      // with any changes
+      // with any changed environment variables
       return config
     },
   },
@@ -550,7 +532,7 @@ module.exports = (on, config) => {
 module.exports = (on, config) => {
   require('@cypress/code-coverage/task')(on, config)
   // IMPORTANT to return the config object
-  // with the any changes
+  // with the any changed environment variables
   return config
 }
 ```
@@ -593,7 +575,8 @@ If you decide to open an issue in this repository, please fill in all informatio
 ### Coverage reporting timeouts
 
 If the plugin times out when sending coverage report data to be merged, this may be due to a very large
-report being sent across processes. You can batch the report by setting the `sendCoverageBatchSize` value in your `cypress.config.js` file's `expose` section. Assign the variable an integer value representing
+report being sent across processes. You can batch the report by setting the `sendCoverageBatchSize` environment
+variable in your `cypress.config.js` file's 'env' section. Assign the variable an integer value representing
 the number of report keys to send per batch.
 
 ## Contributing

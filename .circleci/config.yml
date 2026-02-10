@@ -2,7 +2,7 @@
 version: 2.1
 orbs:
   # https://github.com/cypress-io/circleci-orb
-  cypress: cypress-io/cypress@6.0.0 # used to run e2e tests
+  cypress: cypress-io/cypress@3.0.0 # used to run e2e tests
   win: circleci/windows@5.1.0 # run a test job on Windows
 
 jobs:
@@ -40,21 +40,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install node 22
-          command: nvm install 22
+          name: Install node 20
+          command: nvm install 20.12.1
       - run:
-          name: Use node 22
-          command: nvm use 22
+          name: Use node 20
+          command: nvm use 20.12.1
       - run:
           name: Install deps for code coverage
           command: npm ci
-      - run:
-          name: Build project
-          command: npm run build
-      - run:
-          name: Install test app deps
-          command: npm i
-          working_directory: test-apps/all-files
       - cypress/run-tests:
           # no-workspace: true
           start-command: npm run start:windows --prefix test-apps/all-files
@@ -75,18 +68,6 @@ jobs:
           command: npm i -D check-code-coverage && npm run coverage:check-files
           working_directory: test-apps/all-files
 
-  build-dist:
-    docker:
-      - image: cimg/node:22.14.0
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run: npm run build
-      - persist_to_workspace:
-          paths:
-            - project/dist
-          root: ~/
-
   publish:
     description: Publishes the new version of the plugin to NPM
     docker:
@@ -104,38 +85,35 @@ jobs:
           at: ~/
       - run: npm run semantic-release
 
-  verify-test-apps:
+  cyrun:
     docker:
-      - image: cypress/base:22.14.0
+      - image: cypress/base:16.18.1
     parameters:
-      app:
+      jobname:
         type: string
     steps:
       - attach_workspace:
           at: ~/
       - run:
-          working_directory: test-apps/<< parameters.app >>
-          command: npm i
-      - run:
           command: npm run test
-          working_directory: test-apps/<< parameters.app >>
+          working_directory: test-apps/<< parameters.jobname >>
       - store_artifacts:
-          path: test-apps/<< parameters.app >>/coverage
+          path: test-apps/<< parameters.jobname >>/coverage
       - run:
           name: Verify Code Coverage
           command: npm run coverage:verify
-          working_directory: test-apps/<< parameters.app >>
+          working_directory: test-apps/<< parameters.jobname >>
       - run:
           name: Check code coverage files 📈
           # we will check the final coverage report
           # to make sure it only has files we are interested in
           # because there are files covered at 0 in the report
           command: npm run coverage:check-files
-          working_directory: test-apps/<< parameters.app >>
+          working_directory: test-apps/<< parameters.jobname >>
 
-  unit-test:
+  test-code-coverage-plugin:
     docker:
-      - image: cypress/base:24.11.0
+      - image: cypress/base:16.18.1
     steps:
       - attach_workspace:
           at: ~/
@@ -143,6 +121,9 @@ jobs:
           command: npm run test
       - store_artifacts:
           path: coverage
+      - run:
+          name: Verify Code Coverage
+          command: npm run coverage:verify
 
 workflows:
   build:
@@ -151,25 +132,24 @@ workflows:
       - lint:
           requires:
             - install_and_persist
-      - unit-test:
+
+      - test-code-coverage-plugin:
           requires:
             - install_and_persist
-      - build-dist:
+
+      - cyrun:
+          name: test-<< matrix.jobname>>
           requires:
-            - lint
-            - unit-test
-      - verify-test-apps:
-          requires:
-            - build-dist
+            - install_and_persist
           matrix:
             parameters:
-              app:
+              jobname:
                 - all-files
                 - backend
                 - batch-send-coverage
                 - before-all-visit
                 - before-each-visit
-                - esm-example
+                - cra-e2e-and-ct
                 - exclude-files
                 - frontend
                 - fullstack
@@ -181,9 +161,7 @@ workflows:
                 - unit-tests-js
                 - use-webpack
                 - redirect
-      - windows_test:
-          requires:
-            - build-dist
+      - windows_test
       - publish:
           context: org-npm-credentials
           filters:
@@ -194,5 +172,23 @@ workflows:
                 - next
                 - dev
           requires:
-            - verify-test-apps
+            - lint
+            - test-code-coverage-plugin
+            - test-all-files
+            - test-backend
+            - test-batch-send-coverage
+            - test-before-all-visit
+            - test-before-each-visit
+            - test-cra-e2e-and-ct
+            - test-exclude-files
+            - test-frontend
+            - test-fullstack
+            - test-multiple-backends
+            - test-one-spec
+            - test-same-folder
+            - test-support-files
+            - test-ts-example
+            - test-unit-tests-js
+            - test-use-webpack
+            - test-redirect
             - windows_test

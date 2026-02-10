@@ -11,6 +11,10 @@
     "coverage:verify": "npx nyc report --check-coverage true --lines 100",
     "coverage:check-files": "check-coverage main.js && check-coverage second.js && check-coverage not-covered.js && check-coverage cypress.config.js && only-covered --from coverage/coverage-final.json main.js second.js not-covered.js cypress.config.js"
   },
+  "nyc": {
+    "all": true,
+    "include": "*.js"
+  },
   "devDependencies": {
     "@babel/core": "^7.22.15"
   }

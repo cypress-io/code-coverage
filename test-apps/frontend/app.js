@@ -1,5 +1,5 @@
-const _ = require('lodash')
+import { map } from 'lodash'
 
 const list = [{ name: 'joe' }, { name: 'mary' }]
-const names = _.map(list, 'name')
+const names = map(list, 'name')
 console.log('just names', names)

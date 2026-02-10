@@ -1,23 +1,28 @@
 /// <reference types="cypress" />
-// @ts-check
-
-const dayjs = require('dayjs')
-var duration = require('dayjs/plugin/duration')
-const {
+/// <reference lib="dom" />
+import type { CoverageObject } from './support-utils'
+import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+import {
   filterFilesFromCoverage,
   getSendCoverageBatchSize
-} = require('./support-utils')
+} from './support-utils'
 
 dayjs.extend(duration)
+
+interface WindowCoverageObject {
+  coverage: unknown
+  pathname: string
+}
 
 /**
  * Sends collected code coverage object to the backend code
  * via "cy.task".
  */
-const sendCoverage = (coverage, pathname = '/') => {
+function sendCoverage(coverage: unknown, pathname = '/'): void {
   logMessage(`Saving code coverage for **${pathname}**`)
 
-  const totalCoverage = filterFilesFromCoverage(coverage)
+  const totalCoverage = filterFilesFromCoverage(coverage as CoverageObject)
 
   const batchSize = getSendCoverageBatchSize()
   const keys = Object.keys(totalCoverage)
@@ -35,12 +40,15 @@ const sendCoverage = (coverage, pathname = '/') => {
  * Sends collected code coverage object to the backend code
  * in batches via "cy.task".
  */
-const sendBatchCoverage = (totalCoverage, batchSize) => {
+function sendBatchCoverage(
+  totalCoverage: Record<string, unknown>,
+  batchSize: number
+): void {
   const keys = Object.keys(totalCoverage)
 
   for (let i = 0; i < keys.length; i += batchSize) {
     const batchKeys = keys.slice(i, i + batchSize)
-    const batchCoverage = {}
+    const batchCoverage: Record<string, unknown> = {}
 
     batchKeys.forEach((key) => {
       batchCoverage[key] = totalCoverage[key]
@@ -55,19 +63,20 @@ const sendBatchCoverage = (totalCoverage, batchSize) => {
 /**
  * Consistently logs the given string to the Command Log
  * so the user knows the log message is coming from this plugin.
- * @param {string} s Message to log.
+ * @param s Message to log.
  */
-const logMessage = (s) => {
+function logMessage(s: string): void {
   cy.log(`${s} \`[@cypress/code-coverage]\``)
 }
 
-const registerHooks = () => {
-  let windowCoverageObjects
+function registerHooks(): void {
+  let windowCoverageObjects: WindowCoverageObject[] = []
 
-  const hasE2ECoverage = () => Boolean(windowCoverageObjects.length)
+  const hasE2ECoverage = (): boolean => Boolean(windowCoverageObjects.length)
 
-  // @ts-ignore
-  const hasUnitTestCoverage = () => Boolean(window.__coverage__)
+  // @ts-ignore - __coverage__ is a global added by instrumentation
+  const hasUnitTestCoverage = (): boolean =>
+    Boolean((window as typeof window & { __coverage__?: unknown }).__coverage__)
 
   before(() => {
     // we need to reset the coverage when running
@@ -81,7 +90,7 @@ const registerHooks = () => {
     cy.task(
       'resetCoverage',
       {
-        // @ts-ignore
+        // @ts-ignore - isInteractive is a runtime property
         isInteractive: Cypress.config('isInteractive')
       },
       { log: false }
@@ -95,20 +104,25 @@ const registerHooks = () => {
     // to let the user know the coverage has been collected
     windowCoverageObjects = []
 
-    const saveCoverageObject = (win) => {
+    const saveCoverageObject = (win: Window): void => {
       // if the application code has been instrumented, then the app iframe "win.__coverage__" will be available,
       // in addition, accessing win.__coverage__ can throw when testing cross-origin code,
       // because we don't control the cross-origin code, we can safely return
-      let applicationSourceCoverage
+      let applicationSourceCoverage: unknown
       try {
         // Note that we are purposefully not supporting the optional chaining syntax here to
         // support a wide range of projects (some of which are not set up to support the optional
         // chaining syntax due to current Cypress limitations). See:
         // https://github.com/cypress-io/cypress/issues/20753
         if (win) {
-          applicationSourceCoverage = win.__coverage__
+          // @ts-ignore - __coverage__ is added by instrumentation
+          applicationSourceCoverage = (
+            win as typeof win & { __coverage__?: unknown }
+          ).__coverage__
         }
-      } catch {}
+      } catch {
+        // ignore cross-origin errors
+      }
 
       if (!applicationSourceCoverage) {
         return
@@ -174,9 +188,11 @@ const registerHooks = () => {
 
     // there might be server-side code coverage information
     // we should grab it once after all tests finish
-    // @ts-ignore
-    const baseUrl = Cypress.config('baseUrl') || cy.state('window').origin
-    // @ts-ignore
+
+    const baseUrl =
+      // @ts-ignore - state is a runtime property
+      Cypress.config('baseUrl') || (cy.state('window') as Window).origin
+    // @ts-ignore - proxyUrl is a runtime property
     const runningEndToEndTests = baseUrl !== Cypress.config('proxyUrl')
     const expectFrontendCoverageOnly = Cypress._.get(
       Cypress.expose('codeCoverage'),
@@ -199,7 +215,7 @@ const registerHooks = () => {
         'url',
         '/__coverage__'
       )
-      function captureCoverage(url, suffix = '') {
+      function captureCoverage(url: string, suffix = ''): void {
         cy.request({
           url,
           log: false,
@@ -247,8 +263,10 @@ const registerHooks = () => {
     // then we will have unit test coverage
     // NOTE: spec iframe is NOT reset between the tests, so we can grab
     // the coverage information only once after all tests have finished
-    // @ts-ignore
-    const unitTestCoverage = window.__coverage__
+    // @ts-ignore - __coverage__ is added by instrumentation
+    const unitTestCoverage = (
+      window as typeof window & { __coverage__?: unknown }
+    ).__coverage__
     if (unitTestCoverage) {
       sendCoverage(unitTestCoverage, 'unit')
     }

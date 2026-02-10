@@ -1,74 +1,96 @@
 // helper functions to use from "task.js" plugins code
 // that need access to the file system
 
-// @ts-check
-/// <reference types="cypress" />
-const { readFileSync, writeFileSync, existsSync } = require('fs')
-const { isAbsolute, resolve, join } = require('path')
-const debug = require('debug')('code-coverage')
-const chalk = require('chalk')
-const tinyglobby = require('tinyglobby')
-const yaml = require('js-yaml')
-const {
+/// <reference types="node" />
+import { readFileSync, writeFileSync, existsSync } from 'fs'
+import { isAbsolute, resolve, join } from 'path'
+import debug from 'debug'
+import chalk from 'chalk'
+import { globSync } from 'tinyglobby'
+import yaml from 'js-yaml'
+import {
   combineNycOptions,
   defaultNycOptions,
-  fileCoveragePlaceholder
-} = require('./common-utils')
+  fileCoveragePlaceholder,
+  type NycOptions
+} from './common-utils'
+import type { CoverageMapData, FileCoverageData } from 'istanbul-lib-coverage'
+const log = debug('code-coverage')
 
-function readNycOptions(workingDirectory) {
+export interface CoverageEntry {
+  path: string
+  hash?: string
+  [key: string]: unknown
+}
+
+export interface CoverageMap {
+  [key: string]: CoverageEntry
+}
+
+export function readNycOptions(workingDirectory: string): NycOptions {
   const pkgFilename = join(workingDirectory, 'package.json')
   const pkg = existsSync(pkgFilename)
     ? JSON.parse(readFileSync(pkgFilename, 'utf8'))
     : {}
-  const pkgNycOptions = pkg.nyc || {}
+  const pkgNycOptions: NycOptions = pkg.nyc || {}
 
   const nycrcFilename = join(workingDirectory, '.nycrc')
-  const nycrc = existsSync(nycrcFilename)
+  const nycrc: NycOptions = existsSync(nycrcFilename)
     ? JSON.parse(readFileSync(nycrcFilename, 'utf8'))
     : {}
 
   const nycrcJsonFilename = join(workingDirectory, '.nycrc.json')
-  const nycrcJson = existsSync(nycrcJsonFilename)
+  const nycrcJson: NycOptions = existsSync(nycrcJsonFilename)
     ? JSON.parse(readFileSync(nycrcJsonFilename, 'utf8'))
     : {}
 
   const nycrcYamlFilename = join(workingDirectory, '.nycrc.yaml')
-  let nycrcYaml = {}
+  let nycrcYaml: NycOptions = {}
   if (existsSync(nycrcYamlFilename)) {
     try {
-      nycrcYaml = yaml.safeLoad(readFileSync(nycrcYamlFilename, 'utf8'))
+      nycrcYaml = yaml.load(
+        readFileSync(nycrcYamlFilename, 'utf8')
+      ) as NycOptions
     } catch (error) {
-      throw new Error(`Failed to load .nycrc.yaml: ${error.message}`)
+      throw new Error(
+        `Failed to load .nycrc.yaml: ${error instanceof Error ? error.message : String(error)}`
+      )
     }
   }
 
   const nycrcYmlFilename = join(workingDirectory, '.nycrc.yml')
-  let nycrcYml = {}
+  let nycrcYml: NycOptions = {}
   if (existsSync(nycrcYmlFilename)) {
     try {
-      nycrcYml = yaml.safeLoad(readFileSync(nycrcYmlFilename, 'utf8'))
+      nycrcYml = yaml.load(readFileSync(nycrcYmlFilename, 'utf8')) as NycOptions
     } catch (error) {
-      throw new Error(`Failed to load .nycrc.yml: ${error.message}`)
+      throw new Error(
+        `Failed to load .nycrc.yml: ${error instanceof Error ? error.message : String(error)}`
+      )
     }
   }
 
   const nycConfigFilename = join(workingDirectory, 'nyc.config.js')
-  let nycConfig = {}
+  let nycConfig: NycOptions = {}
   if (existsSync(nycConfigFilename)) {
     try {
-      nycConfig = require(nycConfigFilename)
+      nycConfig = require(nycConfigFilename) as NycOptions
     } catch (error) {
-      throw new Error(`Failed to load nyc.config.js: ${error.message}`)
+      throw new Error(
+        `Failed to load nyc.config.js: ${error instanceof Error ? error.message : String(error)}`
+      )
     }
   }
 
   const nycConfigCommonJsFilename = join(workingDirectory, 'nyc.config.cjs')
-  let nycConfigCommonJs = {}
+  let nycConfigCommonJs: NycOptions = {}
   if (existsSync(nycConfigCommonJsFilename)) {
     try {
-      nycConfigCommonJs = require(nycConfigCommonJsFilename)
+      nycConfigCommonJs = require(nycConfigCommonJsFilename) as NycOptions
     } catch (error) {
-      throw new Error(`Failed to load nyc.config.cjs: ${error.message}`)
+      throw new Error(
+        `Failed to load nyc.config.cjs: ${error instanceof Error ? error.message : String(error)}`
+      )
     }
   }
 
@@ -82,38 +104,36 @@ function readNycOptions(workingDirectory) {
     nycConfigCommonJs,
     pkgNycOptions
   )
-  debug('combined NYC options %o', nycOptions)
+  log('combined NYC options %o', nycOptions)
 
   return nycOptions
 }
 
-function checkAllPathsNotFound(nycFilename) {
-  const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
+export function checkAllPathsNotFound(
+  nycFilename: string
+): boolean | undefined {
+  const nycCoverage: CoverageMap = JSON.parse(readFileSync(nycFilename, 'utf8'))
 
   const coverageKeys = Object.keys(nycCoverage)
   if (!coverageKeys.length) {
-    debug('⚠️ file %s has no coverage information', nycFilename)
+    log('⚠️ file %s has no coverage information', nycFilename)
     return
   }
 
-  const allFilesAreMissing = coverageKeys.every((key, k) => {
+  const allFilesAreMissing = coverageKeys.every((key) => {
     const coverage = nycCoverage[key]
     return !existsSync(coverage.path)
   })
 
-  debug(
-    'in file %s all files are not found? %o',
-    nycFilename,
-    allFilesAreMissing
-  )
+  log('in file %s all files are not found? %o', nycFilename, allFilesAreMissing)
   return allFilesAreMissing
 }
 
 /**
  * A small debug utility to inspect paths saved in NYC output JSON file
  */
-function showNycInfo(nycFilename) {
-  const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
+export function showNycInfo(nycFilename: string): void {
+  const nycCoverage: CoverageMap = JSON.parse(readFileSync(nycFilename, 'utf8'))
 
   const coverageKeys = Object.keys(nycCoverage)
   if (!coverageKeys.length) {
@@ -129,7 +149,7 @@ function showNycInfo(nycFilename) {
     )
     return
   }
-  debug('NYC file %s has %d key(s)', nycFilename, coverageKeys.length)
+  log('NYC file %s has %d key(s)', nycFilename, coverageKeys.length)
 
   const maxPrintKeys = 3
   const showKeys = coverageKeys.slice(0, maxPrintKeys)
@@ -140,7 +160,7 @@ function showNycInfo(nycFilename) {
     // printing a few found keys and file paths from the coverage file
     // will make debugging any problems much much easier
     if (k < maxPrintKeys) {
-      debug('%d key %s file path %s', k + 1, key, coverage.path)
+      log('%d key %s file path %s', k + 1, key, coverage.path)
     }
   })
 }
@@ -150,29 +170,29 @@ function showNycInfo(nycFilename) {
  * and if the file is relative, and exists, changes its path to
  * be absolute.
  */
-function resolveRelativePaths(nycFilename) {
-  const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
+export function resolveRelativePaths(nycFilename: string): void {
+  const nycCoverage: CoverageMap = JSON.parse(readFileSync(nycFilename, 'utf8'))
 
   const coverageKeys = Object.keys(nycCoverage)
   if (!coverageKeys.length) {
-    debug('⚠️ file %s has no coverage information', nycFilename)
+    log('⚠️ file %s has no coverage information', nycFilename)
     return
   }
-  debug('NYC file %s has %d key(s)', nycFilename, coverageKeys.length)
+  log('NYC file %s has %d key(s)', nycFilename, coverageKeys.length)
 
-  let changed
+  let changed = false
 
-  coverageKeys.forEach((key, k) => {
+  coverageKeys.forEach((key) => {
     const coverage = nycCoverage[key]
 
     if (!coverage.path) {
-      debug('key %s does not have path', key)
+      log('key %s does not have path', key)
       return
     }
 
     if (!isAbsolute(coverage.path)) {
       if (existsSync(coverage.path)) {
-        debug('resolving path %s', coverage.path)
+        log('resolving path %s', coverage.path)
         coverage.path = resolve(coverage.path)
         changed = true
       }
@@ -181,13 +201,13 @@ function resolveRelativePaths(nycFilename) {
 
     // path is absolute, let's check if it exists
     if (!existsSync(coverage.path)) {
-      debug('⚠️ cannot find file %s with hash %s', coverage.path, coverage.hash)
+      log('⚠️ cannot find file %s with hash %s', coverage.path, coverage.hash)
     }
   })
 
   if (changed) {
-    debug('resolveRelativePaths saving updated file %s', nycFilename)
-    debug('there are %d keys in the file', coverageKeys.length)
+    log('resolveRelativePaths saving updated file %s', nycFilename)
+    log('there are %d keys in the file', coverageKeys.length)
     writeFileSync(
       nycFilename,
       JSON.stringify(nycCoverage, null, 2) + '\n',
@@ -197,12 +217,12 @@ function resolveRelativePaths(nycFilename) {
 }
 
 /**
- * @param {string[]} filepaths
- * @returns {string | undefined} common prefix that corresponds to current folder
+ * @param filepaths
+ * @returns common prefix that corresponds to current folder
  */
-function findCommonRoot(filepaths) {
+export function findCommonRoot(filepaths: string[]): string | undefined {
   if (!filepaths.length) {
-    debug('cannot find common root without any files')
+    log('cannot find common root without any files')
     return
   }
 
@@ -210,19 +230,19 @@ function findCommonRoot(filepaths) {
   const splitParts = filepaths.map((name) => name.split('/'))
   const lengths = splitParts.map((arr) => arr.length)
   const shortestLength = Math.min.apply(null, lengths)
-  debug('shorted file path has %d parts', shortestLength)
+  log('shorted file path has %d parts', shortestLength)
 
   const cwd = process.cwd()
-  let commonPrefix = []
-  let foundCurrentFolder
+  const commonPrefix: string[] = []
+  let foundCurrentFolder: string | undefined
 
   for (let k = 0; k < shortestLength; k += 1) {
     const part = splitParts[0][k]
     const prefix = commonPrefix.concat(part).join('/')
-    debug('testing prefix %o', prefix)
+    log('testing prefix %o', prefix)
     const allFilesStart = filepaths.every((name) => name.startsWith(prefix))
     if (!allFilesStart) {
-      debug('stopped at non-common prefix %s', prefix)
+      log('stopped at non-common prefix %s', prefix)
       break
     }
 
@@ -231,13 +251,13 @@ function findCommonRoot(filepaths) {
     const removedPrefixNames = filepaths.map((filepath) =>
       filepath.slice(prefix.length)
     )
-    debug('removedPrefix %o', removedPrefixNames)
+    log('removedPrefix %o', removedPrefixNames)
     const foundAllPaths = removedPrefixNames.every((filepath) =>
       existsSync(join(cwd, filepath))
     )
-    debug('all files found at %s? %o', prefix, foundAllPaths)
+    log('all files found at %s? %o', prefix, foundAllPaths)
     if (foundAllPaths) {
-      debug('found prefix that matches current folder: %s', prefix)
+      log('found prefix that matches current folder: %s', prefix)
       foundCurrentFolder = prefix
       break
     }
@@ -246,23 +266,23 @@ function findCommonRoot(filepaths) {
   return foundCurrentFolder
 }
 
-function tryFindingLocalFiles(nycFilename) {
-  const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
+export function tryFindingLocalFiles(nycFilename: string): void {
+  const nycCoverage: CoverageMap = JSON.parse(readFileSync(nycFilename, 'utf8'))
   const coverageKeys = Object.keys(nycCoverage)
   const filenames = coverageKeys.map((key) => nycCoverage[key].path)
   const commonFolder = findCommonRoot(filenames)
   if (!commonFolder) {
-    debug('could not find common folder %s', commonFolder)
+    log('could not find common folder %s', commonFolder)
     return
   }
   const cwd = process.cwd()
-  debug(
+  log(
     'found common folder %s that matches current working directory %s',
     commonFolder,
     cwd
   )
   const length = commonFolder.length
-  let changed
+  let changed = false
 
   coverageKeys.forEach((key) => {
     const from = nycCoverage[key].path
@@ -270,14 +290,14 @@ function tryFindingLocalFiles(nycFilename) {
       const to = join(cwd, from.slice(length))
       // ? Do we need to replace the "key" in the coverage object or can we just replace the "path"?
       nycCoverage[key].path = to
-      debug('replaced %s -> %s', from, to)
+      log('replaced %s -> %s', from, to)
       changed = true
     }
   })
 
   if (changed) {
-    debug('tryFindingLocalFiles saving updated file %s', nycFilename)
-    debug('there are %d keys in the file', coverageKeys.length)
+    log('tryFindingLocalFiles saving updated file %s', nycFilename)
+    log('there are %d keys in the file', coverageKeys.length)
     writeFileSync(
       nycFilename,
       JSON.stringify(nycCoverage, null, 2) + '\n',
@@ -290,8 +310,8 @@ function tryFindingLocalFiles(nycFilename) {
  * Tries to find source files to be included in the final coverage report
  * using NYC options: extension list, include and exclude.
  */
-function findSourceFiles(nycOptions) {
-  debug('include all files options: %o', {
+function findSourceFiles(nycOptions: NycOptions): string[] {
+  log('include all files options: %o', {
     all: nycOptions.all,
     include: nycOptions.include,
     exclude: nycOptions.exclude,
@@ -306,13 +326,13 @@ function findSourceFiles(nycOptions) {
     return []
   }
 
-  let patterns = []
+  const patterns: string[] = []
   if (Array.isArray(nycOptions.include)) {
-    patterns = patterns.concat(nycOptions.include)
+    patterns.push(...nycOptions.include)
   } else if (typeof nycOptions.include === 'string') {
     patterns.push(nycOptions.include)
   } else {
-    debug('using default list of extensions')
+    log('using default list of extensions')
     nycOptions.extension.forEach((extension) => {
       patterns.push('**/*' + extension)
     })
@@ -320,7 +340,7 @@ function findSourceFiles(nycOptions) {
 
   if (Array.isArray(nycOptions.exclude)) {
     const negated = nycOptions.exclude.map((s) => '!' + s)
-    patterns = patterns.concat(negated)
+    patterns.push(...negated)
   } else if (typeof nycOptions.exclude === 'string') {
     patterns.push('!' + nycOptions.exclude)
   }
@@ -328,11 +348,12 @@ function findSourceFiles(nycOptions) {
   // https://github.com/istanbuljs/nyc#including-files-within-node_modules
   patterns.push('!**/node_modules/**')
 
-  debug('searching files to include using patterns %o', patterns)
+  log('searching files to include using patterns %o', patterns)
 
-  const allFiles = tinyglobby.globSync(patterns, { absolute: true })
+  const allFiles = globSync(patterns, { absolute: true })
   return allFiles
 }
+
 /**
  * If the website or unit tests did not load ALL files we need to
  * include, then we should include the missing files ourselves
@@ -340,51 +361,57 @@ function findSourceFiles(nycOptions) {
  *
  * @see https://github.com/cypress-io/code-coverage/issues/207
  */
-function includeAllFiles(nycFilename, nycOptions) {
+export function includeAllFiles(
+  nycFilename: string,
+  nycOptions: NycOptions
+): void {
   if (!nycOptions.all) {
-    debug('NYC "all" option is not set, skipping including all files')
+    log('NYC "all" option is not set, skipping including all files')
     return
   }
 
   const allFiles = findSourceFiles(nycOptions)
-  if (debug.enabled) {
-    debug('found %d file(s)', allFiles.length)
+  if (log.enabled) {
+    log('found %d file(s)', allFiles.length)
     console.error(allFiles.join('\n'))
   }
   if (!allFiles.length) {
-    debug('no files found, hoping for the best')
+    log('no files found, hoping for the best')
     return
   }
 
-  const nycCoverage = JSON.parse(readFileSync(nycFilename, 'utf8'))
+  const nycCoverage: CoverageMapData = JSON.parse(
+    readFileSync(nycFilename, 'utf8')
+  )
   const coverageKeys = Object.keys(nycCoverage)
   const coveredPaths = coverageKeys.map((key) =>
     nycCoverage[key].path.replace(/\\/g, '/')
   )
 
-  debug('coverage has %d record(s)', coveredPaths.length)
+  log('coverage has %d record(s)', coveredPaths.length)
   // report on first couple of entries
-  if (debug.enabled) {
+  if (log.enabled) {
     console.error('coverage has the following first paths')
     console.error(coveredPaths.slice(0, 4).join('\n'))
   }
 
-  let changed
+  let changed = false
   allFiles.forEach((fullPath) => {
     if (coveredPaths.includes(fullPath)) {
       // all good, this file exists in coverage object
       return
     }
-    debug('adding empty coverage for file %s', fullPath)
+    log('adding empty coverage for file %s', fullPath)
     changed = true
     // insert placeholder object for now
     const placeholder = fileCoveragePlaceholder(fullPath)
-    nycCoverage[fullPath] = placeholder
+
+    nycCoverage[fullPath] = placeholder as FileCoverageData
   })
 
   if (changed) {
-    debug('includeAllFiles saving updated file %s', nycFilename)
-    debug('there are %d keys in the file', Object.keys(nycCoverage).length)
+    log('includeAllFiles saving updated file %s', nycFilename)
+    log('there are %d keys in the file', Object.keys(nycCoverage).length)
 
     writeFileSync(
       nycFilename,
@@ -392,13 +419,4 @@ function includeAllFiles(nycFilename, nycOptions) {
       'utf8'
     )
   }
-}
-
-module.exports = {
-  showNycInfo,
-  resolveRelativePaths,
-  checkAllPathsNotFound,
-  tryFindingLocalFiles,
-  readNycOptions,
-  includeAllFiles
 }

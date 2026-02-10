@@ -72,6 +72,7 @@
     "debug": "4.4.0",
     "execa": "4.1.0",
     "istanbul-lib-coverage": "^3.0.0",
+    "js-yaml": "^4.1.1",
     "nyc": "^17.1.0",
     "tinyglobby": "^0.2.14"
   },
@@ -94,7 +95,6 @@
     "console-log-div": "0.6.3",
     "cypress": "^15.10.0",
     "express": "^4.18.2",
-    "js-yaml": "^4.1.1",
     "lodash": "4.17.21",
     "markdown-link-check": "3.13.6",
     "minimatch": "^10.0.0",

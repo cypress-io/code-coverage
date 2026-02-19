@@ -95,7 +95,7 @@
     "console-log-div": "0.6.3",
     "cypress": "^15.10.0",
     "express": "^4.18.2",
-    "lodash": "4.17.21",
+    "lodash": "4.17.23",
     "markdown-link-check": "3.13.6",
     "minimatch": "^10.0.0",
     "parcel": "^2",

@@ -68,7 +68,7 @@
   "dependencies": {
     "@cypress/webpack-preprocessor": "^6.0.0",
     "chalk": "4.1.2",
-    "dayjs": "1.11.19",
+    "dayjs": "1.11.20",
     "debug": "4.4.0",
     "execa": "4.1.0",
     "istanbul-lib-coverage": "^3.0.0",

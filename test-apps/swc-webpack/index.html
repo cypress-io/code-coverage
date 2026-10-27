@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+  <body>
+    <p id="result"></p>
+    <script>
+      // Load the bundle after the page's load event, the way frameworks like
+      // Next.js run component code during hydration
+      window.addEventListener('load', () => {
+        const script = document.createElement('script')
+        script.src = 'main.js'
+        document.body.appendChild(script)
+      })
+    </script>
+  </body>
+</html>

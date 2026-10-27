@@ -1,0 +1,19 @@
+{
+  "name": "example-swc-webpack",
+  "description": "Code coverage from SWC instrumentation in a webpack build",
+  "private": true,
+  "scripts": {
+    "cy:run": "cypress run",
+    "build": "webpack && cp ./index.html ./dist/index.html",
+    "start": "serve -p 1234 dist",
+    "pretest": "rimraf .nyc_output coverage dist",
+    "test": "npm run build && start-test 1234 cy:run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "check-coverage src/index.js && check-coverage src/calc.js && only-covered src/index.js src/calc.js"
+  },
+  "devDependencies": {
+    "@swc/core": "1.16.18",
+    "swc-loader": "^0.2.7",
+    "swc-plugin-coverage-instrument": "0.0.33"
+  }
+}

@@ -84,6 +84,42 @@ That should be it! You should see messages from this plugin in the Cypress Comma
 
 ![Plugin messages](images/gui.png)
 
+### Instrument with SWC
+
+The plugin doesn't depend on Babel. It reads whatever Istanbul-format coverage your code writes to `window.__coverage__`, so you can instrument with [SWC](https://swc.rs) instead by adding [swc-plugin-coverage-instrument](https://github.com/kwonoj/swc-coverage-instrument) to your SWC config.
+
+If you compile with `@swc/core` directly or through `swc-loader`, add the plugin to your `.swcrc`:
+
+```json
+{
+  "jsc": {
+    "experimental": {
+      "plugins": [["swc-plugin-coverage-instrument", {}]]
+    }
+  }
+}
+```
+
+For Next.js, which compiles with SWC by default, add it to `experimental.swcPlugins` in `next.config.js`. Instrumented code is slower and larger, so turn it on only for the builds you test, for example with an environment variable:
+
+```js
+// next.config.js
+module.exports = {
+  experimental: {
+    swcPlugins:
+      process.env.INSTRUMENT_CODE === 'true'
+        ? [['swc-plugin-coverage-instrument', {}]]
+        : []
+  }
+}
+```
+
+Then build with `INSTRUMENT_CODE=true next build` before running Cypress.
+
+SWC plugins only load in the SWC version they were built for, and a mismatch makes the build fail when it loads the plugin. If that happens, try a different `swc-plugin-coverage-instrument` version that matches your `@swc/core`, or the SWC version bundled in your Next.js release. For example, `swc-plugin-coverage-instrument` 0.0.33 works with `@swc/core` 1.16.18 and with Next.js 16.4.3.
+
+See [test-apps/swc-webpack](test-apps/swc-webpack) for a complete example.
+
 ### More information
 
 - Read [Cypress Code Coverage: Instrumenting code](https://on.cypress.io/code-coverage#Instrumenting-code) guide
@@ -642,6 +678,7 @@ Full examples we use for testing in this repository:
 - [test-apps/esm-example](test-apps/esm-example) demonstrates using ES module syntax (`import`/`export`) with the plugin
 - [test-apps/use-webpack](test-apps/use-webpack) shows Webpack build with source maps and Babel
 - [test-apps/component-vite](test-apps/component-vite) collects coverage from React component tests served by Vite
+- [test-apps/swc-webpack](test-apps/swc-webpack) instruments a webpack build with SWC instead of Babel, and loads it after the page's `load` event
 - [test-apps/unit-tests-js](test-apps/unit-tests-js) runs just the unit tests and reports code coverage (JavaScript source code)
 - [test-apps/unit-tests-ts](test-apps/ts-example) runs just the unit tests and reports code coverage (TypeScript source code)
 

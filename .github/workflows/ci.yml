@@ -90,6 +90,7 @@ jobs:
           - one-spec
           - same-folder
           - support-files
+          - swc-webpack
           - ts-example
           - unit-tests-js
           - use-webpack

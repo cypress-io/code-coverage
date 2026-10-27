@@ -193,13 +193,8 @@ const tasks = {
    * Saves the coverage to the nyc output file and generates the report,
    * using the "coverage:report" script when package.json has one
    */
-  coverageReport(): Promise<string | null> | null {
+  coverageReport(): Promise<string | null> {
     saveCoverage(coverageMap)
-    if (!existsSync(nycFilename)) {
-      console.warn('Cannot find coverage file %s', nycFilename)
-      console.warn('Skipping coverage report')
-      return null
-    }
 
     showNycInfo(nycFilename)
 

@@ -687,6 +687,54 @@ If the plugin worked before in version X but stopped after upgrading to version 
 
 If you decide to open an issue in this repository, please fill in all information the [issue template](https://github.com/cypress-io/code-coverage/blob/master/.github/ISSUE_TEMPLATE/bug_report.md) asks for. The issues most likely to be resolved have debug logs, screenshots, and hopefully public repository links so we can try running the tests ourselves.
 
+### Coverage works locally but not in CI
+
+If you get a coverage report on your machine but an empty one in CI, the app that CI tests is almost always not instrumented. You'll see this in the Command Log:
+
+```text
+⚠️ Could not find any coverage information in your application
+```
+
+And this in the terminal:
+
+```text
+⚠️ file .nyc_output/out.json has no coverage information
+```
+
+Versions before 3.13.4 printed `Cannot find coverage file .nyc_output/out.json` instead.
+
+Locally you probably run a dev server, while CI often builds the app for production first. Many instrumentation setups only switch on in development. For example:
+
+- **Babel:** an `istanbul` plugin listed under `"env": { "development": ... }` or `"env": { "test": ... }` in your Babel config only runs when `BABEL_ENV` or `NODE_ENV` matches that name. Production builds usually set `NODE_ENV=production`.
+- **`vite-plugin-istanbul`:** by default, it only instruments code served by `vite dev` and skips `vite build`. Set `forceBuildInstrument: true` to instrument builds too. Pair it with `requireEnv: true` so only builds with `VITE_COVERAGE=true` get instrumented, and your real production build stays clean:
+
+  ```js
+  // vite.config.js
+  import { defineConfig } from 'vite'
+  import istanbul from 'vite-plugin-istanbul'
+
+  export default defineConfig({
+    plugins: [
+      istanbul({
+        requireEnv: true,
+        forceBuildInstrument: true
+      })
+    ]
+  })
+  ```
+
+  Then build with `VITE_COVERAGE=true vite build` in CI.
+
+To catch this early, add a test that fails when the page has no coverage object, and run it in CI:
+
+```js
+// cypress/e2e/instrumentation.cy.js
+it('loads an instrumented app', () => {
+  cy.visit('/')
+  cy.window().should('have.property', '__coverage__')
+})
+```
+
 ### Coverage reporting timeouts
 
 If the plugin times out when sending coverage report data to be merged, this may be due to a very large

@@ -16,7 +16,7 @@
 
 ## Commands
 
-Run these from the repo root with Node 20 or later (CI uses Node 22).
+Run these from the repo root with Node 22.14 or later (the version in `.nvmrc`). `semantic-release` needs at least that version. The published plugin itself still supports Node 20.
 
 - Install: `npm ci`
 - Build to `dist/`: `npm run build`
@@ -79,10 +79,12 @@ Good examples:
 ## When you change things
 
 - A change in `lib/*-utils.ts` should come with a unit test in `test/lib/`.
-- A change in behavior that users see in a Cypress run should be covered by a test app. Extend an existing app if it fits. If you add a new one, also add it to the `verify-test-apps` matrix in `.circleci/config.yml` and to the "Internal test apps" list in `README.md`.
+- A change in behavior that users see in a Cypress run should be covered by a test app. Extend an existing app if it fits. If you add a new one, also add it to the `verify-test-apps` matrix in `.github/workflows/ci.yml` and to the "Internal test apps" list in `README.md`.
 - If you add, rename, or change an option, update `README.md`, since it's the plugin's user-facing documentation.
 - If you add a new entry point, add it to `exports` in `package.json` too.
 
 ## CI
 
-CircleCI (`.circleci/config.yml`) runs the format and Markdown checks, the unit tests, a build, every test app in a matrix, and a Windows run of `test-apps/all-files`. It publishes to npm from `master`, `next`, `beta`, and `dev`. GitHub Actions only handle Snyk scans and issue triage.
+GitHub Actions (`.github/workflows/ci.yml`) runs the format and Markdown checks, the unit tests, a build, every test app in a matrix, and a Windows run of `test-apps/all-files`. Other workflows in `.github/workflows/` handle Snyk scans and issue triage.
+
+After every test passes on a push to `master`, `next`, `beta`, or `dev`, the `release` job in `ci.yml` runs `semantic-release` to publish to npm. It authenticates with npm trusted publishing (OIDC), so there's no npm token secret. The trusted publisher on npmjs.com is tied to the `ci.yml` filename, so don't rename the workflow without updating it there too.

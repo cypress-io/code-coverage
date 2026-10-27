@@ -332,6 +332,64 @@ Sometimes, the NYC tool might be installed in a different folder, not the curren
 }
 ```
 
+## Parallel runs and Cypress Cloud
+
+When you split specs across several CI machines, for example with [Cypress Cloud parallelization](https://docs.cypress.io/cloud/features/smart-orchestration/parallelization) (`cypress run --record --parallel`), each machine only runs some of the specs. The plugin saves that machine's coverage to its own `.nyc_output/out.json` and writes a report from it, so each machine's report only shows part of your coverage. The plugin doesn't combine coverage across machines. Cypress Cloud doesn't either, so you combine the files in your CI pipeline:
+
+1. On each machine, run your tests, then save `.nyc_output/out.json` as a CI artifact under a name unique to that machine.
+2. Add one more job that runs after all the test machines finish. It downloads every file into one folder and runs `nyc report` on that folder. `nyc report` reads every JSON file in its temp folder and merges them.
+
+Here's what that looks like with GitHub Actions and three parallel containers:
+
+```yaml
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        containers: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npx cypress run --record --parallel
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # give each container's coverage file a unique name, so the files
+      # don't overwrite each other when they're downloaded into one folder
+      - run: |
+          mkdir -p coverage-part
+          cp .nyc_output/out.json coverage-part/out-${{ matrix.containers }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.containers }}
+          path: coverage-part
+
+  coverage-report:
+    needs: cypress-run
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          path: .nyc_output
+          merge-multiple: true
+      - run: npx nyc report --reporter=lcov --reporter=text-summary
+```
+
+The `coverage` folder from the last job holds the combined report. Upload it as an artifact or send it to a coverage service from there.
+
+A few things to know:
+
+- The coverage files store absolute paths to your source files. The report job needs the same source code at the same path as the test machines. With hosted CI runners that check out to the same folder every time, as in the example, this works on its own.
+- If you [enforce coverage thresholds](#enforce-coverage-thresholds), each machine checks only its part of the coverage and may fail even when the combined numbers pass. Leave `checkCoverage` off on the test machines and run `npx nyc report --check-coverage` in the report job instead.
+- If the plugin can find your [backend coverage](#instrument-backend-code), that coverage is merged into each machine's `out.json` too, so it's included in the combined report.
+
+The [cypress-example-conduit-app](https://github.com/cypress-io/cypress-example-conduit-app) example follows the same steps on a different CI provider.
+
 ## TypeScript users
 
 TypeScript source files should be automatically included in the report if they are instrumented.

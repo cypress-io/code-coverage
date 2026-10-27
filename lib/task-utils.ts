@@ -2,7 +2,7 @@
 // that need access to the file system
 
 /// <reference types="node" />
-import { readFileSync, writeFileSync, existsSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync, statSync } from 'fs'
 import { isAbsolute, resolve, join } from 'path'
 import debug from 'debug'
 import chalk from 'chalk'
@@ -354,42 +354,86 @@ function findSourceFiles(nycOptions: NycOptions): string[] {
   return allFiles
 }
 
-// same defaults nyc uses, see "parserPlugins" in @istanbuljs/schema
-const defaultParserPlugins = [
-  'asyncGenerators',
-  'bigInt',
-  'classProperties',
-  'classPrivateProperties',
-  'classPrivateMethods',
-  'dynamicImport',
-  'importMeta',
-  'numericSeparator',
-  'objectRestSpread',
-  'optionalCatchBinding',
-  'topLevelAwait'
-]
+// a Babel parser plugin is either its name or a [name, options] pair
+type ParserPlugin = string | [string, object]
 
-function parserPluginsFor(fullPath: string, nycOptions: NycOptions): string[] {
-  const configured = nycOptions['parser-plugins']
-  const plugins = Array.isArray(configured)
-    ? [...(configured as string[])]
-    : [...defaultParserPlugins]
+const parserPluginName = (plugin: ParserPlugin): string =>
+  Array.isArray(plugin) ? plugin[0] : plugin
 
-  // ".ts" files cannot use the "jsx" plugin, it breaks "<Type>value" casts
-  if (/\.[cm]?ts$/.test(fullPath)) {
-    plugins.push('typescript')
-  } else if (fullPath.endsWith('.tsx')) {
-    plugins.push('typescript', 'jsx')
-  } else {
-    plugins.push('jsx')
+/**
+ * Returns the Babel parser plugins to parse the given file with:
+ * nyc's defaults, plus the plugins from "parser-plugins" (or "parserPlugins")
+ * in the NYC options, plus the syntax plugins for the file extension.
+ */
+export function parserPluginsFor(
+  fullPath: string,
+  nycOptions: NycOptions
+): ParserPlugin[] {
+  const { defaults } = require('@istanbuljs/schema') as {
+    defaults: { nyc: { parserPlugins: string[] } }
   }
-  return plugins
+  const configured = nycOptions['parser-plugins'] ?? nycOptions.parserPlugins
+  const plugins: ParserPlugin[] = [...defaults.nyc.parserPlugins]
+  if (Array.isArray(configured)) {
+    plugins.push(...(configured as ParserPlugin[]))
+  }
+
+  // ".ts" files cannot use the "jsx" plugin, it breaks "<Type>value" casts,
+  // and Babel does not allow "flow" together with "typescript"
+  let remove: string[] = []
+  let add: string[] = ['jsx']
+  if (/\.[cm]?ts$/.test(fullPath)) {
+    remove = ['jsx', 'flow']
+    add = ['typescript']
+  } else if (fullPath.endsWith('.tsx')) {
+    remove = ['flow']
+    add = ['typescript', 'jsx']
+  }
+
+  const result: ParserPlugin[] = []
+  const names = new Set<string>()
+  for (const plugin of [...plugins, ...add]) {
+    const name = parserPluginName(plugin)
+    if (remove.includes(name) || names.has(name)) {
+      continue
+    }
+    names.add(name)
+    result.push(plugin)
+  }
+  return result
 }
 
 interface Instrumenter {
   instrumentSync(code: string, filename: string): string
   lastFileCoverage(): FileCoverageData
 }
+
+// one instrumenter per set of parser plugins
+const instrumenters = new Map<string, Instrumenter>()
+
+function getInstrumenter(parserPlugins: ParserPlugin[]): Instrumenter {
+  const key = JSON.stringify(parserPlugins)
+  let instrumenter = instrumenters.get(key)
+  if (!instrumenter) {
+    const { createInstrumenter } = require('istanbul-lib-instrument') as {
+      createInstrumenter(options: object): Instrumenter
+    }
+    instrumenter = createInstrumenter({
+      esModules: true,
+      produceSourceMap: false,
+      parserPlugins
+    })
+    instrumenters.set(key, instrumenter)
+  }
+  return instrumenter
+}
+
+// the coverage report runs after every spec, so remember
+// the zero coverage of each file until the file changes
+const initialCoverageCache = new Map<
+  string,
+  { key: string; coverage: FileCoverageData }
+>()
 
 /**
  * Instruments the given source file to get its initial coverage:
@@ -403,19 +447,24 @@ export function initialFileCoverage(
   nycOptions: NycOptions
 ): FileCoverageData {
   try {
-    const { createInstrumenter } = require('istanbul-lib-instrument') as {
-      createInstrumenter(options: object): Instrumenter
+    const parserPlugins = parserPluginsFor(fullPath, nycOptions)
+    const { mtimeMs, size } = statSync(fullPath)
+    const cacheKey = JSON.stringify([mtimeMs, size, parserPlugins])
+    const cached = initialCoverageCache.get(fullPath)
+    if (cached && cached.key === cacheKey) {
+      return structuredClone(cached.coverage)
     }
-    const instrumenter = createInstrumenter({
-      esModules: true,
-      produceSourceMap: false,
-      parserPlugins: parserPluginsFor(fullPath, nycOptions)
-    })
+
+    const instrumenter = getInstrumenter(parserPlugins)
     instrumenter.instrumentSync(readFileSync(fullPath, 'utf8'), fullPath)
-    const fileCoverage = instrumenter.lastFileCoverage()
     // tells istanbul to replace these zero counters
     // if the real coverage for this file shows up later
-    return { ...fileCoverage, all: true } as FileCoverageData
+    const coverage = {
+      ...instrumenter.lastFileCoverage(),
+      all: true
+    } as FileCoverageData
+    initialCoverageCache.set(fullPath, { key: cacheKey, coverage })
+    return structuredClone(coverage)
   } catch (error) {
     log(
       'could not instrument file %s, using placeholder: %s',
@@ -424,6 +473,19 @@ export function initialFileCoverage(
     )
     return fileCoveragePlaceholder(fullPath) as FileCoverageData
   }
+}
+
+/**
+ * Normalizes a file path so the paths from the coverage object
+ * can be compared with the paths found on disk. Windows paths
+ * are case-insensitive, for example "c:\app\main.js" and "C:/app/main.js"
+ */
+export function comparablePath(
+  filePath: string,
+  platform: NodeJS.Platform = process.platform
+): string {
+  const forwardSlashes = filePath.replace(/\\/g, '/')
+  return platform === 'win32' ? forwardSlashes.toLowerCase() : forwardSlashes
 }
 
 export interface IncludeAllFilesOptions {
@@ -466,7 +528,7 @@ export function includeAllFiles(
   )
   const coverageKeys = Object.keys(nycCoverage)
   const coveredPaths = coverageKeys.map((key) =>
-    nycCoverage[key].path.replace(/\\/g, '/')
+    comparablePath(nycCoverage[key].path)
   )
 
   log('coverage has %d record(s)', coveredPaths.length)
@@ -476,9 +538,10 @@ export function includeAllFiles(
     console.error(coveredPaths.slice(0, 4).join('\n'))
   }
 
+  const covered = new Set(coveredPaths)
   let changed = false
   allFiles.forEach((fullPath) => {
-    if (coveredPaths.includes(fullPath)) {
+    if (covered.has(comparablePath(fullPath))) {
       // all good, this file exists in coverage object
       return
     }

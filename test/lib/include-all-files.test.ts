@@ -1,18 +1,85 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs'
+import {
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  utimesSync,
+  writeFileSync
+} from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { createCoverageMap } from 'istanbul-lib-coverage'
-import { includeAllFiles, initialFileCoverage } from '../../lib/task-utils'
+import {
+  comparablePath,
+  includeAllFiles,
+  initialFileCoverage,
+  parserPluginsFor
+} from '../../lib/task-utils'
 import { defaultNycOptions, type NycOptions } from '../../lib/common-utils'
 
 const fixturesFolder = join(__dirname, '__fixtures__', 'all-files')
 const jsFile = join(fixturesFolder, 'not-loaded.js')
 const tsFile = join(fixturesFolder, 'not-loaded.ts')
 const vueFile = join(fixturesFolder, 'not-loaded.vue')
+const decoratedFile = join(fixturesFolder, 'decorated.js')
 
 const allZero = (counters: Record<string, number>): boolean =>
   Object.values(counters).every((count) => count === 0)
+
+const statementCount = (coverage: { statementMap: object }): number =>
+  Object.keys(coverage.statementMap).length
+
+describe('parserPluginsFor', () => {
+  it('keeps the nyc defaults when adding configured plugins', () => {
+    const plugins = parserPluginsFor(jsFile, {
+      'parser-plugins': ['decorators-legacy']
+    })
+    expect(plugins).toContain('topLevelAwait')
+    expect(plugins).toContain('decorators-legacy')
+    expect(plugins).toContain('jsx')
+  })
+
+  it('reads the camelCase "parserPlugins" option', () => {
+    const plugins = parserPluginsFor(jsFile, {
+      parserPlugins: ['decorators-legacy']
+    })
+    expect(plugins).toContain('decorators-legacy')
+  })
+
+  it('removes "jsx" and "flow" for .ts files', () => {
+    const plugins = parserPluginsFor(tsFile, {
+      'parser-plugins': ['jsx', 'flow', ['decorators', { version: '2023-11' }]]
+    })
+    expect(plugins).not.toContain('jsx')
+    expect(plugins).not.toContain('flow')
+    expect(plugins).toContain('typescript')
+    expect(plugins).toContainEqual(['decorators', { version: '2023-11' }])
+  })
+
+  it('does not repeat plugins', () => {
+    const plugins = parserPluginsFor(jsFile, {
+      'parser-plugins': ['jsx', 'topLevelAwait']
+    })
+    expect(plugins.filter((p) => p === 'jsx')).toHaveLength(1)
+    expect(plugins.filter((p) => p === 'topLevelAwait')).toHaveLength(1)
+  })
+})
+
+describe('comparablePath', () => {
+  it('uses forward slashes', () => {
+    expect(comparablePath('src\\app\\main.js', 'linux')).toBe('src/app/main.js')
+  })
+
+  it('ignores the case of Windows paths', () => {
+    expect(comparablePath('c:\\app\\Main.js', 'win32')).toBe(
+      comparablePath('C:/app/main.js', 'win32')
+    )
+  })
+
+  it('keeps the case of other paths', () => {
+    expect(comparablePath('/app/Main.js', 'linux')).toBe('/app/Main.js')
+  })
+})
 
 describe('initialFileCoverage', () => {
   it('returns zero coverage for a JavaScript file', () => {
@@ -33,6 +100,53 @@ describe('initialFileCoverage', () => {
     expect(Object.keys(coverage.fnMap)).toHaveLength(1)
     expect(allZero(coverage.s)).toBe(true)
     expect(allZero(coverage.f)).toBe(true)
+  })
+
+  it('parses a TypeScript file when "jsx" is a configured plugin', () => {
+    const coverage = initialFileCoverage(tsFile, {
+      ...defaultNycOptions,
+      'parser-plugins': ['jsx']
+    })
+    expect(statementCount(coverage)).toBeGreaterThan(0)
+  })
+
+  it('uses the configured camelCase "parserPlugins"', () => {
+    expect(
+      statementCount(initialFileCoverage(decoratedFile, defaultNycOptions))
+    ).toBe(0)
+    const coverage = initialFileCoverage(decoratedFile, {
+      ...defaultNycOptions,
+      parserPlugins: ['decorators-legacy']
+    })
+    expect(statementCount(coverage)).toBeGreaterThan(0)
+  })
+
+  it('returns a new copy of the cached coverage each time', () => {
+    const first = initialFileCoverage(jsFile, defaultNycOptions)
+    first.s['0'] = 5
+    const second = initialFileCoverage(jsFile, defaultNycOptions)
+    expect(second.s['0']).toBe(0)
+  })
+
+  it('instruments the file again after it changes', () => {
+    const tempFolder = mkdtempSync(join(tmpdir(), 'code-coverage-'))
+    try {
+      const file = join(tempFolder, 'changes.js')
+      writeFileSync(file, 'export const a = 1\n')
+      expect(statementCount(initialFileCoverage(file, defaultNycOptions))).toBe(
+        1
+      )
+
+      writeFileSync(file, 'export const a = 1\nexport const b = 2\n')
+      // make sure the modified time differs even on coarse file systems
+      const later = new Date(Date.now() + 10_000)
+      utimesSync(file, later, later)
+      expect(statementCount(initialFileCoverage(file, defaultNycOptions))).toBe(
+        2
+      )
+    } finally {
+      rmSync(tempFolder, { recursive: true, force: true })
+    }
   })
 
   it('reports the file at 0% lines', () => {

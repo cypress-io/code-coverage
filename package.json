@@ -67,6 +67,7 @@
   "private": false,
   "dependencies": {
     "@cypress/webpack-preprocessor": "^6.0.0",
+    "@istanbuljs/schema": "^0.1.6",
     "chalk": "4.1.2",
     "dayjs": "1.11.20",
     "debug": "4.4.3",

@@ -333,7 +333,8 @@ module.exports = defineConfig({
 Things to know before turning it on:
 
 - Your total percentages will drop, since the unloaded files now count. Existing coverage thresholds can start failing.
-- JavaScript, JSX, and TypeScript files are parsed with Babel, adding any `parser-plugins` from your NYC options. Files it can't parse, like `.vue` single-file components, still get the empty placeholder.
+- JavaScript, JSX, and TypeScript files are parsed with Babel, using nyc's default parser plugins plus any `parser-plugins` (or `parserPlugins`) from your NYC options. The `jsx` and `flow` plugins are skipped for `.ts` files, since they can't be combined with TypeScript there. Files it can't parse, like `.vue` single-file components, still get the empty placeholder.
+- Each file is instrumented once and reused for the reports after later specs, until the file changes.
 - The counters come from your original source, so they can differ slightly from what your build's instrumentation would report for the same file.
 - It's skipped if you use a [custom NYC command](#custom-nyc-command) to generate the report.
 

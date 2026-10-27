@@ -16,7 +16,7 @@
 
 ## Commands
 
-Run these from the repo root with Node 20 or later (CI uses Node 22).
+Run these from the repo root with Node 22.14 or later (the version in `.nvmrc`). `semantic-release` needs at least that version. The published plugin itself still supports Node 20.
 
 - Install: `npm ci`
 - Build to `dist/`: `npm run build`

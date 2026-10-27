@@ -22,13 +22,12 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     env:
-      # we don't need Cypress to check code style
       CYPRESS_INSTALL_BINARY: '0'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - name: Code style check 🧹
@@ -40,22 +39,20 @@ jobs:
     name: Unit tests
     runs-on: ubuntu-latest
     env:
-      # the unit tests run in Vitest, not Cypress
       CYPRESS_INSTALL_BINARY: '0'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm test
-      - uses: actions/upload-artifact@v4
+      - run: npm run coverage
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: unit-test-coverage
           path: coverage
-          if-no-files-found: ignore
 
   build:
     name: Build
@@ -63,10 +60,10 @@ jobs:
     env:
       CYPRESS_INSTALL_BINARY: '0'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - run: npm run build
@@ -100,12 +97,12 @@ jobs:
       run:
         working-directory: test-apps/${{ matrix.app }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: ~/.cache/Cypress
           key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -120,7 +117,7 @@ jobs:
         run: npm i
       - name: Run Cypress tests
         run: npm run test
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: coverage-${{ matrix.app }}
@@ -129,9 +126,8 @@ jobs:
       - name: Verify Code Coverage
         run: npm run coverage:verify
       - name: Check code coverage files 📈
-        # we will check the final coverage report
-        # to make sure it only has files we are interested in
-        # because there are files covered at 0 in the report
+        # files at 0% still appear in the report, so the percentage alone
+        # can't tell whether an unexpected file slipped in
         run: npm run coverage:check-files
 
   windows-test:
@@ -142,12 +138,12 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: ~\AppData\Local\Cypress\Cache
           key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -159,46 +155,36 @@ jobs:
         run: npm i
         working-directory: test-apps/all-files
       - name: Run Cypress tests
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v7
         with:
           install: false
           start: npm run start:windows --prefix test-apps/all-files
-          wait-on: 'http://localhost:1234'
           command: npx cypress run --project test-apps/all-files
       - name: Verify Code Coverage
-        # make sure the examples captures 100% of code
         run: npm run coverage:verify
         working-directory: test-apps/all-files
       - name: Check code coverage files 📈
-        # we will check the final coverage report
-        # to make sure it only has files we are interested in
-        # because there are files covered at 0 in the report
         run: npm i -D check-code-coverage && npm run coverage:check-files
         working-directory: test-apps/all-files
 
   release:
     name: Release
-    # publish only after every test passes, and only from the branches in .releaserc
     needs: [verify-test-apps, windows-test]
     if: github.event_name == 'push' && contains(fromJSON('["master", "next", "beta", "dev"]'), github.ref_name)
     runs-on: ubuntu-latest
-    concurrency:
-      group: release-${{ github.ref }}
-      cancel-in-progress: false
     permissions:
       contents: write # to be able to publish a GitHub release
       issues: write # to be able to comment on released issues
       pull-requests: write # to be able to comment on released pull requests
       id-token: write # to enable use of OIDC for npm trusted publishing and provenance
     env:
-      # we don't need Cypress to do the release
       CYPRESS_INSTALL_BINARY: '0'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           # semantic-release reads the full history and tags to work out the next version
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           # npm trusted publishing needs npm 11.5.1 or later, which ships with Node 24
           node-version: 24

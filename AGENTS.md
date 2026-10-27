@@ -18,16 +18,14 @@
 
 Run these from the repo root with Node 20 or later (CI uses Node 22).
 
-| What | Command |
-| --- | --- |
-| Install | `npm ci` |
-| Build to `dist/` | `npm run build` |
-| Unit tests | `npm test` |
-| Unit tests with coverage (80% line threshold) | `npm run coverage` |
-| Format check (CI runs this) | `npm run format:check` |
-| Fix formatting | `npm run format` |
-| Markdown link check (CI runs this) | `npm run check:markdown` |
-| All test apps | `npm run apps:test:coverage:verify` |
+- Install: `npm ci`
+- Build to `dist/`: `npm run build`
+- Unit tests: `npm test`
+- Unit tests with coverage (80% line threshold): `npm run coverage`
+- Format check (CI runs this): `npm run format:check`
+- Fix formatting: `npm run format`
+- Markdown link check (CI runs this): `npm run check:markdown`
+- All test apps: `npm run apps:test:coverage:verify`
 
 The README's Contributing section mentions `npm run test:ci`, but that script doesn't exist in `package.json`. Use the commands above instead.
 

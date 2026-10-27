@@ -226,5 +226,30 @@ describe('filtering specs', () => {
         'src/my-code.js': {}
       })
     })
+
+    it('ignores Symbol keys on the coverage object prototype', () => {
+      config.mockImplementation((key: string) => {
+        if (key === 'specPattern') return '**/*.cy.js'
+        return undefined
+      })
+
+      // some runtimes (e.g. a dynamically imported wasm module) add a Symbol key
+      // to the prototype of window.__coverage__
+      const wasmType = Symbol('wasm type')
+      const totalCoverage = Object.create({ [wasmType]: 0 })
+      totalCoverage['/user/app/src/codeA.js'] = {}
+      totalCoverage['/user/app/src/specA.cy.js'] = {}
+
+      const result = filterFilesFromCoverage(
+        totalCoverage,
+        config as any,
+        expose as any,
+        spec as any
+      )
+      expect(result).toEqual({
+        '/user/app/src/codeA.js': {}
+      })
+      expect(Object.getOwnPropertySymbols(result)).toEqual([])
+    })
   })
 })

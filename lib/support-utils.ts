@@ -44,7 +44,10 @@ function filterSpecsFromCoverage(
 ): CoverageObject {
   const testFilePatterns = getCypressExcludePatterns(config, expose)
 
-  const isTestFile = (_: unknown, filePath: string): boolean => {
+  const isTestFile = (_: unknown, filePath: string | symbol): boolean => {
+    // lodash omitBy also visits inherited Symbol keys, which are not file paths
+    // https://github.com/cypress-io/code-coverage/issues/908
+    if (typeof filePath !== 'string') return true
     const workingDir = spec.absolute.replace(spec.relative, '')
     const filename = filePath.replace(workingDir, '')
     const matchedPattern = testFilePatterns.some((specPattern) =>

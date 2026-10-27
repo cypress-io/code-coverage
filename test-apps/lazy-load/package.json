@@ -1,0 +1,15 @@
+{
+  "name": "example-lazy-load",
+  "description": "Getting code coverage from instrumented code that loads after the page, like a micro-frontend",
+  "scripts": {
+    "start": "parcel serve index.html",
+    "cy:run": "cypress run",
+    "pretest": "rimraf .nyc_output .cache coverage dist",
+    "test": "start-test 1234 cy:run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "check-coverage remote.js && only-covered remote.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.6"
+  }
+}

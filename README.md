@@ -472,6 +472,7 @@ Full examples we use for testing in this repository:
 - [test-apps/fullstack](test-apps/fullstack) instruments and merges backend, e2e and unit test coverage into a single report
 - [test-apps/before-all-visit](test-apps/before-all-visit) checks if code coverage works when `cy.visit` is made once in the `before` hook
 - [test-apps/before-each-visit](test-apps/before-each-visit) checks if code coverage correctly keeps track of code when doing `cy.visit` before each test
+- [test-apps/lazy-load](test-apps/lazy-load) checks if code coverage is collected from instrumented code that loads after the page, like a micro-frontend
 - [test-apps/one-spec](test-apps/one-spec) confirms that coverage is collected and filtered correctly if the user only executes a single Cypress test
 - [test-apps/ts-example](test-apps/ts-example) uses Babel + Parcel to instrument and serve TypeScript file
 - [test-apps/esm-example](test-apps/esm-example) demonstrates using ES module syntax (`import`/`export`) with the plugin

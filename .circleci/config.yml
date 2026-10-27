@@ -173,6 +173,7 @@ workflows:
                 - exclude-files
                 - frontend
                 - fullstack
+                - lazy-load
                 - multiple-backends
                 - one-spec
                 - same-folder

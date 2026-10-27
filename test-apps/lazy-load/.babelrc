@@ -1,0 +1,8 @@
+{
+  "overrides": [
+    {
+      "test": "./remote.js",
+      "plugins": ["istanbul"]
+    }
+  ]
+}

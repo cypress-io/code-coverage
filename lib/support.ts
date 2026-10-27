@@ -99,52 +99,52 @@ function registerHooks(): void {
     })
   })
 
+  const saveCoverageObject = (win: Window): void => {
+    // if the application code has been instrumented, then the app iframe "win.__coverage__" will be available,
+    // in addition, accessing win.__coverage__ can throw when testing cross-origin code,
+    // because we don't control the cross-origin code, we can safely return
+    let applicationSourceCoverage: unknown
+    try {
+      // Note that we are purposefully not supporting the optional chaining syntax here to
+      // support a wide range of projects (some of which are not set up to support the optional
+      // chaining syntax due to current Cypress limitations). See:
+      // https://github.com/cypress-io/cypress/issues/20753
+      if (win) {
+        // @ts-ignore - __coverage__ is added by instrumentation
+        applicationSourceCoverage = (
+          win as typeof win & { __coverage__?: unknown }
+        ).__coverage__
+      }
+    } catch {
+      // ignore cross-origin errors
+    }
+
+    if (!applicationSourceCoverage) {
+      return
+    }
+
+    const existingCoverage = Cypress._.find(windowCoverageObjects, {
+      coverage: applicationSourceCoverage
+    })
+    if (existingCoverage) {
+      // this application code coverage object is already known
+      // which can happen when combining `window:load` and `before` callbacks,
+      // it can also happen when the user navigates away and then returns to the page
+      // in which case we need to use new applicationSourceCoverage, because the old will not be updated anymore.
+      existingCoverage.coverage = applicationSourceCoverage
+      return
+    }
+
+    windowCoverageObjects.push({
+      coverage: applicationSourceCoverage,
+      pathname: win.location.pathname
+    })
+  }
+
   beforeEach(() => {
     // each object will have the coverage and url pathname
     // to let the user know the coverage has been collected
     windowCoverageObjects = []
-
-    const saveCoverageObject = (win: Window): void => {
-      // if the application code has been instrumented, then the app iframe "win.__coverage__" will be available,
-      // in addition, accessing win.__coverage__ can throw when testing cross-origin code,
-      // because we don't control the cross-origin code, we can safely return
-      let applicationSourceCoverage: unknown
-      try {
-        // Note that we are purposefully not supporting the optional chaining syntax here to
-        // support a wide range of projects (some of which are not set up to support the optional
-        // chaining syntax due to current Cypress limitations). See:
-        // https://github.com/cypress-io/cypress/issues/20753
-        if (win) {
-          // @ts-ignore - __coverage__ is added by instrumentation
-          applicationSourceCoverage = (
-            win as typeof win & { __coverage__?: unknown }
-          ).__coverage__
-        }
-      } catch {
-        // ignore cross-origin errors
-      }
-
-      if (!applicationSourceCoverage) {
-        return
-      }
-
-      const existingCoverage = Cypress._.find(windowCoverageObjects, {
-        coverage: applicationSourceCoverage
-      })
-      if (existingCoverage) {
-        // this application code coverage object is already known
-        // which can happen when combining `window:load` and `before` callbacks,
-        // it can also happen when the user navigates away and then returns to the page
-        // in which case we need to use new applicationSourceCoverage, because the old will not be updated anymore.
-        existingCoverage.coverage = applicationSourceCoverage
-        return
-      }
-
-      windowCoverageObjects.push({
-        coverage: applicationSourceCoverage,
-        pathname: win.location.pathname
-      })
-    }
 
     // save reference to coverage for each app window loaded in the test
     cy.on('window:load', saveCoverageObject)
@@ -154,31 +154,37 @@ function registerHooks(): void {
   })
 
   afterEach(() => {
-    // save coverage after the test
-    // because now the window coverage objects have been updated
-    windowCoverageObjects.forEach((cover) => {
-      sendCoverage(cover.coverage, cover.pathname)
-    })
+    // save reference if the coverage object was created after the page loaded,
+    // for example by lazy-loaded code or a micro-frontend
+    cy.window({ log: false }).then((win) => {
+      saveCoverageObject(win)
 
-    if (!hasE2ECoverage()) {
-      if (hasUnitTestCoverage()) {
-        logMessage(`👉 Only found unit test code coverage.`)
-      } else {
-        const expectBackendCoverageOnly = Cypress._.get(
-          Cypress.expose('codeCoverage'),
-          'expectBackendCoverageOnly',
-          false
-        )
-        if (!expectBackendCoverageOnly) {
-          logMessage(`
-            ⚠️ Could not find any coverage information in your application
-            by looking at the window coverage object.
-            Did you forget to instrument your application?
-            See [code-coverage#instrument-your-application](https://github.com/cypress-io/code-coverage#instrument-your-application)
-          `)
+      // save coverage after the test
+      // because now the window coverage objects have been updated
+      windowCoverageObjects.forEach((cover) => {
+        sendCoverage(cover.coverage, cover.pathname)
+      })
+
+      if (!hasE2ECoverage()) {
+        if (hasUnitTestCoverage()) {
+          logMessage(`👉 Only found unit test code coverage.`)
+        } else {
+          const expectBackendCoverageOnly = Cypress._.get(
+            Cypress.expose('codeCoverage'),
+            'expectBackendCoverageOnly',
+            false
+          )
+          if (!expectBackendCoverageOnly) {
+            logMessage(`
+              ⚠️ Could not find any coverage information in your application
+              by looking at the window coverage object.
+              Did you forget to instrument your application?
+              See [code-coverage#instrument-your-application](https://github.com/cypress-io/code-coverage#instrument-your-application)
+            `)
+          }
         }
       }
-    }
+    })
   })
 
   after(function collectBackendCoverage() {

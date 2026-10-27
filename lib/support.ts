@@ -131,14 +131,20 @@ function registerHooks(): void {
 
     cy.on('window:load', saveCoverageObject)
 
+    // Some apps only create `__coverage__` after `window:load`, for example
+    // when a framework runs component code during hydration, so read each
+    // page again before it goes away
+    cy.on('window:before:unload', (event: BeforeUnloadEvent) => {
+      saveCoverageObject(event.currentTarget as Window)
+    })
+
     // Catches a page visited in a before() hook, which loaded before the
     // `window:load` listener existed
     cy.window({ log: false }).then(saveCoverageObject)
   })
 
   afterEach(() => {
-    // Some apps only create `__coverage__` after `window:load`, for example
-    // when a framework runs component code during hydration
+    // The last page never unloads during the test
     cy.window({ log: false }).then(saveCoverageObject)
 
     // Send after the test so the counters include everything it ran

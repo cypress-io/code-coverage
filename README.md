@@ -37,6 +37,25 @@ module.exports = defineConfig({
 })
 ```
 
+If your config file uses ES module syntax, such as a `cypress.config.ts` file or a project with `"type": "module"` in its `package.json`, you can import the task instead of calling `require`:
+
+```ts
+// cypress.config.ts
+import { defineConfig } from 'cypress'
+import codeCoverageTask from '@cypress/code-coverage/task'
+
+export default defineConfig({
+  e2e: {
+    setupNodeEvents(on, config) {
+      codeCoverageTask(on, config)
+      return config
+    },
+  },
+})
+```
+
+Both forms work in either kind of config file. If TypeScript reports `Cannot find module '@cypress/code-coverage/task'`, set `"moduleResolution"` to `"bundler"` in your `tsconfig.json`, or set both `"module"` and `"moduleResolution"` to `"node16"` or `"nodenext"`. The plugin's entry points are only declared in the `exports` field of its `package.json`, and older module resolution settings don't read it.
+
 ## Instrument your application
 
 This plugin **DOES NOT** instrument your code. You have to instrument it yourself using the [Istanbul.js](https://istanbul.js.org/) tool. Luckily, it is not difficult. For example, if you are already using Babel to transpile, you can add [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul) to your `.babelrc` and instrument on the fly.

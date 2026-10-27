@@ -22,8 +22,7 @@ describe('peer dependencies', () => {
   it('marks use-babelrc peer dependencies as optional', () => {
     const peerDependencies: Record<string, string> = pkg.peerDependencies
     const peerDependenciesMeta: Record<string, { optional?: boolean }> =
-      // @ts-ignore - missing before peerDependenciesMeta was added
-      pkg.peerDependenciesMeta ?? {}
+      pkg.peerDependenciesMeta
     useBabelrcOnly.forEach((name) => {
       expect(peerDependencies).toHaveProperty(name)
       expect(peerDependenciesMeta[name]?.optional, name).toBe(true)
@@ -32,8 +31,7 @@ describe('peer dependencies', () => {
 
   it('keeps cypress as a required peer dependency', () => {
     const peerDependenciesMeta: Record<string, { optional?: boolean }> =
-      // @ts-ignore - missing before peerDependenciesMeta was added
-      pkg.peerDependenciesMeta ?? {}
+      pkg.peerDependenciesMeta
     expect(pkg.peerDependencies).toHaveProperty('cypress')
     expect(peerDependenciesMeta.cypress?.optional).not.toBe(true)
   })

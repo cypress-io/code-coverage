@@ -8,14 +8,11 @@ let webpackPreprocessor: typeof webpackPreprocessorType
 try {
   webpackPreprocessor = require('@cypress/webpack-preprocessor')
 } catch (err) {
-  const { code, message } = err as NodeJS.ErrnoException
-  if (
-    code === 'MODULE_NOT_FOUND' &&
-    message.includes("'@cypress/webpack-preprocessor'")
-  ) {
+  if ((err as NodeJS.ErrnoException)?.code === 'MODULE_NOT_FOUND') {
     throw new Error(
-      '@cypress/code-coverage/use-babelrc requires @cypress/webpack-preprocessor. ' +
-        'Install it with: npm install -D @cypress/webpack-preprocessor @babel/core @babel/preset-env babel-loader webpack'
+      '@cypress/code-coverage/use-babelrc requires @cypress/webpack-preprocessor and its peer dependencies. ' +
+        'Install them with: npm install -D @cypress/webpack-preprocessor @babel/core@7 @babel/preset-env@7 babel-loader webpack\n\n' +
+        (err as Error).message
     )
   }
   throw err

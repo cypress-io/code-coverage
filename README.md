@@ -117,13 +117,11 @@ Watch the video [How to read code coverage report](https://youtu.be/yVvCYtsmkZU)
 
 If you test your application code directly from `specs`, you might want to instrument them and combine unit test code coverage with any end-to-end code coverage (from iframe). You can easily instrument spec files using [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul), for example.
 
-Install the plugin, along with the webpack preprocessor and the Babel and webpack packages it needs
+Install the plugin, along with [@cypress/webpack-preprocessor](https://github.com/cypress-io/cypress/tree/develop/npm/webpack-preprocessor) and the Babel 7 and webpack packages it needs. These are optional peer dependencies, so they aren't installed for you.
 
 ```shell
-npm i -D babel-plugin-istanbul @cypress/webpack-preprocessor @babel/core @babel/preset-env babel-loader webpack
+npm i -D babel-plugin-istanbul @cypress/webpack-preprocessor @babel/core@7 @babel/preset-env@7 babel-loader webpack
 ```
-
-**Note:** `@cypress/code-coverage/use-babelrc` uses [@cypress/webpack-preprocessor](https://github.com/cypress-io/cypress/tree/develop/npm/webpack-preprocessor), which is an optional peer dependency. You need to install it yourself.
 
 Set your `.babelrc` file.
 

@@ -4,6 +4,7 @@ import type { CoverageObject } from './support-utils'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import {
+  canRequestUrl,
   filterFilesFromCoverage,
   getSendCoverageBatchSize
 } from './support-utils'
@@ -189,7 +190,16 @@ function registerHooks(): void {
         'url',
         '/__coverage__'
       )
+      // @ts-ignore - state is a runtime property
+      const pageOrigin = (cy.state('window') as Window).location.origin
       function captureCoverage(url: string, suffix = ''): void {
+        if (!canRequestUrl(url, Cypress.config('baseUrl'), pageOrigin)) {
+          logMessage(`
+            ⚠️ Skipped backend code coverage from \`${url}\`
+            because there is no \`baseUrl\` or visited page to resolve it against.
+          `)
+          return
+        }
         cy.request({
           url,
           log: false,

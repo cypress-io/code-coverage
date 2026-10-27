@@ -255,6 +255,8 @@ Or if you have multiple servers from which you are wanting to gather code covera
 
 That should be enough - the code coverage from the server will be requested at the end of the test run and merged with the client-side code coverage, producing a combined report.
 
+If `url` is relative (the default is `/__coverage__`), the plugin resolves it against `baseUrl` or the origin of the page the last test visited. When neither exists, for example without a `baseUrl` and a last test that never calls `cy.visit`, the plugin logs a message and skips the backend coverage request. Use an absolute `url` to always collect backend coverage, or set `expectFrontendCoverageOnly: true` to never request it.
+
 ### expectBackendCoverageOnly
 
 If there is NO frontend code coverage, and you only want to collect backend code coverage using Cypress tests, set `expectBackendCoverageOnly: true` in the `cypress.json` file. Otherwise, Cypress complains that it cannot find the frontend code coverage.
@@ -476,6 +478,7 @@ Full examples we use for testing in this repository:
 - [test-apps/ts-example](test-apps/ts-example) uses Babel + Parcel to instrument and serve TypeScript file
 - [test-apps/esm-example](test-apps/esm-example) demonstrates using ES module syntax (`import`/`export`) with the plugin
 - [test-apps/use-webpack](test-apps/use-webpack) shows Webpack build with source maps and Babel
+- [test-apps/no-base-url](test-apps/no-base-url) runs without a `baseUrl` and checks that a last test that never calls `cy.visit` doesn't break the backend coverage step
 - [test-apps/unit-tests-js](test-apps/unit-tests-js) runs just the unit tests and reports code coverage (JavaScript source code)
 - [test-apps/unit-tests-ts](test-apps/ts-example) runs just the unit tests and reports code coverage (TypeScript source code)
 

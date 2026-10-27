@@ -86,6 +86,7 @@ jobs:
           - frontend
           - fullstack
           - multiple-backends
+          - no-base-url
           - one-spec
           - same-folder
           - support-files

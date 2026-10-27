@@ -163,3 +163,22 @@ export function getSendCoverageBatchSize(): number | null {
   const isValid = !isNaN(parsedBatchSize) && parsedBatchSize > 0
   return isValid ? parsedBatchSize : null
 }
+
+/**
+ * `cy.request` resolves a relative url against `baseUrl` or the page's
+ * `location.origin`, and throws when neither is an http(s) origin. Test
+ * isolation leaves the page on about:blank, whose `location.origin` is "null",
+ * so a test that never calls `cy.visit` has nothing to resolve against.
+ * https://github.com/cypress-io/code-coverage/issues/777
+ */
+export function canRequestUrl(
+  url: string,
+  baseUrl: unknown,
+  pageOrigin: unknown
+): boolean {
+  return isHttpUrl(url) || isHttpUrl(baseUrl) || isHttpUrl(pageOrigin)
+}
+
+function isHttpUrl(url: unknown): boolean {
+  return typeof url === 'string' && /^https?:\/\//i.test(url)
+}

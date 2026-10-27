@@ -10,3 +10,4 @@ cypress-coverage/
 yarn.lock
 .parcel-cache
 test-apps/*/package-lock.json
+.swc/

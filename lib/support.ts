@@ -87,49 +87,56 @@ function registerHooks(): void {
     })
   })
 
+  const saveCoverageObject = (win: Window): void => {
+    let applicationSourceCoverage: unknown
+    try {
+      // Note that we are purposefully not supporting the optional chaining syntax here to
+      // support a wide range of projects (some of which are not set up to support the optional
+      // chaining syntax due to current Cypress limitations). See:
+      // https://github.com/cypress-io/cypress/issues/20753
+      if (win) {
+        // @ts-ignore - __coverage__ is added by instrumentation
+        applicationSourceCoverage = (
+          win as typeof win & { __coverage__?: unknown }
+        ).__coverage__
+      }
+    } catch {
+      // Reading __coverage__ from a cross-origin window throws, and we don't
+      // collect coverage for code we don't control
+    }
+
+    if (!applicationSourceCoverage) {
+      return
+    }
+
+    const existingCoverage = Cypress._.find(windowCoverageObjects, {
+      coverage: applicationSourceCoverage
+    })
+    if (existingCoverage) {
+      // Both `window:load` and `cy.window()` can report the same window, and
+      // navigating away and back creates a new object for the same page. The
+      // old object stops updating, so keep the latest one.
+      existingCoverage.coverage = applicationSourceCoverage
+      return
+    }
+
+    windowCoverageObjects.push({
+      coverage: applicationSourceCoverage,
+      pathname: win.location.pathname
+    })
+  }
+
   beforeEach(() => {
     windowCoverageObjects = []
 
-    const saveCoverageObject = (win: Window): void => {
-      let applicationSourceCoverage: unknown
-      try {
-        // Note that we are purposefully not supporting the optional chaining syntax here to
-        // support a wide range of projects (some of which are not set up to support the optional
-        // chaining syntax due to current Cypress limitations). See:
-        // https://github.com/cypress-io/cypress/issues/20753
-        if (win) {
-          // @ts-ignore - __coverage__ is added by instrumentation
-          applicationSourceCoverage = (
-            win as typeof win & { __coverage__?: unknown }
-          ).__coverage__
-        }
-      } catch {
-        // Reading __coverage__ from a cross-origin window throws, and we don't
-        // collect coverage for code we don't control
-      }
-
-      if (!applicationSourceCoverage) {
-        return
-      }
-
-      const existingCoverage = Cypress._.find(windowCoverageObjects, {
-        coverage: applicationSourceCoverage
-      })
-      if (existingCoverage) {
-        // Both `window:load` and `cy.window()` can report the same window, and
-        // navigating away and back creates a new object for the same page. The
-        // old object stops updating, so keep the latest one.
-        existingCoverage.coverage = applicationSourceCoverage
-        return
-      }
-
-      windowCoverageObjects.push({
-        coverage: applicationSourceCoverage,
-        pathname: win.location.pathname
-      })
-    }
-
     cy.on('window:load', saveCoverageObject)
+
+    // Some apps only create `__coverage__` after `window:load`, for example
+    // when a framework runs component code during hydration, so read each
+    // page again before it goes away
+    cy.on('window:before:unload', (event: BeforeUnloadEvent) => {
+      saveCoverageObject(event.currentTarget as Window)
+    })
 
     // Catches a page visited in a before() hook, which loaded before the
     // `window:load` listener existed
@@ -137,30 +144,35 @@ function registerHooks(): void {
   })
 
   afterEach(() => {
-    // Send after the test so the counters include everything it ran
-    windowCoverageObjects.forEach((cover) => {
-      sendCoverage(cover.coverage, cover.pathname)
-    })
+    // The last page never unloads during the test
+    cy.window({ log: false }).then(saveCoverageObject)
 
-    if (!hasE2ECoverage()) {
-      if (hasUnitTestCoverage()) {
-        logMessage(`👉 Only found unit test code coverage.`)
-      } else {
-        const expectBackendCoverageOnly = Cypress._.get(
-          Cypress.expose('codeCoverage'),
-          'expectBackendCoverageOnly',
-          false
-        )
-        if (!expectBackendCoverageOnly) {
-          logMessage(`
+    // Send after the test so the counters include everything it ran
+    cy.then(() => {
+      windowCoverageObjects.forEach((cover) => {
+        sendCoverage(cover.coverage, cover.pathname)
+      })
+
+      if (!hasE2ECoverage()) {
+        if (hasUnitTestCoverage()) {
+          logMessage(`👉 Only found unit test code coverage.`)
+        } else {
+          const expectBackendCoverageOnly = Cypress._.get(
+            Cypress.expose('codeCoverage'),
+            'expectBackendCoverageOnly',
+            false
+          )
+          if (!expectBackendCoverageOnly) {
+            logMessage(`
             ⚠️ Could not find any coverage information in your application
             by looking at the window coverage object.
             Did you forget to instrument your application?
             See [code-coverage#instrument-your-application](https://github.com/cypress-io/code-coverage#instrument-your-application)
           `)
+          }
         }
       }
-    }
+    })
   })
 
   after(function collectBackendCoverage() {

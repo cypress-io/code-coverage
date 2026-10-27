@@ -37,6 +37,25 @@ module.exports = defineConfig({
 })
 ```
 
+If your config file uses ES module syntax, such as a `cypress.config.ts` file or a project with `"type": "module"` in its `package.json`, you can import the task instead of calling `require`:
+
+```ts
+// cypress.config.ts
+import { defineConfig } from 'cypress'
+import codeCoverageTask from '@cypress/code-coverage/task'
+
+export default defineConfig({
+  e2e: {
+    setupNodeEvents(on, config) {
+      codeCoverageTask(on, config)
+      return config
+    },
+  },
+})
+```
+
+Both forms work in either kind of config file. If TypeScript reports `Cannot find module '@cypress/code-coverage/task'`, set `"moduleResolution"` to `"bundler"` in your `tsconfig.json`, or set both `"module"` and `"moduleResolution"` to `"node16"` or `"nodenext"`. The plugin's entry points are only declared in the `exports` field of its `package.json`, and older module resolution settings don't read it.
+
 ## Instrument your application
 
 This plugin **DOES NOT** instrument your code. You have to instrument it yourself using the [Istanbul.js](https://istanbul.js.org/) tool. Luckily, it is not difficult. For example, if you are already using Babel to transpile, you can add [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul) to your `.babelrc` and instrument on the fly.
@@ -64,6 +83,42 @@ If you have instrumented your application's code and see the `window.__coverage_
 That should be it! You should see messages from this plugin in the Cypress Command Log.
 
 ![Plugin messages](images/gui.png)
+
+### Instrument with SWC
+
+The plugin doesn't depend on Babel. It reads whatever Istanbul-format coverage your code writes to `window.__coverage__`, so you can instrument with [SWC](https://swc.rs) instead by adding [swc-plugin-coverage-instrument](https://github.com/kwonoj/swc-coverage-instrument) to your SWC config.
+
+If you compile with `@swc/core` directly or through `swc-loader`, add the plugin to your `.swcrc`:
+
+```json
+{
+  "jsc": {
+    "experimental": {
+      "plugins": [["swc-plugin-coverage-instrument", {}]]
+    }
+  }
+}
+```
+
+For Next.js, which compiles with SWC by default, add it to `experimental.swcPlugins` in `next.config.js`. Instrumented code is slower and larger, so turn it on only for the builds you test, for example with an environment variable:
+
+```js
+// next.config.js
+module.exports = {
+  experimental: {
+    swcPlugins:
+      process.env.INSTRUMENT_CODE === 'true'
+        ? [['swc-plugin-coverage-instrument', {}]]
+        : []
+  }
+}
+```
+
+Then build with `INSTRUMENT_CODE=true next build` before running Cypress.
+
+SWC plugins only load in the SWC version they were built for, and a mismatch makes the build fail when it loads the plugin. If that happens, try a different `swc-plugin-coverage-instrument` version that matches your `@swc/core`, or the SWC version bundled in your Next.js release. For example, `swc-plugin-coverage-instrument` 0.0.33 works with `@swc/core` 1.16.18 and with Next.js 16.4.3.
+
+See [test-apps/swc-webpack](test-apps/swc-webpack) for a complete example.
 
 ### More information
 
@@ -154,6 +209,116 @@ The reports are still written, so you can look at what's missing. A few things t
 If your NYC options set `check-coverage` but `expose.codeCoverage.checkCoverage` isn't on, the plugin prints a warning that the thresholds aren't enforced.
 
 Watch the video [How to read code coverage report](https://youtu.be/yVvCYtsmkZU) to see how to read the HTML coverage report.
+
+## Component testing
+
+The plugin collects coverage from component tests, too. The setup is the same as for end-to-end tests, but it goes in your component testing configuration:
+
+1. Import the support file in `cypress/support/component.js`:
+
+   ```js
+   // cypress/support/component.js
+   import '@cypress/code-coverage/support'
+   ```
+
+2. Register the task in `component.setupNodeEvents`:
+
+   ```js
+   // cypress.config.js
+   const { defineConfig } = require('cypress')
+
+   module.exports = defineConfig({
+     component: {
+       devServer: {
+         framework: 'react',
+         bundler: 'vite'
+       },
+       setupNodeEvents(on, config) {
+         require('@cypress/code-coverage/task')(on, config)
+         return config
+       }
+     }
+   })
+   ```
+
+3. Instrument the code your dev server serves. Cypress builds your components with the dev server you configure, so that's where Istanbul needs to run.
+
+For Vite, add [vite-plugin-istanbul](https://github.com/iFaxity/vite-plugin-istanbul) to your Vite config. It instruments code served by the dev server by default:
+
+```js
+// vite.config.js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import istanbul from 'vite-plugin-istanbul'
+
+export default defineConfig({
+  plugins: [
+    react(),
+    istanbul({
+      include: 'src/*',
+      exclude: ['node_modules', 'cypress', '**/*.cy.jsx'],
+      extension: ['.js', '.jsx']
+    })
+  ]
+})
+```
+
+For webpack, add [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul) to the Babel loader in the `webpackConfig` you pass to the dev server:
+
+```js
+// cypress.config.js
+const { defineConfig } = require('cypress')
+
+module.exports = defineConfig({
+  component: {
+    devServer: {
+      framework: 'react',
+      bundler: 'webpack',
+      webpackConfig: {
+        resolve: { extensions: ['.js', '.jsx'] },
+        module: {
+          rules: [
+            {
+              test: /\.jsx?$/,
+              exclude: /node_modules/,
+              use: {
+                loader: 'babel-loader',
+                options: {
+                  presets: [['@babel/preset-react', { runtime: 'automatic' }]],
+                  plugins: ['istanbul']
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    setupNodeEvents(on, config) {
+      require('@cypress/code-coverage/task')(on, config)
+      return config
+    }
+  }
+})
+```
+
+`babel-plugin-istanbul` doesn't skip `.cy.jsx` spec files on its own, so exclude them in your [NYC options](#where-nyc-options-are-read-from), for example in `.nycrc.json`:
+
+```json
+{
+  "exclude": ["**/*.cy.jsx", "cypress/**"]
+}
+```
+
+If instrumentation isn't working, the plugin logs "Could not find any coverage information in your application" after each test. To fail fast instead, check for the coverage object right after mounting:
+
+```js
+it('mounts an instrumented component', () => {
+  cy.mount(<Counter />)
+  cy.window().should('have.property', '__coverage__')
+})
+```
+
+See [test-apps/component-vite](test-apps/component-vite) for a complete example.
 
 ## Instrument unit tests
 
@@ -293,9 +458,45 @@ If there is ONLY frontend code coverage, set `expectFrontendCoverageOnly: true` 
 }
 ```
 
+## Where NYC options are read from
+
+The plugin reads [NYC options](https://github.com/istanbuljs/nyc#common-configuration-options) from the folder that holds your Cypress config file, because that's the working directory Cypress uses when it loads the config and runs `setupNodeEvents`. Most of the time that's your project root. But if you pass `--config-file cypress/cypress.config.ts`, the plugin looks in the `cypress` folder, not in the folder you started Cypress from.
+
+The plugin looks for these files in that folder only. It doesn't search parent folders:
+
+- `.nycrc`
+- `.nycrc.json`
+- `.nycrc.yaml`
+- `.nycrc.yml`
+- `nyc.config.js`
+- `nyc.config.cjs`
+- the `nyc` object in `package.json`
+
+Unlike the `nyc` CLI, which uses the first config file it finds, the plugin merges every file it finds. If two files set the same option, the one later in the list wins, so the `nyc` object in `package.json` overrides the rest. The [`coverage:report` script](#custom-nyc-command) is looked up in that same `package.json`. Relative paths such as `report-dir`, `temp-dir`, and the `include` and `exclude` globs are resolved against that folder as well.
+
+For example, in a monorepo where you run `cypress run --config-file cypress/cypress.config.ts` from `libs/foo`, put the options next to the Cypress config rather than in `libs/foo/package.json`:
+
+```text
+libs/foo/
+├── package.json        <- not read by the plugin
+├── src/
+└── cypress/
+    ├── cypress.config.ts
+    └── .nycrc.json     <- read by the plugin
+```
+
+```json
+{
+  "include": ["../src/**/*.ts"],
+  "report-dir": "../coverage"
+}
+```
+
+If you aren't sure which options the plugin picked up, run Cypress with `DEBUG=code-coverage` and look for the `combined NYC options` line. See [Debugging](#debugging).
+
 ## Custom report folder
 
-You can specify a custom report folder by adding `nyc` object to the `package.json` file. For example, to save reports to `cypress-coverage` folder, use:
+You can specify a custom report folder by adding `nyc` object to the `package.json` file in the [same folder as your Cypress config file](#where-nyc-options-are-read-from). For example, to save reports to `cypress-coverage` folder, use:
 
 ```json
 {
@@ -322,7 +523,7 @@ You can specify custom coverage reporter(s) to use. For example, to output text 
 
 ## Custom NYC command
 
-Sometimes, the NYC tool might be installed in a different folder, not the current or parent folder, or you might want to customize the report command. In that case, put the custom command into `package.json` in the current folder, and this plugin will automatically use it.
+Sometimes, the NYC tool might be installed in a different folder, not the current or parent folder, or you might want to customize the report command. In that case, put the custom command into `package.json` in the [same folder as your Cypress config file](#where-nyc-options-are-read-from), and this plugin will automatically use it.
 
 ```json
 {
@@ -467,7 +668,7 @@ expose: {
 
 Cypress 10 and later users should set the `exclude` option to exclude any items from the `cypress` folder they don't want included in the coverage reports.
 
-Additionally, you can use [`nyc` configuration](https://github.com/istanbuljs/nyc#common-configuration-options) and [include and exclude options](https://github.com/istanbuljs/nyc#using-include-and-exclude-arrays). You can include and exclude files using `minimatch` patterns in the `.nycrc` file or the "nyc" object inside your `package.json` file.
+Additionally, you can use [`nyc` configuration](https://github.com/istanbuljs/nyc#common-configuration-options) and [include and exclude options](https://github.com/istanbuljs/nyc#using-include-and-exclude-arrays). You can include and exclude files using `minimatch` patterns in the `.nycrc` file or the "nyc" object inside your `package.json` file. Whichever you use, put it in the [same folder as your Cypress config file](#where-nyc-options-are-read-from).
 
 For example, if you want only to include files in the `app` folder but exclude the `app/util.js` file, you can set it in your `package.json`.
 
@@ -534,6 +735,8 @@ Full examples we use for testing in this repository:
 - [test-apps/ts-example](test-apps/ts-example) uses Babel + Parcel to instrument and serve TypeScript file
 - [test-apps/esm-example](test-apps/esm-example) demonstrates using ES module syntax (`import`/`export`) with the plugin
 - [test-apps/use-webpack](test-apps/use-webpack) shows Webpack build with source maps and Babel
+- [test-apps/component-vite](test-apps/component-vite) collects coverage from React component tests served by Vite
+- [test-apps/swc-webpack](test-apps/swc-webpack) instruments a webpack build with SWC instead of Babel, and loads it after the page's `load` event
 - [test-apps/unit-tests-js](test-apps/unit-tests-js) runs just the unit tests and reports code coverage (JavaScript source code)
 - [test-apps/unit-tests-ts](test-apps/ts-example) runs just the unit tests and reports code coverage (TypeScript source code)
 
@@ -689,6 +892,54 @@ Common issue: [not instrumenting your application when running Cypress](#instrum
 If the plugin worked before in version X but stopped after upgrading to version Y, please try the [released versions](https://github.com/cypress-io/code-coverage/releases) between X and Y to see where the breaking change was.
 
 If you decide to open an issue in this repository, please fill in all information the [issue template](https://github.com/cypress-io/code-coverage/blob/master/.github/ISSUE_TEMPLATE/bug_report.md) asks for. The issues most likely to be resolved have debug logs, screenshots, and hopefully public repository links so we can try running the tests ourselves.
+
+### Coverage works locally but not in CI
+
+If you get a coverage report on your machine but an empty one in CI, the app that CI tests is almost always not instrumented. You'll see this in the Command Log:
+
+```text
+⚠️ Could not find any coverage information in your application
+```
+
+And this in the terminal:
+
+```text
+⚠️ file .nyc_output/out.json has no coverage information
+```
+
+Versions before 3.13.4 printed `Cannot find coverage file .nyc_output/out.json` instead.
+
+Locally you probably run a dev server, while CI often builds the app for production first. Many instrumentation setups only switch on in development. For example:
+
+- **Babel:** an `istanbul` plugin listed under `"env": { "development": ... }` or `"env": { "test": ... }` in your Babel config only runs when `BABEL_ENV` or `NODE_ENV` matches that name. Production builds usually set `NODE_ENV=production`.
+- **`vite-plugin-istanbul`:** by default, it only instruments code served by `vite dev` and skips `vite build`. Set `forceBuildInstrument: true` to instrument builds too. Pair it with `requireEnv: true` so only builds with `VITE_COVERAGE=true` get instrumented, and your real production build stays clean:
+
+  ```js
+  // vite.config.js
+  import { defineConfig } from 'vite'
+  import istanbul from 'vite-plugin-istanbul'
+
+  export default defineConfig({
+    plugins: [
+      istanbul({
+        requireEnv: true,
+        forceBuildInstrument: true
+      })
+    ]
+  })
+  ```
+
+  Then build with `VITE_COVERAGE=true vite build` in CI.
+
+To catch this early, add a test that fails when the page has no coverage object, and run it in CI:
+
+```js
+// cypress/e2e/instrumentation.cy.js
+it('loads an instrumented app', () => {
+  cy.visit('/')
+  cy.window().should('have.property', '__coverage__')
+})
+```
 
 ### Coverage reporting timeouts
 

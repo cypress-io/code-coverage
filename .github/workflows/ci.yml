@@ -81,6 +81,7 @@ jobs:
           - batch-send-coverage
           - before-all-visit
           - before-each-visit
+          - component-vite
           - esm-example
           - exclude-files
           - frontend
@@ -89,6 +90,7 @@ jobs:
           - one-spec
           - same-folder
           - support-files
+          - swc-webpack
           - ts-example
           - unit-tests-js
           - use-webpack

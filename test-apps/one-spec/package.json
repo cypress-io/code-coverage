@@ -11,5 +11,9 @@
   },
   "devDependencies": {
     "@babel/core": "^7.28.6"
+  },
+  "nyc": {
+    "check-coverage": true,
+    "lines": 100
   }
 }

@@ -32,8 +32,8 @@ module.exports = defineConfig({
       // It's IMPORTANT to return the config object
       // with any changes
       return config
-    }
-  }
+    },
+  },
 })
 ```
 
@@ -247,10 +247,7 @@ Or if you have multiple servers from which you are wanting to gather code covera
 {
   "expose": {
     "codeCoverage": {
-      "url": [
-        "http://localhost:3000/__coverage__",
-        "http://localhost:3001/__coverage__"
-      ]
+      "url": ["http://localhost:3000/__coverage__", "http://localhost:3001/__coverage__"]
     }
   }
 }
@@ -580,8 +577,8 @@ module.exports = defineConfig({
       // It's IMPORTANT to return the config object
       // with any changes
       return config
-    }
-  }
+    },
+  },
 })
 ```
 

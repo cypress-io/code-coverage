@@ -174,6 +174,116 @@ If your NYC options set `check-coverage` but `expose.codeCoverage.checkCoverage`
 
 Watch the video [How to read code coverage report](https://youtu.be/yVvCYtsmkZU) to see how to read the HTML coverage report.
 
+## Component testing
+
+The plugin collects coverage from component tests, too. The setup is the same as for end-to-end tests, but it goes in your component testing configuration:
+
+1. Import the support file in `cypress/support/component.js`:
+
+   ```js
+   // cypress/support/component.js
+   import '@cypress/code-coverage/support'
+   ```
+
+2. Register the task in `component.setupNodeEvents`:
+
+   ```js
+   // cypress.config.js
+   const { defineConfig } = require('cypress')
+
+   module.exports = defineConfig({
+     component: {
+       devServer: {
+         framework: 'react',
+         bundler: 'vite'
+       },
+       setupNodeEvents(on, config) {
+         require('@cypress/code-coverage/task')(on, config)
+         return config
+       }
+     }
+   })
+   ```
+
+3. Instrument the code your dev server serves. Cypress builds your components with the dev server you configure, so that's where Istanbul needs to run.
+
+For Vite, add [vite-plugin-istanbul](https://github.com/iFaxity/vite-plugin-istanbul) to your Vite config. It instruments code served by the dev server by default:
+
+```js
+// vite.config.js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import istanbul from 'vite-plugin-istanbul'
+
+export default defineConfig({
+  plugins: [
+    react(),
+    istanbul({
+      include: 'src/*',
+      exclude: ['node_modules', 'cypress', '**/*.cy.jsx'],
+      extension: ['.js', '.jsx']
+    })
+  ]
+})
+```
+
+For webpack, add [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul) to the Babel loader in the `webpackConfig` you pass to the dev server:
+
+```js
+// cypress.config.js
+const { defineConfig } = require('cypress')
+
+module.exports = defineConfig({
+  component: {
+    devServer: {
+      framework: 'react',
+      bundler: 'webpack',
+      webpackConfig: {
+        resolve: { extensions: ['.js', '.jsx'] },
+        module: {
+          rules: [
+            {
+              test: /\.jsx?$/,
+              exclude: /node_modules/,
+              use: {
+                loader: 'babel-loader',
+                options: {
+                  presets: [['@babel/preset-react', { runtime: 'automatic' }]],
+                  plugins: ['istanbul']
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    setupNodeEvents(on, config) {
+      require('@cypress/code-coverage/task')(on, config)
+      return config
+    }
+  }
+})
+```
+
+`babel-plugin-istanbul` doesn't skip `.cy.jsx` spec files on its own, so exclude them in your [NYC options](#where-nyc-options-are-read-from), for example in `.nycrc.json`:
+
+```json
+{
+  "exclude": ["**/*.cy.jsx", "cypress/**"]
+}
+```
+
+If instrumentation isn't working, the plugin logs "Could not find any coverage information in your application" after each test. To fail fast instead, check for the coverage object right after mounting:
+
+```js
+it('mounts an instrumented component', () => {
+  cy.mount(<Counter />)
+  cy.window().should('have.property', '__coverage__')
+})
+```
+
+See [test-apps/component-vite](test-apps/component-vite) for a complete example.
+
 ## Instrument unit tests
 
 If you test your application code directly from `specs`, you might want to instrument them and combine unit test code coverage with any end-to-end code coverage (from iframe). You can easily instrument spec files using [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul), for example.
@@ -531,6 +641,7 @@ Full examples we use for testing in this repository:
 - [test-apps/ts-example](test-apps/ts-example) uses Babel + Parcel to instrument and serve TypeScript file
 - [test-apps/esm-example](test-apps/esm-example) demonstrates using ES module syntax (`import`/`export`) with the plugin
 - [test-apps/use-webpack](test-apps/use-webpack) shows Webpack build with source maps and Babel
+- [test-apps/component-vite](test-apps/component-vite) collects coverage from React component tests served by Vite
 - [test-apps/unit-tests-js](test-apps/unit-tests-js) runs just the unit tests and reports code coverage (JavaScript source code)
 - [test-apps/unit-tests-ts](test-apps/ts-example) runs just the unit tests and reports code coverage (TypeScript source code)
 

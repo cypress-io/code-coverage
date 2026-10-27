@@ -61,4 +61,4 @@ npm run coverage:check-files  # checks only the expected files appear in the rep
 
 GitHub Actions (`.github/workflows/ci.yml`) runs the format and Markdown checks, the unit tests, a build, every test app in a matrix, and a Windows run of `test-apps/all-files`. Other workflows in `.github/workflows/` handle Snyk scans and issue triage.
 
-CircleCI (`.circleci/config.yml`) only publishes to npm from `master`, `next`, `beta`, and `dev`.
+After every test passes on a push to `master`, `next`, `beta`, or `dev`, the `release` job in `ci.yml` runs `semantic-release` to publish to npm. It authenticates with npm trusted publishing (OIDC), so there's no npm token secret. The trusted publisher on npmjs.com is tied to the `ci.yml` filename, so don't rename the workflow without updating it there too.

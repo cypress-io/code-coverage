@@ -27,7 +27,6 @@
     "format": "prettier --write '{lib,middleware,test}/**/*.{js,ts}'",
     "format:check": "prettier --check '{lib,middleware,test}/**/*.{js,ts}'",
     "check:markdown": "find *.md -exec npx markdown-link-check {} \\;",
-    "effective:config": "circleci config process .circleci/config.yml | sed /^#/d",
     "apps:test:coverage:verify": "./scripts/test-apps-and-verify-coverage.sh"
   },
   "engines": {
@@ -101,7 +100,7 @@
     "parcel": "^2",
     "prettier": "3.6.2",
     "rimraf": "6.1.3",
-    "semantic-release": "23.1.1",
+    "semantic-release": "25.0.9",
     "serve": "14.2.6",
     "start-server-and-test": "2.1.5",
     "typescript": "^5.9.3",

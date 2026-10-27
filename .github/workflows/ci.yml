@@ -175,3 +175,37 @@ jobs:
         # because there are files covered at 0 in the report
         run: npm i -D check-code-coverage && npm run coverage:check-files
         working-directory: test-apps/all-files
+
+  release:
+    name: Release
+    # publish only after every test passes, and only from the branches in .releaserc
+    needs: [verify-test-apps, windows-test]
+    if: github.event_name == 'push' && contains(fromJSON('["master", "next", "beta", "dev"]'), github.ref_name)
+    runs-on: ubuntu-latest
+    concurrency:
+      group: release-${{ github.ref }}
+      cancel-in-progress: false
+    permissions:
+      contents: write # to be able to publish a GitHub release
+      issues: write # to be able to comment on released issues
+      pull-requests: write # to be able to comment on released pull requests
+      id-token: write # to enable use of OIDC for npm trusted publishing and provenance
+    env:
+      # we don't need Cypress to do the release
+      CYPRESS_INSTALL_BINARY: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # semantic-release reads the full history and tags to work out the next version
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          # npm trusted publishing needs npm 11.5.1 or later, which ships with Node 24
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Publish to npm 🚀
+        run: npm run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -8,7 +8,7 @@
 npm install -D @cypress/code-coverage
 ```
 
-**Note:** This plugin assumes that `cypress` is a peer dependency already installed in your project.
+**Note:** This plugin assumes that `cypress` is a peer dependency already installed in your project. Babel and webpack are not required. They are optional peer dependencies used only by [`@cypress/code-coverage/use-babelrc`](#instrument-unit-tests).
 
 Then add the code below to the `supportFile` and `setupNodeEvents` function.
 
@@ -117,11 +117,13 @@ Watch the video [How to read code coverage report](https://youtu.be/yVvCYtsmkZU)
 
 If you test your application code directly from `specs`, you might want to instrument them and combine unit test code coverage with any end-to-end code coverage (from iframe). You can easily instrument spec files using [babel-plugin-istanbul](https://github.com/istanbuljs/babel-plugin-istanbul), for example.
 
-Install the plugin
+Install the plugin, along with the webpack preprocessor and the Babel and webpack packages it needs
 
 ```shell
-npm i -D babel-plugin-istanbul
+npm i -D babel-plugin-istanbul @cypress/webpack-preprocessor @babel/core @babel/preset-env babel-loader webpack
 ```
+
+**Note:** `@cypress/code-coverage/use-babelrc` uses [@cypress/webpack-preprocessor](https://github.com/cypress-io/cypress/tree/develop/npm/webpack-preprocessor), which is an optional peer dependency. You need to install it yourself.
 
 Set your `.babelrc` file.
 

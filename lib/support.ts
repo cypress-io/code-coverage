@@ -190,10 +190,22 @@ function registerHooks(): void {
         'url',
         '/__coverage__'
       )
-      // @ts-ignore - state is a runtime property
-      const pageOrigin = (cy.state('window') as Window).location.origin
+      const expectBackendCoverageOnly = Cypress._.get(
+        Cypress.expose('codeCoverage'),
+        'expectBackendCoverageOnly',
+        false
+      )
+      // The same origin cy.request falls back to. It's empty when the page is
+      // on another origin, where reading location directly would throw.
+      // @ts-ignore - getRemoteLocation is a runtime property
+      const pageOrigin: string = cy.getRemoteLocation('origin')
       function captureCoverage(url: string, suffix = ''): void {
         if (!canRequestUrl(url, Cypress.config('baseUrl'), pageOrigin)) {
+          if (expectBackendCoverageOnly) {
+            throw new Error(
+              `Expected to collect backend code coverage from ${url}, but there is no \`baseUrl\` or visited page to resolve it against`
+            )
+          }
           logMessage(`
             ⚠️ Skipped backend code coverage from \`${url}\`
             because there is no \`baseUrl\` or visited page to resolve it against.
@@ -210,11 +222,6 @@ function registerHooks(): void {
           })
           .then((coverage) => {
             if (!coverage) {
-              const expectBackendCoverageOnly = Cypress._.get(
-                Cypress.expose('codeCoverage'),
-                'expectBackendCoverageOnly',
-                false
-              )
               if (expectBackendCoverageOnly) {
                 throw new Error(
                   `Expected to collect backend code coverage from ${url}`

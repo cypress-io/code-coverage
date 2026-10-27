@@ -32,8 +32,8 @@ module.exports = defineConfig({
       // It's IMPORTANT to return the config object
       // with any changes
       return config
-    },
-  },
+    }
+  }
 })
 ```
 
@@ -247,7 +247,10 @@ Or if you have multiple servers from which you are wanting to gather code covera
 {
   "expose": {
     "codeCoverage": {
-      "url": ["http://localhost:3000/__coverage__", "http://localhost:3001/__coverage__"]
+      "url": [
+        "http://localhost:3000/__coverage__",
+        "http://localhost:3001/__coverage__"
+      ]
     }
   }
 }
@@ -255,7 +258,7 @@ Or if you have multiple servers from which you are wanting to gather code covera
 
 That should be enough - the code coverage from the server will be requested at the end of the test run and merged with the client-side code coverage, producing a combined report.
 
-If `url` is relative (the default is `/__coverage__`), the plugin resolves it against `baseUrl` or the origin of the page the last test visited. When neither exists, for example without a `baseUrl` and a last test that never calls `cy.visit`, the plugin logs a message and skips the backend coverage request. Use an absolute `url` to always collect backend coverage, or set `expectFrontendCoverageOnly: true` to never request it.
+If `url` is a path (the default is `/__coverage__`), the plugin resolves it against `baseUrl` or the origin of the page the last test visited. When neither exists, for example without a `baseUrl` and a last test that never calls `cy.visit`, the plugin logs a message and skips the backend coverage request, or fails the run if `expectBackendCoverageOnly` is set. Use an absolute `url` to always collect backend coverage, or set `expectFrontendCoverageOnly: true` to never request it.
 
 ### expectBackendCoverageOnly
 
@@ -577,8 +580,8 @@ module.exports = defineConfig({
       // It's IMPORTANT to return the config object
       // with any changes
       return config
-    },
-  },
+    }
+  }
 })
 ```
 

@@ -165,10 +165,11 @@ export function getSendCoverageBatchSize(): number | null {
 }
 
 /**
- * `cy.request` resolves a relative url against `baseUrl` or the page's
- * `location.origin`, and throws when neither is an http(s) origin. Test
- * isolation leaves the page on about:blank, whose `location.origin` is "null",
- * so a test that never calls `cy.visit` has nothing to resolve against.
+ * `cy.request` resolves a path against `baseUrl` or the page's origin, and
+ * throws when neither is an http(s) origin. Test isolation leaves the page on
+ * about:blank, which has no origin, so a test that never calls `cy.visit` has
+ * nothing to resolve against. Any other url is left for `cy.request` to judge,
+ * since it also accepts hosts without a protocol, such as `localhost:3000`.
  * https://github.com/cypress-io/code-coverage/issues/777
  */
 export function canRequestUrl(
@@ -176,9 +177,10 @@ export function canRequestUrl(
   baseUrl: unknown,
   pageOrigin: unknown
 ): boolean {
-  return isHttpUrl(url) || isHttpUrl(baseUrl) || isHttpUrl(pageOrigin)
+  const isPath = url.startsWith('/') && !url.startsWith('//')
+  return !isPath || isHttpOrigin(baseUrl) || isHttpOrigin(pageOrigin)
 }
 
-function isHttpUrl(url: unknown): boolean {
-  return typeof url === 'string' && /^https?:\/\//i.test(url)
+function isHttpOrigin(origin: unknown): boolean {
+  return typeof origin === 'string' && /^https?:\/\//i.test(origin)
 }

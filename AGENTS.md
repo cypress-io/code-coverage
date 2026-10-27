@@ -46,7 +46,7 @@ npm run coverage:check-files  # checks only the expected files appear in the rep
 
 - **Formatting:** Prettier with no semicolons, single quotes, two-space indent, and no trailing commas (`.prettierrc.json`). Run `npm run format` before committing.
 - **TypeScript:** `strict` is on. Keep types sound rather than reaching for `any`.
-- **Commits:** Conventional Commits (`feat:`, `fix:`, `chore:`, with `!` for breaking changes). `semantic-release` derives versions from them, so the prefix matters.
+- **Commits and PR titles:** Conventional Commits (`feat:`, `fix:`, `chore:`, with `!` for breaking changes). `semantic-release` derives versions from them, so the prefix matters. PRs are squash-merged, so the PR title becomes the commit on `master` and needs the same prefix.
 - **Agent instructions:** when you edit `AGENTS.md` or other instruction files, use unordered lists rather than tables.
 - **Configuration API:** user-facing options are read from `Cypress.expose()` (the `expose` section of `cypress.config.js`), not `Cypress.env()`. That change was a breaking release, so don't reintroduce `Cypress.env` reads.
 
@@ -82,6 +82,8 @@ Good examples:
 - A change in behavior that users see in a Cypress run should be covered by a test app. Extend an existing app if it fits. If you add a new one, also add it to the `verify-test-apps` matrix in `.github/workflows/ci.yml` and to the "Internal test apps" list in `README.md`.
 - If you add, rename, or change an option, update `README.md`, since it's the plugin's user-facing documentation.
 - If you add a new entry point, add it to `exports` in `package.json` too.
+- Before you push, run `npm test` and `npm run format:check`.
+- When you open a PR, fill in every section of `.github/pull_request_template.md`. Under "How has the user experience changed?", write "No change" if nothing users see or do is different.
 
 ## CI
 

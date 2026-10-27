@@ -15,6 +15,61 @@ export interface CoverageObject {
   }
 }
 
+export interface WindowCoverageObject {
+  coverage: unknown
+  pathname: string
+}
+
+/**
+ * Saves a reference to the application window's "__coverage__" object,
+ * unless an equal coverage object has already been saved.
+ * Safe to call several times per test, for example on "window:load"
+ * and again after the test, to pick up coverage created by lazy-loaded code.
+ */
+export function saveWindowCoverageObject(
+  win: Window | undefined,
+  windowCoverageObjects: WindowCoverageObject[]
+): void {
+  // if the application code has been instrumented, then the app iframe "win.__coverage__" will be available,
+  // in addition, accessing win.__coverage__ can throw when testing cross-origin code,
+  // because we don't control the cross-origin code, we can safely return
+  let applicationSourceCoverage: unknown
+  try {
+    // Note that we are purposefully not supporting the optional chaining syntax here to
+    // support a wide range of projects (some of which are not set up to support the optional
+    // chaining syntax due to current Cypress limitations). See:
+    // https://github.com/cypress-io/cypress/issues/20753
+    if (win) {
+      applicationSourceCoverage = (
+        win as typeof win & { __coverage__?: unknown }
+      ).__coverage__
+    }
+  } catch {
+    // ignore cross-origin errors
+  }
+
+  if (!win || !applicationSourceCoverage) {
+    return
+  }
+
+  const existingCoverage = Cypress._.find(windowCoverageObjects, {
+    coverage: applicationSourceCoverage
+  })
+  if (existingCoverage) {
+    // this application code coverage object is already known
+    // which can happen when combining `window:load` and `before` callbacks,
+    // it can also happen when the user navigates away and then returns to the page
+    // in which case we need to use new applicationSourceCoverage, because the old will not be updated anymore.
+    existingCoverage.coverage = applicationSourceCoverage
+    return
+  }
+
+  windowCoverageObjects.push({
+    coverage: applicationSourceCoverage,
+    pathname: win.location.pathname
+  })
+}
+
 /** excludes files that shouldn't be in code coverage report */
 export function filterFilesFromCoverage(
   totalCoverage: CoverageObject,

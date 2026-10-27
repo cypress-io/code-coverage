@@ -10,4 +10,16 @@ describe('lazy-loaded code', () => {
     cy.window().should('have.property', '__coverage__')
     cy.window().invoke('multiply', 2, 3).should('equal', 6)
   })
+
+  // the plugin reads "window.__coverage__" again after each test,
+  // which must not fail when the test ends on another origin
+  it('does not fail when the test ends on another origin', () => {
+    cy.visit('/')
+    cy.window().then((win) => {
+      win.location.href = 'http://127.0.0.1:1234/'
+    })
+    cy.origin('http://127.0.0.1:1234', () => {
+      cy.get('#load-remote').should('exist')
+    })
+  })
 })

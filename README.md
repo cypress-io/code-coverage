@@ -1,4 +1,4 @@
-# @cypress/code-coverage [![renovate-app badge][renovate-badge]][renovate-app] [![CircleCI](https://circleci.com/gh/cypress-io/code-coverage.svg?style=svg)](https://circleci.com/gh/cypress-io/code-coverage)
+# @cypress/code-coverage [![renovate-app badge][renovate-badge]][renovate-app] [![CI](https://github.com/cypress-io/code-coverage/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/cypress-io/code-coverage/actions/workflows/ci.yml)
 
 > Saves the code coverage collected during Cypress tests
 

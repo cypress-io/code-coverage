@@ -53,10 +53,12 @@ npm run coverage:check-files  # checks only the expected files appear in the rep
 ## When you change things
 
 - A change in `lib/*-utils.ts` should come with a unit test in `test/lib/`.
-- A change in behavior that users see in a Cypress run should be covered by a test app. Extend an existing app if it fits. If you add a new one, also add it to the `verify-test-apps` matrix in `.circleci/config.yml` and to the "Internal test apps" list in `README.md`.
+- A change in behavior that users see in a Cypress run should be covered by a test app. Extend an existing app if it fits. If you add a new one, also add it to the `verify-test-apps` matrix in `.github/workflows/ci.yml` and to the "Internal test apps" list in `README.md`.
 - If you add, rename, or change an option, update `README.md`, since it's the plugin's user-facing documentation.
 - If you add a new entry point, add it to `exports` in `package.json` too.
 
 ## CI
 
-CircleCI (`.circleci/config.yml`) runs the format and Markdown checks, the unit tests, a build, every test app in a matrix, and a Windows run of `test-apps/all-files`. It publishes to npm from `master`, `next`, `beta`, and `dev`. GitHub Actions only handle Snyk scans and issue triage.
+GitHub Actions (`.github/workflows/ci.yml`) runs the format and Markdown checks, the unit tests, a build, every test app in a matrix, and a Windows run of `test-apps/all-files`. Other workflows in `.github/workflows/` handle Snyk scans and issue triage.
+
+CircleCI (`.circleci/config.yml`) only publishes to npm from `master`, `next`, `beta`, and `dev`.

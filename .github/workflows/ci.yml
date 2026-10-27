@@ -1,0 +1,177 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - beta
+      - next
+      - dev
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    env:
+      # we don't need Cypress to check code style
+      CYPRESS_INSTALL_BINARY: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Code style check 🧹
+        run: npm run format:check
+      - name: Markdown link check
+        run: npm run check:markdown
+
+  unit-test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    env:
+      # the unit tests run in Vitest, not Cypress
+      CYPRESS_INSTALL_BINARY: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-test-coverage
+          path: coverage
+          if-no-files-found: ignore
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      CYPRESS_INSTALL_BINARY: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+  verify-test-apps:
+    name: Test app (${{ matrix.app }})
+    needs: [lint, unit-test, build]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app:
+          - all-files
+          - backend
+          - batch-send-coverage
+          - before-all-visit
+          - before-each-visit
+          - esm-example
+          - exclude-files
+          - frontend
+          - fullstack
+          - multiple-backends
+          - one-spec
+          - same-folder
+          - support-files
+          - ts-example
+          - unit-tests-js
+          - use-webpack
+          - redirect
+    defaults:
+      run:
+        working-directory: test-apps/${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Install root dependencies
+        run: npm ci
+        working-directory: .
+      - name: Build project
+        # test apps load the plugin from dist/ through "@cypress/code-coverage": "file:."
+        run: npm run build
+        working-directory: .
+      - name: Install test app dependencies
+        run: npm i
+      - name: Run Cypress tests
+        run: npm run test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ matrix.app }}
+          path: test-apps/${{ matrix.app }}/coverage
+          if-no-files-found: ignore
+      - name: Verify Code Coverage
+        run: npm run coverage:verify
+      - name: Check code coverage files 📈
+        # we will check the final coverage report
+        # to make sure it only has files we are interested in
+        # because there are files covered at 0 in the report
+        run: npm run coverage:check-files
+
+  windows-test:
+    name: Test app (all-files, Windows)
+    needs: [lint, unit-test, build]
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: ~\AppData\Local\Cypress\Cache
+          key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Install deps for code coverage
+        run: npm ci
+      - name: Build project
+        run: npm run build
+      - name: Install test app deps
+        run: npm i
+        working-directory: test-apps/all-files
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
+        with:
+          install: false
+          start: npm run start:windows --prefix test-apps/all-files
+          wait-on: 'http://localhost:1234'
+          command: npx cypress run --project test-apps/all-files
+      - name: Verify Code Coverage
+        # make sure the examples captures 100% of code
+        run: npm run coverage:verify
+        working-directory: test-apps/all-files
+      - name: Check code coverage files 📈
+        # we will check the final coverage report
+        # to make sure it only has files we are interested in
+        # because there are files covered at 0 in the report
+        run: npm i -D check-code-coverage && npm run coverage:check-files
+        working-directory: test-apps/all-files

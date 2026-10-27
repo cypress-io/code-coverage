@@ -149,6 +149,15 @@ function registerHooks(): void {
     // save reference to coverage for each app window loaded in the test
     cy.on('window:load', saveCoverageObject)
 
+    // the app may create "window.__coverage__" after the "load" event,
+    // so check again before the test navigates away from the page
+    cy.on('window:before:unload', (event: BeforeUnloadEvent) => {
+      const doc = event.target as Document | null
+      if (doc && doc.defaultView) {
+        saveCoverageObject(doc.defaultView)
+      }
+    })
+
     // save reference if visiting a page inside a before() hook
     cy.window({ log: false }).then(saveCoverageObject)
   })

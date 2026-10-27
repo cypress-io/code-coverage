@@ -121,8 +121,35 @@ function maybePrintFinalCoverageFiles(folder: string): void {
   })
 }
 
-// set from "expose.codeCoverage.checkCoverage" when the tasks are registered
-let shouldCheckCoverage = false
+/**
+ * Checks the final coverage against the thresholds in the NYC options.
+ * Runs once at the end of "cypress run", after the last spec's report.
+ */
+async function checkCoverageAfterRun(): Promise<void> {
+  if (customNycReportScript) {
+    log(
+      'skipping coverage threshold check, using script "%s" from package.json',
+      DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME
+    )
+    return
+  }
+  if (!existsSync(nycFilename)) {
+    log('skipping coverage threshold check, cannot find %s', nycFilename)
+    return
+  }
+
+  const NYC = require('nyc')
+  const nyc = new NYC(nycReportOptions)
+  const finalCoverageMap: IstanbulCoverageMap =
+    await nyc.getCoverageMapFromAllCoverageFiles()
+  const errors = checkCoverageThresholds(finalCoverageMap, nycReportOptions)
+  if (errors.length) {
+    throw new Error(
+      `Code coverage is below the threshold:\n${errors.join('\n')}`
+    )
+  }
+  log('coverage meets the thresholds')
+}
 
 interface TaskParams {
   isInteractive?: boolean
@@ -223,32 +250,7 @@ const tasks = {
 
       return reportFolder
     }
-
-    const nycCheckCoverage = Boolean(
-      nycReportOptions['check-coverage'] || nycReportOptions.checkCoverage
-    )
-    if (!shouldCheckCoverage) {
-      if (nycCheckCoverage) {
-        console.warn(
-          'NYC option "check-coverage" is ignored. To enforce coverage thresholds, set "expose.codeCoverage.checkCoverage" to true in your Cypress config'
-        )
-      }
-      return nyc.report().then(returnReportFolder)
-    }
-
-    const checkCoverage = async (): Promise<void> => {
-      const finalCoverageMap: IstanbulCoverageMap =
-        await nyc.getCoverageMapFromAllCoverageFiles()
-      const errors = checkCoverageThresholds(finalCoverageMap, nycReportOptions)
-      if (errors.length) {
-        throw new Error(
-          `Code coverage is below the threshold:\n${errors.join('\n')}`
-        )
-      }
-      log('coverage meets the thresholds')
-    }
-
-    return nyc.report().then(checkCoverage).then(returnReportFolder)
+    return nyc.report().then(returnReportFolder)
   }
 }
 
@@ -275,7 +277,16 @@ export = function registerCodeCoverageTasks(
   const codeCoverageConfig = config.expose.codeCoverage as
     | { checkCoverage?: boolean }
     | undefined
-  shouldCheckCoverage = codeCoverageConfig?.checkCoverage === true
+  if (codeCoverageConfig?.checkCoverage === true) {
+    on('after:run', checkCoverageAfterRun)
+  } else if (
+    nycReportOptions['check-coverage'] ||
+    nycReportOptions.checkCoverage
+  ) {
+    console.warn(
+      'NYC option "check-coverage" is ignored. To enforce coverage thresholds, set "expose.codeCoverage.checkCoverage" to true in your Cypress config'
+    )
+  }
 
   // set a variable to let the hooks running in the browser
   // know that they can send coverage commands

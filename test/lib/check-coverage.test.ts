@@ -29,6 +29,12 @@ describe('getCoverageThresholds', () => {
       statements: 0
     })
   })
+
+  it('rejects a threshold that is not a number', () => {
+    expect(() => getCoverageThresholds({ lines: '80%' })).toThrow(
+      'Expected NYC option "lines" to be a number, got "80%"'
+    )
+  })
 })
 
 describe('checkCoverageThresholds', () => {

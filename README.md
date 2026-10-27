@@ -138,14 +138,18 @@ Set the thresholds the same way you would for `nyc --check-coverage`, for exampl
 }
 ```
 
-After writing the reports, the plugin compares the coverage against `lines`, `functions`, `branches`, and `statements`. Any threshold you leave out uses the nyc default: 90% for `lines` and 0% for the rest. With `per-file: true`, each file is checked on its own. If any threshold isn't met, the `after` hook fails with a message such as:
+When `cypress run` finishes, the plugin compares the coverage from all specs against `lines`, `functions`, `branches`, and `statements`. Any threshold you leave out uses the nyc default: 90% for `lines` and 0% for the rest. With `per-file: true`, each file is checked on its own. If any threshold isn't met, the run fails with a message such as:
 
 ```text
 Code coverage is below the threshold:
 Coverage for lines (75%) does not meet global threshold (80%)
 ```
 
-The reports are still written, so you can look at what's missing. If you use a [custom NYC command](#custom-nyc-command), the plugin doesn't check thresholds. Add `--check-coverage` to that script instead.
+The reports are still written, so you can look at what's missing. A few things to know:
+
+- The check runs in the `after:run` event, so it doesn't run in `cypress open` unless you turn on [`experimentalInteractiveRunEvents`](https://docs.cypress.io/app/references/experiments).
+- Cypress keeps only one handler per event. If your `setupNodeEvents` registers its own `after:run` handler, one of the two replaces the other.
+- If you use a [custom NYC command](#custom-nyc-command), the plugin doesn't check thresholds. Add `--check-coverage` to that script instead.
 
 If your NYC options set `check-coverage` but `expose.codeCoverage.checkCoverage` isn't on, the plugin prints a warning that the thresholds aren't enforced.
 

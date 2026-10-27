@@ -450,7 +450,13 @@ export function getCoverageThresholds(
   }
   coverageThresholdKeys.forEach((key) => {
     if (nycOptions[key] !== undefined) {
-      defaults[key] = Number(nycOptions[key])
+      const threshold = Number(nycOptions[key])
+      if (Number.isNaN(threshold)) {
+        throw new Error(
+          `Expected NYC option "${key}" to be a number, got ${JSON.stringify(nycOptions[key])}`
+        )
+      }
+      defaults[key] = threshold
     }
   })
   return defaults

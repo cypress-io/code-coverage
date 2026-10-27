@@ -10,7 +10,6 @@ describe('Webpack example', () => {
   })
 
   it('has add function', () => {
-    // test "add" via this unit test
     expect(add(2, 3)).to.equal(5)
   })
 })

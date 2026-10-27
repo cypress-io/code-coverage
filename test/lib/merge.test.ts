@@ -42,15 +42,12 @@ describe('merging coverage', () => {
     coverageMap.merge(_.cloneDeep(coverageFixture))
 
     const merged = normalizeCoverageData(coverageMap.data)
-    // it is almost the same - only the statement count has been doubled
+    // merging the same coverage twice doubles the statement count
     const expected = _.cloneDeep(coverageFixture)
     expected[filename].s[0] = 2
     expect(merged).toEqual(expected)
   })
 
-  // This test is skipped in the vitest migration. It is testing internals
-  // of nyc that have changed with nyc 17. This needs fixed before we can
-  // finalize v4 of @cypress/code-coverage.
   it('does not merge correctly placeholders', () => {
     const coverageWithPlaceHolder = _.cloneDeep(coverageFixture)
     const placeholder = fileCoveragePlaceholder(filename)
@@ -65,7 +62,6 @@ describe('merging coverage', () => {
       [filename]: placeholder
     })
 
-    // now lets merge full info
     const previous = createCoverageMap(coverageWithPlaceHolder)
     const coverageMap = createCoverageMap(previous)
     coverageMap.merge(coverageFixture)
@@ -84,7 +80,6 @@ describe('merging coverage', () => {
     removePlaceholders(inputCoverage)
     expect(inputCoverage).toEqual(coverageFixture)
 
-    // add placeholder
     const placeholder = fileCoveragePlaceholder(filename)
     ;(
       inputCoverage as Record<

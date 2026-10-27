@@ -1,8 +1,7 @@
 /// <reference types="cypress" />
 /// <reference lib="dom" />
 
-// helper functions that are safe to use in the browser
-// from support.js file - no file system access
+// Runs in the browser, so these helpers must not touch the file system
 
 export interface CoverageObject {
   [key: string]: {
@@ -15,7 +14,6 @@ export interface CoverageObject {
   }
 }
 
-/** excludes files that shouldn't be in code coverage report */
 export function filterFilesFromCoverage(
   totalCoverage: CoverageObject,
   config: typeof Cypress.config = Cypress.config,
@@ -53,10 +51,6 @@ function toForwardSlashes(filePath: string): string {
   return filePath.replace(/\\/g, '/')
 }
 
-/**
- * remove coverage for the spec files themselves,
- * only keep "external" application source file coverage
- */
 function filterSpecsFromCoverage(
   totalCoverage: CoverageObject,
   config: typeof Cypress.config = Cypress.config,
@@ -90,9 +84,6 @@ function filterSpecsFromCoverage(
   return coverage
 }
 
-/**
- * Reads Cypress config and exclude patterns and combines them into one array
- */
 function getCypressExcludePatterns(
   config: typeof Cypress.config,
   expose: typeof Cypress.expose
@@ -105,7 +96,6 @@ function getCypressExcludePatterns(
 
   let testFilePatterns: string[] = []
   if (Array.isArray(testFilePattern)) {
-    // Filter out any undefined values and ensure all are strings
     for (const p of testFilePattern) {
       if (p !== undefined && typeof p === 'string') {
         testFilePatterns.push(p)
@@ -115,9 +105,7 @@ function getCypressExcludePatterns(
     testFilePatterns = [testFilePattern]
   }
 
-  // combine test files pattern and exclude patterns into single exclude pattern
   if (Array.isArray(excludePattern)) {
-    // Filter out any undefined values and ensure all are strings
     for (const p of excludePattern) {
       if (p !== undefined && typeof p === 'string') {
         testFilePatterns.push(p)
@@ -130,10 +118,6 @@ function getCypressExcludePatterns(
   return testFilePatterns
 }
 
-/**
- * Removes support file from the coverage object.
- * Support files are now handled via the exclude patterns in getCypressExcludePatterns.
- */
 function filterSupportFilesFromCoverage(
   totalCoverage: CoverageObject,
   config: typeof Cypress.config = Cypress.config
@@ -173,10 +157,6 @@ export function fixSourcePaths(coverage: CoverageObject): void {
   })
 }
 
-/**
- * Validates and returns the configured batch size for
- * sending coverage to the backend
- */
 export function getSendCoverageBatchSize(): number | null {
   const batchSize = Cypress.expose('sendCoverageBatchSize')
   const parsedBatchSize = parseInt(String(batchSize), 10)

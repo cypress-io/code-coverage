@@ -31,7 +31,6 @@ describe('filtering specs', () => {
       config = vi.fn()
 
       expose = vi.fn().mockReturnValue({
-        //filter out all files in the cypress folder
         codeCoverage: {
           exclude: 'cypress/**/*.*'
         }
@@ -91,7 +90,6 @@ describe('filtering specs', () => {
       const totalCoverage = {
         '/user/app/cypress/support/index.js': {},
         '/user/app/cypress/commands/index.js': {},
-        //these files should be included
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {}
       }
@@ -156,7 +154,6 @@ describe('filtering specs', () => {
       const totalCoverage = {
         '/user/app/src/codeA.js': {},
         '/user/app/src/codeB.js': {},
-        // these files should be removed
         '/user/app/cypress/integration/spec1.cy.js': {},
         '/user/app/cypress/integration/spec2.cy.js': {}
       }
@@ -181,7 +178,6 @@ describe('filtering specs', () => {
       const totalCoverage = {
         '/user/app/src/specA.cy.js': {},
         '/user/app/src/specB.cy.js': {},
-        // This file should be included in coverage
         'src/my-code.js': {}
       }
       const result = filterFilesFromCoverage(
@@ -197,7 +193,6 @@ describe('filtering specs', () => {
 
     it('filters list of specs when exclude pattern is an array', () => {
       expose = vi.fn().mockReturnValue({
-        //filter out a.js and b.js in cypress folder
         codeCoverage: {
           exclude: ['cypress/**/a.js', 'cypress/**/b.js']
         }
@@ -211,7 +206,6 @@ describe('filtering specs', () => {
       const totalCoverage = {
         '/user/app/cypress/a.js': {},
         '/user/app/cypress/b.js': {},
-        // These files should be included in coverage
         '/user/app/cypress/c.js': {},
         'src/my-code.js': {}
       }
@@ -239,7 +233,6 @@ describe('filtering specs', () => {
 
       const totalCoverage = {
         'C:\\user\\app\\cypress\\e2e\\specA.cy.js': {},
-        // this file should be included in coverage
         'C:\\user\\app\\src\\codeA.js': {}
       }
       const result = filterFilesFromCoverage(

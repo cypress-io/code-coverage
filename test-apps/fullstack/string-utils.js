@@ -1,4 +1,3 @@
-// reverses a string
 const reverse = s => {
   return s
     .split('')

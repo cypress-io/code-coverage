@@ -19,6 +19,5 @@ it('works', () => {
     .invoke('sub', 5, 2)
     .should('equal', 3)
 
-  // application's code should be instrumented
   cy.window().should('have.property', '__coverage__')
 })

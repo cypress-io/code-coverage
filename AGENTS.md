@@ -47,6 +47,7 @@ npm run coverage:check-files  # checks only the expected files appear in the rep
 - **Formatting:** Prettier with no semicolons, single quotes, two-space indent, and no trailing commas (`.prettierrc.json`). Run `npm run format` before committing.
 - **TypeScript:** `strict` is on. Keep types sound rather than reaching for `any`.
 - **Commits:** Conventional Commits (`feat:`, `fix:`, `chore:`, with `!` for breaking changes). `semantic-release` derives versions from them, so the prefix matters.
+- **Agent instructions:** when you edit `AGENTS.md` or other instruction files, use unordered lists rather than tables.
 - **Configuration API:** user-facing options are read from `Cypress.expose()` (the `expose` section of `cypress.config.js`), not `Cypress.env()`. That change was a breaking release, so don't reintroduce `Cypress.env` reads.
 
 ## When you change things

@@ -22,14 +22,35 @@ export function filterFilesFromCoverage(
   expose: typeof Cypress.expose = Cypress.expose,
   spec: typeof Cypress.spec = Cypress.spec
 ): CoverageObject {
+  const fileCoverage = ownFileCoverage(totalCoverage)
   const withoutSpecs = filterSpecsFromCoverage(
-    totalCoverage,
+    fileCoverage,
     config,
     expose,
     spec
   )
   const appCoverageOnly = filterSupportFilesFromCoverage(withoutSpecs, config)
   return appCoverageOnly
+}
+
+/**
+ * Copies only the coverage object's own string keys, which are the file paths.
+ * The object can also carry inherited or Symbol keys added by the page's
+ * runtime (for example a dynamically imported wasm module), and lodash omitBy
+ * would visit those and copy inherited ones into the result.
+ * https://github.com/cypress-io/code-coverage/issues/908
+ */
+function ownFileCoverage(totalCoverage: CoverageObject): CoverageObject {
+  const coverage: CoverageObject = {}
+  for (const filePath of Object.keys(totalCoverage)) {
+    coverage[filePath] = totalCoverage[filePath]
+  }
+  return coverage
+}
+
+/** Converts Windows path separators so paths can be matched against globs */
+function toForwardSlashes(filePath: string): string {
+  return filePath.replace(/\\/g, '/')
 }
 
 /**
@@ -44,12 +65,18 @@ function filterSpecsFromCoverage(
 ): CoverageObject {
   const testFilePatterns = getCypressExcludePatterns(config, expose)
 
-  const isTestFile = (_: unknown, filePath: string | symbol): boolean => {
-    // lodash omitBy also visits inherited Symbol keys, which are not file paths
-    // https://github.com/cypress-io/code-coverage/issues/908
-    if (typeof filePath !== 'string') return true
-    const workingDir = spec.absolute.replace(spec.relative, '')
-    const filename = filePath.replace(workingDir, '')
+  const absoluteSpec = toForwardSlashes(spec.absolute)
+  const relativeSpec = toForwardSlashes(spec.relative)
+  const workingDir = absoluteSpec.endsWith(relativeSpec)
+    ? absoluteSpec.slice(0, absoluteSpec.length - relativeSpec.length)
+    : ''
+
+  const isTestFile = (_: unknown, filePath: string): boolean => {
+    const normalizedPath = toForwardSlashes(filePath)
+    const filename =
+      workingDir && normalizedPath.startsWith(workingDir)
+        ? normalizedPath.slice(workingDir.length)
+        : normalizedPath
     const matchedPattern = testFilePatterns.some((specPattern) =>
       Cypress.minimatch(filename, specPattern, { debug: false })
     )

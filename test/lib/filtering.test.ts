@@ -227,19 +227,21 @@ describe('filtering specs', () => {
       })
     })
 
-    it('ignores Symbol keys on the coverage object prototype', () => {
+    it('filters Windows paths against forward-slash patterns', () => {
       config.mockImplementation((key: string) => {
-        if (key === 'specPattern') return '**/*.cy.js'
+        if (key === 'specPattern') return 'cypress/e2e/**/*.cy.js'
         return undefined
       })
+      spec = {
+        absolute: 'C:\\user\\app\\cypress\\e2e\\test.cy.js',
+        relative: 'cypress\\e2e\\test.cy.js'
+      }
 
-      // some runtimes (e.g. a dynamically imported wasm module) add a Symbol key
-      // to the prototype of window.__coverage__
-      const wasmType = Symbol('wasm type')
-      const totalCoverage = Object.create({ [wasmType]: 0 })
-      totalCoverage['/user/app/src/codeA.js'] = {}
-      totalCoverage['/user/app/src/specA.cy.js'] = {}
-
+      const totalCoverage = {
+        'C:\\user\\app\\cypress\\e2e\\specA.cy.js': {},
+        // this file should be included in coverage
+        'C:\\user\\app\\src\\codeA.js': {}
+      }
       const result = filterFilesFromCoverage(
         totalCoverage,
         config as any,
@@ -247,8 +249,82 @@ describe('filtering specs', () => {
         spec as any
       )
       expect(result).toEqual({
-        '/user/app/src/codeA.js': {}
+        'C:\\user\\app\\src\\codeA.js': {}
       })
+    })
+  })
+
+  // https://github.com/cypress-io/code-coverage/issues/908
+  describe('keys that are not file paths', () => {
+    const config = vi.fn((key: string) => {
+      if (key === 'specPattern') return '**/*.cy.js'
+      return undefined
+    })
+    const expose = vi.fn().mockReturnValue({})
+    const spec = {
+      absolute: '/user/app/cypress/e2e/test.cy.js',
+      relative: 'cypress/e2e/test.cy.js'
+    }
+
+    const filter = (totalCoverage: object) =>
+      filterFilesFromCoverage(
+        totalCoverage as any,
+        config as any,
+        expose as any,
+        spec as any
+      )
+
+    it('ignores Symbol keys on the coverage object prototype', () => {
+      // some runtimes (e.g. a dynamically imported wasm module) add a Symbol key
+      // to the prototype of window.__coverage__
+      const totalCoverage = Object.create({ [Symbol('wasm type')]: 0 })
+      totalCoverage['/user/app/src/codeA.js'] = {}
+      totalCoverage['/user/app/src/specA.cy.js'] = {}
+
+      const result = filter(totalCoverage)
+      expect(result).toEqual({ '/user/app/src/codeA.js': {} })
+      expect(Object.getOwnPropertySymbols(result)).toEqual([])
+    })
+
+    it('ignores own Symbol keys', () => {
+      const totalCoverage = {
+        '/user/app/src/codeA.js': {},
+        [Symbol('wasm type')]: 0
+      }
+
+      const result = filter(totalCoverage)
+      expect(result).toEqual({ '/user/app/src/codeA.js': {} })
+      expect(Object.getOwnPropertySymbols(result)).toEqual([])
+    })
+
+    it('ignores inherited string keys', () => {
+      const totalCoverage = Object.create({ notAFile: 0 })
+      totalCoverage['/user/app/src/codeA.js'] = {}
+
+      const result = filter(totalCoverage)
+      expect(Object.keys(result)).toEqual(['/user/app/src/codeA.js'])
+    })
+
+    it('ignores non-file keys when filtering the support file', () => {
+      const withSupportFile = vi.fn((key: string) => {
+        if (key === 'specPattern') return '**/*.cy.js'
+        if (key === 'supportFile') return '/user/app/cypress/support/e2e.js'
+        return undefined
+      })
+      const totalCoverage = Object.create({
+        notAFile: 0,
+        [Symbol('wasm type')]: 0
+      })
+      totalCoverage['/user/app/cypress/support/e2e.js'] = {}
+      totalCoverage['/user/app/src/codeA.js'] = {}
+
+      const result = filterFilesFromCoverage(
+        totalCoverage,
+        withSupportFile as any,
+        expose as any,
+        spec as any
+      )
+      expect(Object.keys(result)).toEqual(['/user/app/src/codeA.js'])
       expect(Object.getOwnPropertySymbols(result)).toEqual([])
     })
   })

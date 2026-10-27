@@ -34,11 +34,29 @@
     "node": ">=20"
   },
   "peerDependencies": {
-    "@babel/core": "^7.0.1",
-    "@babel/preset-env": "^7.0.0",
+    "@babel/core": "^7.0.1 || ^8",
+    "@babel/preset-env": "^7.0.0 || ^8",
+    "@cypress/webpack-preprocessor": "^6.0.0",
     "babel-loader": "^8.3 || ^9 || ^10",
     "cypress": ">=15.10.0",
     "webpack": "^4 || ^5"
+  },
+  "peerDependenciesMeta": {
+    "@babel/core": {
+      "optional": true
+    },
+    "@babel/preset-env": {
+      "optional": true
+    },
+    "@cypress/webpack-preprocessor": {
+      "optional": true
+    },
+    "babel-loader": {
+      "optional": true
+    },
+    "webpack": {
+      "optional": true
+    }
   },
   "repository": {
     "type": "git",
@@ -66,7 +84,6 @@
   },
   "private": false,
   "dependencies": {
-    "@cypress/webpack-preprocessor": "^6.0.0",
     "chalk": "4.1.2",
     "dayjs": "1.11.20",
     "debug": "4.4.3",
@@ -80,6 +97,7 @@
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.11",
     "@cypress/code-coverage": "file:.",
+    "@cypress/webpack-preprocessor": "^6.0.0",
     "@types/debug": "^4.1.12",
     "@types/express": "^5.0.6",
     "@types/hapi": "^18.0.15",

@@ -1,0 +1,3 @@
+{
+  "plugins": [["istanbul", { "include": ["lazy.js"] }]]
+}

@@ -20,13 +20,10 @@ import debug from 'debug'
 
 const log = debug('code-coverage')
 
-// these are standard folder and file names used by NYC tools
 const processWorkingDirectory = process.cwd()
 
-// there might be custom "nyc" options in the user package.json
-// see https://github.com/istanbuljs/nyc#configuring-nyc
-// potentially there might be "nyc" options in other configuration files
-// it allows, but for now ignore those options
+// A "coverage:report" script in the user's package.json replaces the built-in
+// nyc report and threshold check
 const pkgFilename = join(processWorkingDirectory, 'package.json')
 const pkg = existsSync(pkgFilename)
   ? JSON.parse(readFileSync(pkgFilename, 'utf8'))
@@ -59,7 +56,7 @@ const nycReportOptions = (function getNycOption() {
       nycReportOptions['report-dir'] as string
     )
   }
-  // seems nyc API really is using camel cased version
+  // nyc's API reads the camelCase names
   nycReportOptions.reportDir = nycReportOptions['report-dir']
 
   return nycReportOptions
@@ -163,7 +160,8 @@ const tasks = {
    *    - running a single spec or "Run all specs" needs to reset coverage
    * Headless mode with "cypress run"
    *    - runs EACH spec separately, so we cannot reset the coverage
-   *      or we will lose the coverage from previous specs.
+   *      or we will lose the coverage from previous specs. The user is
+   *      expected to delete .nyc_output before "cypress run" instead.
    */
   resetCoverage({ isInteractive }: TaskParams): null {
     if (isInteractive) {
@@ -171,22 +169,14 @@ const tasks = {
       coverageMap = createCoverageMap({})
       saveCoverage(coverageMap)
     }
-    /*
-        Else:
-          in headless mode, assume the coverage file was deleted
-          before the `cypress run` command was called
-          example: rm -rf .nyc_output || true
-      */
 
     return null
   },
 
   /**
-   * Combines coverage information from single test
-   * with previously collected coverage.
+   * Merges a test's coverage into the coverage collected so far.
    *
    * @param sentCoverage Stringified coverage object sent by the test runner
-   * @returns Nothing is returned from this task
    */
   combineCoverage(sentCoverage: string): null {
     const coverage = JSON.parse(sentCoverage)
@@ -200,8 +190,8 @@ const tasks = {
   },
 
   /**
-   * Saves coverage information as a JSON file and calls
-   * NPM script to generate HTML report
+   * Saves the coverage to the nyc output file and generates the report,
+   * using the "coverage:report" script when package.json has one
    */
   coverageReport(): Promise<string | null> | null {
     saveCoverage(coverageMap)
@@ -256,14 +246,11 @@ const tasks = {
 
 /**
  * Registers code coverage collection and reporting tasks.
- * Sets an expose variable to tell the browser code that it can
- * send the coverage.
  * @example
   ```
-    // your plugins file
-    module.exports = (on, config) => {
-      require('cypress/code-coverage/task')(on, config)
-      // IMPORTANT to return the config object with any changes
+    setupNodeEvents(on, config) {
+      require('@cypress/code-coverage/task')(on, config)
+      // the browser only sees the flag set below if the config is returned
       return config
     }
   ```
@@ -288,8 +275,7 @@ export = function registerCodeCoverageTasks(
     )
   }
 
-  // set a variable to let the hooks running in the browser
-  // know that they can send coverage commands
+  // support.ts skips its hooks unless it sees this, since cy.task would fail
   config.expose.codeCoverageTasksRegistered = true
 
   return config

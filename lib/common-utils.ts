@@ -21,7 +21,6 @@ export function combineNycOptions(...options: NycOptions[]): NycOptions {
   // last option wins
   const nycOptions = Object.assign({}, ...options)
 
-  // normalize string and [string] props
   stringToArray('reporter', nycOptions)
   stringToArray('extension', nycOptions)
   stringToArray('exclude', nycOptions)
@@ -49,8 +48,6 @@ export interface FileCoveragePlaceholder {
 /**
  * Returns an object with placeholder properties for files we
  * do not have coverage yet. The result can go into the coverage object
- *
- * @param fullPath Filename
  */
 export function fileCoveragePlaceholder(
   fullPath: string

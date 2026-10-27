@@ -1,5 +1,4 @@
-// helper functions to use from "task.js" plugins code
-// that need access to the file system
+// Node-side helpers for task.ts that need the file system
 
 /// <reference types="node" />
 import { readFileSync, writeFileSync, existsSync } from 'fs'
@@ -162,8 +161,6 @@ export function showNycInfo(nycFilename: string): void {
   showKeys.forEach((key, k) => {
     const coverage = nycCoverage[key]
 
-    // printing a few found keys and file paths from the coverage file
-    // will make debugging any problems much much easier
     if (k < maxPrintKeys) {
       log('%d key %s file path %s', k + 1, key, coverage.path)
     }
@@ -204,7 +201,6 @@ export function resolveRelativePaths(nycFilename: string): void {
       return
     }
 
-    // path is absolute, let's check if it exists
     if (!existsSync(coverage.path)) {
       log('⚠️ cannot find file %s with hash %s', coverage.path, coverage.hash)
     }
@@ -222,8 +218,8 @@ export function resolveRelativePaths(nycFilename: string): void {
 }
 
 /**
- * @param filepaths
- * @returns common prefix that corresponds to current folder
+ * Returns the common prefix that, once removed, makes every path
+ * exist relative to the current folder
  */
 export function findCommonRoot(filepaths: string[]): string | undefined {
   if (!filepaths.length) {
@@ -293,7 +289,6 @@ export function tryFindingLocalFiles(nycFilename: string): void {
     const from = nycCoverage[key].path
     if (from.startsWith(commonFolder)) {
       const to = join(cwd, from.slice(length))
-      // ? Do we need to replace the "key" in the coverage object or can we just replace the "path"?
       nycCoverage[key].path = to
       log('replaced %s -> %s', from, to)
       changed = true
@@ -394,7 +389,6 @@ export function includeAllFiles(
   )
 
   log('coverage has %d record(s)', coveredPaths.length)
-  // report on first couple of entries
   if (log.enabled) {
     console.error('coverage has the following first paths')
     console.error(coveredPaths.slice(0, 4).join('\n'))
@@ -403,12 +397,10 @@ export function includeAllFiles(
   let changed = false
   allFiles.forEach((fullPath) => {
     if (coveredPaths.includes(fullPath)) {
-      // all good, this file exists in coverage object
       return
     }
     log('adding empty coverage for file %s', fullPath)
     changed = true
-    // insert placeholder object for now
     const placeholder = fileCoveragePlaceholder(fullPath)
 
     nycCoverage[fullPath] = placeholder as FileCoverageData

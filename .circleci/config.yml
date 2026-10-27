@@ -56,22 +56,14 @@ jobs:
           command: npm i
           working_directory: test-apps/all-files
       - cypress/run-tests:
-          # no-workspace: true
           start-command: npm run start:windows --prefix test-apps/all-files
-          # wait-on: 'http://localhost:1234'
           cypress-command: npx cypress run --project test-apps/all-files
-          # store screenshots and videos
-          # store_artifacts: true          
       - run:
-          # make sure the examples captures 100% of code
           name: Verify Code Coverage
           command: npm run coverage:verify
           working_directory: test-apps/all-files
       - run:
           name: Check code coverage files 📈
-          # we will check the final coverage report
-          # to make sure it only has files we are interested in
-          # because there are files covered at 0 in the report
           command: npm i -D check-code-coverage && npm run coverage:check-files
           working_directory: test-apps/all-files
 
@@ -127,9 +119,8 @@ jobs:
           working_directory: test-apps/<< parameters.app >>
       - run:
           name: Check code coverage files 📈
-          # we will check the final coverage report
-          # to make sure it only has files we are interested in
-          # because there are files covered at 0 in the report
+          # files at 0% still appear in the report, so the percentage alone
+          # can't tell whether an unexpected file slipped in
           command: npm run coverage:check-files
           working_directory: test-apps/<< parameters.app >>
 

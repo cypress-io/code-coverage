@@ -354,6 +354,86 @@ function findSourceFiles(nycOptions: NycOptions): string[] {
   return allFiles
 }
 
+// same defaults nyc uses, see "parserPlugins" in @istanbuljs/schema
+const defaultParserPlugins = [
+  'asyncGenerators',
+  'bigInt',
+  'classProperties',
+  'classPrivateProperties',
+  'classPrivateMethods',
+  'dynamicImport',
+  'importMeta',
+  'numericSeparator',
+  'objectRestSpread',
+  'optionalCatchBinding',
+  'topLevelAwait'
+]
+
+function parserPluginsFor(fullPath: string, nycOptions: NycOptions): string[] {
+  const configured = nycOptions['parser-plugins']
+  const plugins = Array.isArray(configured)
+    ? [...(configured as string[])]
+    : [...defaultParserPlugins]
+
+  // ".ts" files cannot use the "jsx" plugin, it breaks "<Type>value" casts
+  if (/\.[cm]?ts$/.test(fullPath)) {
+    plugins.push('typescript')
+  } else if (fullPath.endsWith('.tsx')) {
+    plugins.push('typescript', 'jsx')
+  } else {
+    plugins.push('jsx')
+  }
+  return plugins
+}
+
+interface Instrumenter {
+  instrumentSync(code: string, filename: string): string
+  lastFileCoverage(): FileCoverageData
+}
+
+/**
+ * Instruments the given source file to get its initial coverage:
+ * the full statement, function and branch maps with all counters at zero.
+ * Falls back to an empty placeholder if the file cannot be parsed.
+ *
+ * @see https://github.com/cypress-io/code-coverage/issues/539
+ */
+export function initialFileCoverage(
+  fullPath: string,
+  nycOptions: NycOptions
+): FileCoverageData {
+  try {
+    const { createInstrumenter } = require('istanbul-lib-instrument') as {
+      createInstrumenter(options: object): Instrumenter
+    }
+    const instrumenter = createInstrumenter({
+      esModules: true,
+      produceSourceMap: false,
+      parserPlugins: parserPluginsFor(fullPath, nycOptions)
+    })
+    instrumenter.instrumentSync(readFileSync(fullPath, 'utf8'), fullPath)
+    const fileCoverage = instrumenter.lastFileCoverage()
+    // tells istanbul to replace these zero counters
+    // if the real coverage for this file shows up later
+    return { ...fileCoverage, all: true } as FileCoverageData
+  } catch (error) {
+    log(
+      'could not instrument file %s, using placeholder: %s',
+      fullPath,
+      error instanceof Error ? error.message : String(error)
+    )
+    return fileCoveragePlaceholder(fullPath) as FileCoverageData
+  }
+}
+
+export interface IncludeAllFilesOptions {
+  /**
+   * Instrument the missing files to report their real statements,
+   * functions and branches at 0% instead of adding empty placeholders
+   */
+  instrument?: boolean
+}
+
 /**
  * If the website or unit tests did not load ALL files we need to
  * include, then we should include the missing files ourselves
@@ -363,7 +443,8 @@ function findSourceFiles(nycOptions: NycOptions): string[] {
  */
 export function includeAllFiles(
   nycFilename: string,
-  nycOptions: NycOptions
+  nycOptions: NycOptions,
+  { instrument = false }: IncludeAllFilesOptions = {}
 ): void {
   if (!nycOptions.all) {
     log('NYC "all" option is not set, skipping including all files')
@@ -401,8 +482,14 @@ export function includeAllFiles(
       // all good, this file exists in coverage object
       return
     }
-    log('adding empty coverage for file %s', fullPath)
     changed = true
+    if (instrument) {
+      log('adding zero coverage for file %s', fullPath)
+      nycCoverage[fullPath] = initialFileCoverage(fullPath, nycOptions)
+      return
+    }
+
+    log('adding empty coverage for file %s', fullPath)
     // insert placeholder object for now
     const placeholder = fileCoveragePlaceholder(fullPath)
 

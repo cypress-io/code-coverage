@@ -1,0 +1,16 @@
+{
+  "name": "example-all-files-instrumented",
+  "description": "Report all files, with zero coverage for files no test loads",
+  "private": true,
+  "scripts": {
+    "cy:run": "cypress run",
+    "start": "parcel serve index.html",
+    "pretest": "rimraf .nyc_output .cache coverage dist",
+    "test": "start-test 1234 cy:run",
+    "coverage:verify": "node verify-coverage.js",
+    "coverage:check-files": "check-coverage main.js && check-coverage second.js && only-covered --from coverage/coverage-final.json main.js second.js not-covered.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.15"
+  }
+}

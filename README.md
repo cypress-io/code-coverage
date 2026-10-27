@@ -313,6 +313,32 @@ For example, to ensure the final report includes all JS files from the "src/page
 
 See example [test-app/all-files](./test-apps/all-files)
 
+### instrumentUnloadedFiles
+
+With `all: true`, a file that no test loads only gets an empty placeholder in the report. It shows up, but with 0 statements, functions, and branches, so it doesn't lower the totals. This is common with Vite and other bundlers that only instrument the modules the browser actually requests (see [#539](https://github.com/cypress-io/code-coverage/issues/539)).
+
+To report those files with their real statements at 0%, set `instrumentUnloadedFiles: true` in the `expose.codeCoverage` object. The plugin then instruments each missing file itself when it generates the report.
+
+```js
+// cypress.config.js
+module.exports = defineConfig({
+  expose: {
+    codeCoverage: {
+      instrumentUnloadedFiles: true
+    }
+  }
+})
+```
+
+Things to know before turning it on:
+
+- Your total percentages will drop, since the unloaded files now count. Existing coverage thresholds can start failing.
+- JavaScript, JSX, and TypeScript files are parsed with Babel, adding any `parser-plugins` from your NYC options. Files it can't parse, like `.vue` single-file components, still get the empty placeholder.
+- The counters come from your original source, so they can differ slightly from what your build's instrumentation would report for the same file.
+- It's skipped if you use a [custom NYC command](#custom-nyc-command) to generate the report.
+
+See example [test-apps/all-files-instrumented](./test-apps/all-files-instrumented)
+
 ## Exclude code
 
 You can exclude parts of the code or entire files from the code coverage report. See [Istanbul guide](https://github.com/gotwarlost/istanbul/blob/master/ignoring-code-for-coverage.md). Common cases:
@@ -380,7 +406,7 @@ For example, if you want only to include files in the `app` folder but exclude t
 }
 ```
 
-**Note:** If you have the `all: true` NYC option set, this plugin will check the produced `.nyc_output/out.json` before generating the final report. If the `out.json` file does not have information for some files that should be there according to the `include` list, then an empty placeholder will be included. See [PR 208](https://github.com/cypress-io/code-coverage/pull/208).
+**Note:** If you have the `all: true` NYC option set, this plugin will check the produced `.nyc_output/out.json` before generating the final report. If the `out.json` file does not have information for some files that should be there according to the `include` list, then an empty placeholder will be included. See [PR 208](https://github.com/cypress-io/code-coverage/pull/208). To report those files at 0% instead, see [instrumentUnloadedFiles](#instrumentunloadedfiles).
 
 Another important option is `excludeAfterRemap`. By default, it is false, which might let excluded files through. If you exclude the files, and the instrumenter does not respect the `nyc.exclude` setting, then add `excludeAfterRemap: true` to tell `nyc report` to exclude files. See [test-apps/exclude-files](test-apps/exclude-files).
 
@@ -426,6 +452,8 @@ npm run dev:no:coverage
 
 Full examples we use for testing in this repository:
 
+- [test-apps/all-files](test-apps/all-files) uses the NYC `all` option to include files no test loads
+- [test-apps/all-files-instrumented](test-apps/all-files-instrumented) uses `instrumentUnloadedFiles` to report files no test loads at 0%
 - [test-apps/backend](test-apps/backend) only instruments the backend Node server and saves the coverage report
 - [test-apps/fullstack](test-apps/fullstack) instruments and merges backend, e2e and unit test coverage into a single report
 - [test-apps/before-all-visit](test-apps/before-all-visit) checks if code coverage works when `cy.visit` is made once in the `before` hook

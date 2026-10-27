@@ -66,6 +66,9 @@ const nycReportOptions = (function getNycOption() {
 
 const nycFilename = join(nycReportOptions['temp-dir'] as string, 'out.json')
 
+// set from "expose.codeCoverage.instrumentUnloadedFiles" when the tasks are registered
+let instrumentUnloadedFiles = false
+
 let coverageMap: IstanbulCoverageMap = (() => {
   const previousCoverage = existsSync(nycFilename)
     ? JSON.parse(readFileSync(nycFilename, 'utf8'))
@@ -203,7 +206,9 @@ const tasks = {
 
     if (nycReportOptions.all) {
       log('nyc needs to report on all included files')
-      includeAllFiles(nycFilename, nycReportOptions)
+      includeAllFiles(nycFilename, nycReportOptions, {
+        instrument: instrumentUnloadedFiles
+      })
     }
 
     log('calling NYC reporter with options %o', nycReportOptions)
@@ -242,6 +247,11 @@ export = function registerCodeCoverageTasks(
   config: Cypress.PluginConfigOptions
 ): Cypress.PluginConfigOptions {
   on('task', tasks)
+
+  const codeCoverageConfig = config.expose?.codeCoverage as
+    | { instrumentUnloadedFiles?: boolean }
+    | undefined
+  instrumentUnloadedFiles = codeCoverageConfig?.instrumentUnloadedFiles === true
 
   // set a variable to let the hooks running in the browser
   // know that they can send coverage commands

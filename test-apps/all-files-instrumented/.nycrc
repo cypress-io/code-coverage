@@ -1,0 +1,4 @@
+{
+  "all": true,
+  "include": ["main.js", "second.js", "not-covered.js"]
+}

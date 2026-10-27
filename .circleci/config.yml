@@ -165,6 +165,7 @@ workflows:
             parameters:
               app:
                 - all-files
+                - all-files-instrumented
                 - backend
                 - batch-send-coverage
                 - before-all-visit

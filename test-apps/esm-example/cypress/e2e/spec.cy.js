@@ -7,7 +7,6 @@ it('works', () => {
     .invoke('reverse', 'super')
     .should('equal', 'repus')
 
-  // application's code should be instrumented
   cy.window().should('have.property', '__coverage__')
 })
 

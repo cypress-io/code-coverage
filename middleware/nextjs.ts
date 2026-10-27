@@ -6,12 +6,12 @@
   ```
   // in your pages/api/coverage.js
   module.exports = require('@cypress/code-coverage/middleware/nextjs')
-  // then add an exposed config variable that points to the API to your cypress.json
-  {
-    "baseUrl": "http://localhost:3000",
-    "expose": {
-      "codeCoverage": {
-        "url": "/api/coverage"
+  // then point the plugin at the API route in cypress.config.js
+  e2e: {
+    baseUrl: 'http://localhost:3000',
+    expose: {
+      codeCoverage: {
+        url: '/api/coverage'
       }
     }
   }
@@ -22,7 +22,6 @@
  */
 
 export = function returnCodeCoverageNext(req: any, res: any): void {
-  // only GET is supported
   res.status(200).json({
     coverage:
       (global as typeof globalThis & { __coverage__?: unknown }).__coverage__ ||

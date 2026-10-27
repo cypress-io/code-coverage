@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # Run all test apps for @cypress/code-coverage
-# Usage: ./run-all-test-apps.sh
+# Usage: ./scripts/test-apps-and-verify-coverage.sh
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TEST_APPS_DIR="$SCRIPT_DIR/../test-apps"
 
-# Dynamically find test apps (directories with package.json containing a test script)
+# A test app is any directory whose package.json has a test script
 TEST_APPS=()
 for dir in "$TEST_APPS_DIR"/*/; do
   if [ -f "$dir/package.json" ] && grep -q '"test"' "$dir/package.json"; then
@@ -16,10 +16,8 @@ for dir in "$TEST_APPS_DIR"/*/; do
   fi
 done
 
-# Sort alphabetically for consistent ordering
 IFS=$'\n' TEST_APPS=($(sort <<<"${TEST_APPS[*]}")); unset IFS
 
-# Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -59,7 +57,6 @@ for app in "${TEST_APPS[@]}"; do
   echo ""
 done
 
-# Summary
 echo "============================================"
 echo "SUMMARY"
 echo "============================================"

@@ -15,10 +15,6 @@ interface WindowCoverageObject {
   pathname: string
 }
 
-/**
- * Sends collected code coverage object to the backend code
- * via "cy.task".
- */
 function sendCoverage(coverage: unknown, pathname = '/'): void {
   logMessage(`Saving code coverage for **${pathname}**`)
 
@@ -36,10 +32,6 @@ function sendCoverage(coverage: unknown, pathname = '/'): void {
   }
 }
 
-/**
- * Sends collected code coverage object to the backend code
- * in batches via "cy.task".
- */
 function sendBatchCoverage(
   totalCoverage: Record<string, unknown>,
   batchSize: number
@@ -60,11 +52,7 @@ function sendBatchCoverage(
   }
 }
 
-/**
- * Consistently logs the given string to the Command Log
- * so the user knows the log message is coming from this plugin.
- * @param s Message to log.
- */
+// Tags each message so users can tell it comes from this plugin
 function logMessage(s: string): void {
   cy.log(`${s} \`[@cypress/code-coverage]\``)
 }
@@ -100,14 +88,9 @@ function registerHooks(): void {
   })
 
   beforeEach(() => {
-    // each object will have the coverage and url pathname
-    // to let the user know the coverage has been collected
     windowCoverageObjects = []
 
     const saveCoverageObject = (win: Window): void => {
-      // if the application code has been instrumented, then the app iframe "win.__coverage__" will be available,
-      // in addition, accessing win.__coverage__ can throw when testing cross-origin code,
-      // because we don't control the cross-origin code, we can safely return
       let applicationSourceCoverage: unknown
       try {
         // Note that we are purposefully not supporting the optional chaining syntax here to
@@ -121,7 +104,8 @@ function registerHooks(): void {
           ).__coverage__
         }
       } catch {
-        // ignore cross-origin errors
+        // Reading __coverage__ from a cross-origin window throws, and we don't
+        // collect coverage for code we don't control
       }
 
       if (!applicationSourceCoverage) {
@@ -132,10 +116,9 @@ function registerHooks(): void {
         coverage: applicationSourceCoverage
       })
       if (existingCoverage) {
-        // this application code coverage object is already known
-        // which can happen when combining `window:load` and `before` callbacks,
-        // it can also happen when the user navigates away and then returns to the page
-        // in which case we need to use new applicationSourceCoverage, because the old will not be updated anymore.
+        // Both `window:load` and `cy.window()` can report the same window, and
+        // navigating away and back creates a new object for the same page. The
+        // old object stops updating, so keep the latest one.
         existingCoverage.coverage = applicationSourceCoverage
         return
       }
@@ -146,16 +129,15 @@ function registerHooks(): void {
       })
     }
 
-    // save reference to coverage for each app window loaded in the test
     cy.on('window:load', saveCoverageObject)
 
-    // save reference if visiting a page inside a before() hook
+    // Catches a page visited in a before() hook, which loaded before the
+    // `window:load` listener existed
     cy.window({ log: false }).then(saveCoverageObject)
   })
 
   afterEach(() => {
-    // save coverage after the test
-    // because now the window coverage objects have been updated
+    // Send after the test so the counters include everything it ran
     windowCoverageObjects.forEach((cover) => {
       sendCoverage(cover.coverage, cover.pathname)
     })
@@ -182,13 +164,7 @@ function registerHooks(): void {
   })
 
   after(function collectBackendCoverage() {
-    // I wish I could fail the tests if there is no code coverage information
-    // but throwing an error here does not fail the test run due to
-    // https://github.com/cypress-io/cypress/issues/2296
-
-    // there might be server-side code coverage information
-    // we should grab it once after all tests finish
-
+    // Backend counters accumulate across tests, so fetch them once at the end
     const baseUrl =
       // @ts-ignore - state is a runtime property
       Cypress.config('baseUrl') || (cy.state('window') as Window).origin
@@ -207,9 +183,7 @@ function registerHooks(): void {
       runningEndToEndTests &&
       isIntegrationSpec
     ) {
-      // we can only request server-side code coverage
-      // if we are running end-to-end tests,
-      // otherwise where do we send the request?
+      // Without an app server under test there is no backend to ask
       const captureUrls = Cypress._.get(
         Cypress.expose('codeCoverage'),
         'url',
@@ -226,8 +200,6 @@ function registerHooks(): void {
           })
           .then((coverage) => {
             if (!coverage) {
-              // we did not get code coverage - this is the
-              // original failed request
               const expectBackendCoverageOnly = Cypress._.get(
                 Cypress.expose('codeCoverage'),
                 'expectBackendCoverageOnly',
@@ -238,7 +210,6 @@ function registerHooks(): void {
                   `Expected to collect backend code coverage from ${url}`
                 )
               } else {
-                // we did not really expect to collect the backend code coverage
                 return
               }
             }
@@ -257,12 +228,8 @@ function registerHooks(): void {
   })
 
   after(function mergeUnitTestCoverage() {
-    // collect and merge frontend coverage
-
-    // if spec bundle has been instrumented (using Cypress preprocessor)
-    // then we will have unit test coverage
-    // NOTE: spec iframe is NOT reset between the tests, so we can grab
-    // the coverage information only once after all tests have finished
+    // The spec iframe isn't reset between tests, so an instrumented spec
+    // bundle's coverage is complete only once all tests have finished
     // @ts-ignore - __coverage__ is added by instrumentation
     const unitTestCoverage = (
       window as typeof window & { __coverage__?: unknown }
@@ -273,7 +240,6 @@ function registerHooks(): void {
   })
 
   after(function generateReport() {
-    // when all tests finish, lets generate the coverage report
     const logInstance = Cypress.log({
       name: 'Coverage',
       message: ['Generating report [@cypress/code-coverage]']
@@ -291,12 +257,8 @@ function registerHooks(): void {
   })
 }
 
-// to disable code coverage commands and save time
-// pass exposed variable coverage=false
-//  cypress run --expose coverage=false
-// see https://on.cypress.io/environment-variables
-
-// to avoid "coverage" variable being case-sensitive, convert to lowercase
+// `cypress run --expose coverage=false` skips the hooks to save time.
+// Keys are lowercased so `coverage` matches regardless of case.
 const exposedValues = Object.fromEntries(
   Object.entries(Cypress.expose()).map(([key, value]) => [
     key.toLowerCase(),
@@ -307,7 +269,7 @@ const exposedValues = Object.fromEntries(
 if (exposedValues.coverage === false) {
   console.log('Skipping code coverage hooks')
 } else if (Cypress.expose('codeCoverageTasksRegistered') !== true) {
-  // register a hook just to log a message
+  // cy.log only works inside a hook or test
   before(() => {
     logMessage(`
       ⚠️ Code coverage tasks were not registered by the plugins file.

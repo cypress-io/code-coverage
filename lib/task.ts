@@ -12,7 +12,8 @@ import {
   checkAllPathsNotFound,
   tryFindingLocalFiles,
   readNycOptions,
-  includeAllFiles
+  includeAllFiles,
+  checkCoverageThresholds
 } from './task-utils'
 import { fixSourcePaths } from './support-utils'
 import debug from 'debug'
@@ -120,6 +121,9 @@ function maybePrintFinalCoverageFiles(folder: string): void {
   })
 }
 
+// set from "expose.codeCoverage.checkCoverage" when the tasks are registered
+let shouldCheckCoverage = false
+
 interface TaskParams {
   isInteractive?: boolean
 }
@@ -219,7 +223,32 @@ const tasks = {
 
       return reportFolder
     }
-    return nyc.report().then(returnReportFolder)
+
+    const nycCheckCoverage = Boolean(
+      nycReportOptions['check-coverage'] || nycReportOptions.checkCoverage
+    )
+    if (!shouldCheckCoverage) {
+      if (nycCheckCoverage) {
+        console.warn(
+          'NYC option "check-coverage" is ignored. To enforce coverage thresholds, set "expose.codeCoverage.checkCoverage" to true in your Cypress config'
+        )
+      }
+      return nyc.report().then(returnReportFolder)
+    }
+
+    const checkCoverage = async (): Promise<void> => {
+      const finalCoverageMap: IstanbulCoverageMap =
+        await nyc.getCoverageMapFromAllCoverageFiles()
+      const errors = checkCoverageThresholds(finalCoverageMap, nycReportOptions)
+      if (errors.length) {
+        throw new Error(
+          `Code coverage is below the threshold:\n${errors.join('\n')}`
+        )
+      }
+      log('coverage meets the thresholds')
+    }
+
+    return nyc.report().then(checkCoverage).then(returnReportFolder)
   }
 }
 
@@ -242,6 +271,11 @@ export = function registerCodeCoverageTasks(
   config: Cypress.PluginConfigOptions
 ): Cypress.PluginConfigOptions {
   on('task', tasks)
+
+  const codeCoverageConfig = config.expose.codeCoverage as
+    | { checkCoverage?: boolean }
+    | undefined
+  shouldCheckCoverage = codeCoverageConfig?.checkCoverage === true
 
   // set a variable to let the hooks running in the browser
   // know that they can send coverage commands

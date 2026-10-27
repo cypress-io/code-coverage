@@ -14,7 +14,12 @@ import {
   fileCoveragePlaceholder,
   type NycOptions
 } from './common-utils'
-import type { CoverageMapData, FileCoverageData } from 'istanbul-lib-coverage'
+import type {
+  CoverageMap as IstanbulCoverageMap,
+  CoverageMapData,
+  CoverageSummary,
+  FileCoverageData
+} from 'istanbul-lib-coverage'
 const log = debug('code-coverage')
 
 export interface CoverageEntry {
@@ -419,4 +424,71 @@ export function includeAllFiles(
       'utf8'
     )
   }
+}
+
+const coverageThresholdKeys = [
+  'lines',
+  'functions',
+  'branches',
+  'statements'
+] as const
+
+type CoverageThresholdKey = (typeof coverageThresholdKeys)[number]
+
+/**
+ * Returns the coverage thresholds from NYC options, using the same
+ * defaults as "nyc --check-coverage": 90% lines, 0% for the rest.
+ */
+export function getCoverageThresholds(
+  nycOptions: NycOptions
+): Record<CoverageThresholdKey, number> {
+  const defaults: Record<CoverageThresholdKey, number> = {
+    lines: 90,
+    functions: 0,
+    branches: 0,
+    statements: 0
+  }
+  coverageThresholdKeys.forEach((key) => {
+    if (nycOptions[key] !== undefined) {
+      defaults[key] = Number(nycOptions[key])
+    }
+  })
+  return defaults
+}
+
+/**
+ * Checks the coverage map against the thresholds in the NYC options
+ * ("lines", "functions", "branches", "statements" and "per-file").
+ * Returns a list of error messages, empty if the coverage is high enough.
+ */
+export function checkCoverageThresholds(
+  coverageMap: IstanbulCoverageMap,
+  nycOptions: NycOptions
+): string[] {
+  const thresholds = getCoverageThresholds(nycOptions)
+  const perFile = Boolean(nycOptions['per-file'] || nycOptions.perFile)
+  const errors: string[] = []
+
+  const check = (summary: CoverageSummary, file?: string): void => {
+    coverageThresholdKeys.forEach((key) => {
+      const coverage = summary[key].pct
+      if (coverage < thresholds[key]) {
+        errors.push(
+          file
+            ? `Coverage for ${key} (${coverage}%) does not meet threshold (${thresholds[key]}%) for ${file}`
+            : `Coverage for ${key} (${coverage}%) does not meet global threshold (${thresholds[key]}%)`
+        )
+      }
+    })
+  }
+
+  if (perFile) {
+    coverageMap.files().forEach((file) => {
+      check(coverageMap.fileCoverageFor(file).toSummary(), file)
+    })
+  } else {
+    check(coverageMap.getCoverageSummary())
+  }
+
+  return errors
 }

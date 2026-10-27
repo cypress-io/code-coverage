@@ -293,9 +293,45 @@ If there is ONLY frontend code coverage, set `expectFrontendCoverageOnly: true` 
 }
 ```
 
+## Where NYC options are read from
+
+The plugin reads [NYC options](https://github.com/istanbuljs/nyc#common-configuration-options) from the folder that holds your Cypress config file, because that's the working directory Cypress uses when it loads the config and runs `setupNodeEvents`. Most of the time that's your project root. But if you pass `--config-file cypress/cypress.config.ts`, the plugin looks in the `cypress` folder, not in the folder you started Cypress from.
+
+The plugin looks for these files in that folder only. It doesn't search parent folders:
+
+- `.nycrc`
+- `.nycrc.json`
+- `.nycrc.yaml`
+- `.nycrc.yml`
+- `nyc.config.js`
+- `nyc.config.cjs`
+- the `nyc` object in `package.json`
+
+Unlike the `nyc` CLI, which uses the first config file it finds, the plugin merges every file it finds. If two files set the same option, the one later in the list wins, so the `nyc` object in `package.json` overrides the rest. The [`coverage:report` script](#custom-nyc-command) is looked up in that same `package.json`. Relative paths such as `report-dir`, `temp-dir`, and the `include` and `exclude` globs are resolved against that folder as well.
+
+For example, in a monorepo where you run `cypress run --config-file cypress/cypress.config.ts` from `libs/foo`, put the options next to the Cypress config rather than in `libs/foo/package.json`:
+
+```text
+libs/foo/
+├── package.json        <- not read by the plugin
+├── src/
+└── cypress/
+    ├── cypress.config.ts
+    └── .nycrc.json     <- read by the plugin
+```
+
+```json
+{
+  "include": ["../src/**/*.ts"],
+  "report-dir": "../coverage"
+}
+```
+
+If you aren't sure which options the plugin picked up, run Cypress with `DEBUG=code-coverage` and look for the `combined NYC options` line. See [Debugging](#debugging).
+
 ## Custom report folder
 
-You can specify a custom report folder by adding `nyc` object to the `package.json` file. For example, to save reports to `cypress-coverage` folder, use:
+You can specify a custom report folder by adding `nyc` object to the `package.json` file in the [same folder as your Cypress config file](#where-nyc-options-are-read-from). For example, to save reports to `cypress-coverage` folder, use:
 
 ```json
 {
@@ -322,7 +358,7 @@ You can specify custom coverage reporter(s) to use. For example, to output text 
 
 ## Custom NYC command
 
-Sometimes, the NYC tool might be installed in a different folder, not the current or parent folder, or you might want to customize the report command. In that case, put the custom command into `package.json` in the current folder, and this plugin will automatically use it.
+Sometimes, the NYC tool might be installed in a different folder, not the current or parent folder, or you might want to customize the report command. In that case, put the custom command into `package.json` in the [same folder as your Cypress config file](#where-nyc-options-are-read-from), and this plugin will automatically use it.
 
 ```json
 {
@@ -409,7 +445,7 @@ expose: {
 
 Cypress 10 and later users should set the `exclude` option to exclude any items from the `cypress` folder they don't want included in the coverage reports.
 
-Additionally, you can use [`nyc` configuration](https://github.com/istanbuljs/nyc#common-configuration-options) and [include and exclude options](https://github.com/istanbuljs/nyc#using-include-and-exclude-arrays). You can include and exclude files using `minimatch` patterns in the `.nycrc` file or the "nyc" object inside your `package.json` file.
+Additionally, you can use [`nyc` configuration](https://github.com/istanbuljs/nyc#common-configuration-options) and [include and exclude options](https://github.com/istanbuljs/nyc#using-include-and-exclude-arrays). You can include and exclude files using `minimatch` patterns in the `.nycrc` file or the "nyc" object inside your `package.json` file. Whichever you use, put it in the [same folder as your Cypress config file](#where-nyc-options-are-read-from).
 
 For example, if you want only to include files in the `app` folder but exclude the `app/util.js` file, you can set it in your `package.json`.
 

@@ -521,6 +521,25 @@ You can specify custom coverage reporter(s) to use. For example, to output text 
 
 **Tip:** find list of reporters [here](https://istanbul.js.org/docs/advanced/alternative-reporters/)
 
+### Console reporters print in the middle of the test output
+
+Console reporters such as `text` and `text-summary` can print their table in the middle of your Cypress output, often just before the result of the last test in a spec. Why? The plugin generates the report from an `after()` hook at the end of each spec, while Cypress is still printing that spec's results. The same happens when a [`coverage:report` script](#custom-nyc-command) prints to the terminal. Because the hook runs once per spec, you see the table again after every spec, too.
+
+This is cosmetic, and your coverage numbers are still correct. To get the summary once, after all the Cypress output, keep only file reporters in your NYC config (the default reporters are all file reporters), and print the summary yourself after `cypress run` finishes:
+
+```json
+{
+  "nyc": {
+    "reporter": ["lcov", "json"]
+  },
+  "scripts": {
+    "test": "cypress run && nyc report --reporter=text-summary"
+  }
+}
+```
+
+`nyc report` reads the coverage the plugin saved in `.nyc_output`, so it doesn't need to run your tests again. Use `--reporter=text` instead if you want the file-by-file table.
+
 ## Custom NYC command
 
 Sometimes, the NYC tool might be installed in a different folder, not the current or parent folder, or you might want to customize the report command. In that case, put the custom command into `package.json` in the [same folder as your Cypress config file](#where-nyc-options-are-read-from), and this plugin will automatically use it.

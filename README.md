@@ -704,6 +704,19 @@ For example, if you want only to include files in the `app` folder but exclude t
 
 Another important option is `excludeAfterRemap`. By default, it is false, which might let excluded files through. If you exclude the files, and the instrumenter does not respect the `nyc.exclude` setting, then add `excludeAfterRemap: true` to tell `nyc report` to exclude files. See [test-apps/exclude-files](test-apps/exclude-files).
 
+**Bundler virtual modules:** some bundlers generate virtual modules that are instrumented but don't exist on disk. For example, a [Stencil](https://stenciljs.com) app instrumented with `rollup-plugin-istanbul` reports coverage for `@lazy-browser-entrypoint?app-data=conditional`. When `nyc report` can't read the source, the report shows an "Unable to lookup source ... ENOENT" page for that entry (older versions could fail with `ENOENT`, see [#400](https://github.com/cypress-io/code-coverage/issues/400)), and the entry still counts toward your totals. Exclude these modules by name and set `excludeAfterRemap: true`:
+
+```json
+{
+  "nyc": {
+    "exclude": ["**/@lazy-browser-entrypoint*"],
+    "excludeAfterRemap": true
+  }
+}
+```
+
+Use the same approach for any other module name that shows up in `.nyc_output/out.json` without a matching file on disk.
+
 ## Disable plugin
 
 You can skip the client-side code coverage hooks by setting the exposed `coverage` value to `false`.

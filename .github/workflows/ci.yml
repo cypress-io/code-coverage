@@ -93,6 +93,7 @@ jobs:
           - swc-webpack
           - ts-example
           - unit-tests-js
+          - unit-tests-ts
           - use-webpack
           - redirect
     defaults:

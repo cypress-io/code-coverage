@@ -78,6 +78,7 @@
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.11",
+    "@babel/preset-typescript": "^7.29.7",
     "@cypress/code-coverage": "file:.",
     "@types/debug": "^4.1.12",
     "@types/express": "^5.0.6",

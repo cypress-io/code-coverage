@@ -350,7 +350,16 @@ module.exports = (on, config) => {
 
 The code coverage from spec files will be combined with end-to-end coverage.
 
-Find examples of just the unit tests and JavaScript source files with collected code coverage in [test-apps/unit-tests-js](./test-apps/unit-tests-js).
+`use-babelrc` compiles `.js`, `.jsx`, `.ts` and `.tsx` files with your `.babelrc`. For TypeScript, add `@babel/preset-typescript` to it:
+
+```json
+{
+  "presets": ["@babel/preset-typescript"],
+  "plugins": ["istanbul"]
+}
+```
+
+Find examples of just the unit tests with collected code coverage in [test-apps/unit-tests-js](./test-apps/unit-tests-js) (JavaScript) and [test-apps/unit-tests-ts](./test-apps/unit-tests-ts) (TypeScript).
 
 ## Instrument backend code
 
@@ -770,7 +779,7 @@ Full examples we use for testing in this repository:
 - [test-apps/component-vite](test-apps/component-vite) collects coverage from React component tests served by Vite
 - [test-apps/swc-webpack](test-apps/swc-webpack) instruments a webpack build with SWC instead of Babel, and loads it after the page's `load` event
 - [test-apps/unit-tests-js](test-apps/unit-tests-js) runs just the unit tests and reports code coverage (JavaScript source code)
-- [test-apps/unit-tests-ts](test-apps/ts-example) runs just the unit tests and reports code coverage (TypeScript source code)
+- [test-apps/unit-tests-ts](test-apps/unit-tests-ts) runs just the unit tests and reports code coverage (TypeScript source code)
 
 ### External examples
 

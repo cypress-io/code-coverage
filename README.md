@@ -759,7 +759,7 @@ TypeScript source files should be automatically included in the report if they a
 If you bundle TypeScript with webpack, let `babel-loader` handle the `.ts` files so that Babel can strip the types and instrument the code in one pass:
 
 ```shell
-npm i -D babel-loader @babel/core @babel/preset-typescript babel-plugin-istanbul
+npm i -D webpack webpack-cli babel-loader @babel/core @babel/preset-typescript babel-plugin-istanbul
 ```
 
 ```js
@@ -785,11 +785,38 @@ module.exports = {
 // .babelrc
 {
   "presets": ["@babel/preset-typescript"],
-  "plugins": ["istanbul"]
+  "env": {
+    "test": {
+      "plugins": ["istanbul"]
+    }
+  }
 }
 ```
 
-Babel doesn't type-check, so run `tsc --noEmit` separately if you need it. To also collect coverage from TypeScript files that your specs import directly, bundle the specs with the same webpack config through [@cypress/webpack-preprocessor](https://github.com/cypress-io/cypress/tree/develop/npm/webpack-preprocessor). See [test-apps/webpack-ts](test-apps/webpack-ts) for a complete example.
+Instrumented code is slower and larger, so the `env` block only adds `istanbul` when `NODE_ENV` (or `BABEL_ENV`) is `test`. Set it for the build you run Cypress against, for example `NODE_ENV=test webpack`. Babel doesn't type-check, so run `tsc --noEmit` separately if you need it.
+
+To also collect coverage from TypeScript files that your specs import directly, install [@cypress/webpack-preprocessor](https://github.com/cypress-io/cypress/tree/develop/npm/webpack-preprocessor) and bundle the specs with the same webpack config. Run Cypress with `NODE_ENV=test` too, so the specs are bundled with instrumentation. The plugin leaves spec and support files out of the report, so you don't need to exclude them.
+
+```js
+// cypress.config.js
+const { defineConfig } = require('cypress')
+const webpack = require('@cypress/webpack-preprocessor')
+
+module.exports = defineConfig({
+  e2e: {
+    setupNodeEvents(on, config) {
+      on(
+        'file:preprocessor',
+        webpack({ webpackOptions: require('./webpack.config') })
+      )
+      require('@cypress/code-coverage/task')(on, config)
+      return config
+    }
+  }
+})
+```
+
+See [test-apps/webpack-ts](test-apps/webpack-ts) for a working example.
 
 For other setups, see [test-apps/ts-example](test-apps/ts-example), [bahmutov/cra-ts-code-coverage-example](https://github.com/bahmutov/cra-ts-code-coverage-example) or [bahmutov/cypress-angular-coverage-example](https://github.com/bahmutov/cypress-angular-coverage-example).
 

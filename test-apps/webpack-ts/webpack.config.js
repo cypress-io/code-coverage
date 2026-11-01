@@ -14,8 +14,6 @@ module.exports = {
   module: {
     rules: [
       {
-        // babel-loader reads .babelrc, which strips the types with
-        // @babel/preset-typescript and instruments with babel-plugin-istanbul
         test: /\.[jt]s$/,
         exclude: /node_modules/,
         use: 'babel-loader'

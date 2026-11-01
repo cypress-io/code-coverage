@@ -526,7 +526,7 @@ afterEach(() => {
 })
 ```
 
-A few things to keep in mind:
+Before you rely on this workaround, know where it stops working:
 
 - A worker's counters live only as long as the worker does. Collect coverage before the test terminates the worker or leaves the page that started it.
 - The example asks each worker for coverage once, at the end of the test that started it. That suits tests that call `cy.visit()` in each test or in `beforeEach()`, because every visit starts new workers. Workers that outlive their test don't report their activity in later tests.

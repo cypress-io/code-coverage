@@ -952,8 +952,6 @@ npm run dev:no:coverage
 ## Links
 
 - Read the [Cypress code coverage guide](http://on.cypress.io/code-coverage)
-- Read ["Code Coverage by Parcel Bundler"](https://glebbahmutov.com/blog/code-coverage-by-parcel/) blog post
-- Read ["Combined End-to-end and Unit Test Coverage"](https://glebbahmutov.com/blog/combined-end-to-end-and-unit-test-coverage/)
 - If you are using React, check out [@cypress/instrument-cra](https://github.com/cypress-io/instrument-cra)
 - Watch videos in [Cypress Tips & Tricks](https://www.youtube.com/playlist?list=PLP9o9QNnQuAYYRpJzDNWpeuOVTwxmIxcI) playlist
 

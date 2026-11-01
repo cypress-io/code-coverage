@@ -120,6 +120,34 @@ SWC plugins only load in the SWC version they were built for, and a mismatch mak
 
 See [test-apps/swc-webpack](test-apps/swc-webpack) for a complete example.
 
+### Instrument an Angular app
+
+Angular CLI ignores `.babelrc` and `babel.config.json`, so adding `babel-plugin-istanbul` there has no effect. Angular 17 and later build with the esbuild-based `application` builder by default, which has no option to add Istanbul. One way to instrument the app is to switch the `build` and `serve` targets in `angular.json` to the webpack-based builders from [@angular-builders/custom-webpack](https://github.com/just-jeb/angular-builders/tree/master/packages/custom-webpack), then add a loader that instruments your TypeScript source after Angular compiles it:
+
+```js
+// coverage.webpack.js, set as "customWebpackConfig" in angular.json
+const path = require('path')
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        include: path.join(__dirname, 'src'),
+        exclude: /\.spec\.ts$/,
+        enforce: 'post',
+        use: {
+          loader: 'babel-loader',
+          options: { plugins: ['istanbul'] }
+        }
+      }
+    ]
+  }
+}
+```
+
+The `custom-webpack:browser` builder takes `main` where the `application` builder takes `browser`, so rename that option when you switch. Setting options such as `env.coverage` or `instrument` in your Cypress config doesn't instrument anything. Check for `window.__coverage__` in the app as described above.
+
 ### More information
 
 - Read [Cypress Code Coverage: Instrumenting code](https://on.cypress.io/code-coverage#Instrumenting-code) guide

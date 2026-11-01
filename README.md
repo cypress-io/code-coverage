@@ -521,11 +521,11 @@ You can specify custom coverage reporter(s) to use. For example, to output text 
 
 **Tip:** find list of reporters [here](https://istanbul.js.org/docs/advanced/alternative-reporters/)
 
-### Console reporters print in the middle of the test output
+### Console reporters print mid-run
 
-Console reporters such as `text` and `text-summary` can print their table in the middle of your Cypress output, often just before the result of the last test in a spec. Why? The plugin generates the report from an `after()` hook at the end of each spec, while Cypress is still printing that spec's results. The same happens when a [`coverage:report` script](#custom-nyc-command) prints to the terminal. Because the hook runs once per spec, you see the table again after every spec, too.
+The report is generated in an `after()` hook at the end of each spec, while Cypress is still printing results. So console reporters such as `text` and `text-summary`, or a [`coverage:report` script](#custom-nyc-command) that prints, can appear before the last test's result, once per spec. The numbers are still correct.
 
-This is cosmetic, and your coverage numbers are still correct. To get the summary once, after all the Cypress output, keep only file reporters in your NYC config (the default reporters are all file reporters), and print the summary yourself after `cypress run` finishes:
+To print the summary once at the end, use only file reporters (like the defaults) and run `nyc report` after `cypress run`:
 
 ```json
 {
@@ -538,7 +538,7 @@ This is cosmetic, and your coverage numbers are still correct. To get the summar
 }
 ```
 
-`nyc report` reads the coverage the plugin saved in `.nyc_output`, so it doesn't need to run your tests again. Use `--reporter=text` instead if you want the file-by-file table.
+`nyc report` reads the saved `.nyc_output`, so tests don't run again. Use `--reporter=text` for the per-file table.
 
 ## Custom NYC command
 

@@ -756,7 +756,42 @@ The [cypress-example-conduit-app](https://github.com/cypress-io/cypress-example-
 
 TypeScript source files should be automatically included in the report if they are instrumented.
 
-See [test-apps/ts-example](test-apps/ts-example), [bahmutov/cra-ts-code-coverage-example](https://github.com/bahmutov/cra-ts-code-coverage-example) or [bahmutov/cypress-angular-coverage-example](https://github.com/bahmutov/cypress-angular-coverage-example).
+If you bundle TypeScript with webpack, let `babel-loader` handle the `.ts` files so that Babel can strip the types and instrument the code in one pass:
+
+```shell
+npm i -D babel-loader @babel/core @babel/preset-typescript babel-plugin-istanbul
+```
+
+```js
+// webpack.config.js
+module.exports = {
+  entry: './src/index.ts',
+  resolve: {
+    extensions: ['.ts', '.js']
+  },
+  module: {
+    rules: [
+      {
+        test: /\.[jt]s$/,
+        exclude: /node_modules/,
+        use: 'babel-loader'
+      }
+    ]
+  }
+}
+```
+
+```json
+// .babelrc
+{
+  "presets": ["@babel/preset-typescript"],
+  "plugins": ["istanbul"]
+}
+```
+
+Babel doesn't type-check, so run `tsc --noEmit` separately if you need it. To also collect coverage from TypeScript files that your specs import directly, bundle the specs with the same webpack config through [@cypress/webpack-preprocessor](https://github.com/cypress-io/cypress/tree/develop/npm/webpack-preprocessor). See [test-apps/webpack-ts](test-apps/webpack-ts) for a complete example.
+
+For other setups, see [test-apps/ts-example](test-apps/ts-example), [bahmutov/cra-ts-code-coverage-example](https://github.com/bahmutov/cra-ts-code-coverage-example) or [bahmutov/cypress-angular-coverage-example](https://github.com/bahmutov/cypress-angular-coverage-example).
 
 ## Include code
 
@@ -909,6 +944,7 @@ Full examples we use for testing in this repository:
 - [test-apps/ts-example](test-apps/ts-example) uses Babel + Parcel to instrument and serve TypeScript file
 - [test-apps/esm-example](test-apps/esm-example) demonstrates using ES module syntax (`import`/`export`) with the plugin
 - [test-apps/use-webpack](test-apps/use-webpack) shows Webpack build with source maps and Babel
+- [test-apps/webpack-ts](test-apps/webpack-ts) bundles TypeScript sources with webpack, using Babel to strip the types and instrument the code
 - [test-apps/component-vite](test-apps/component-vite) collects coverage from React component tests served by Vite
 - [test-apps/swc-webpack](test-apps/swc-webpack) instruments a webpack build with SWC instead of Babel, and loads it after the page's `load` event
 - [test-apps/unit-tests-js](test-apps/unit-tests-js) runs just the unit tests and reports code coverage (JavaScript source code)

@@ -95,6 +95,7 @@ jobs:
           - unit-tests-js
           - unit-tests-ts
           - use-webpack
+          - webpack-ts
           - redirect
     defaults:
       run:

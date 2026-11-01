@@ -1,0 +1,17 @@
+{
+  "name": "example-webpack-ts",
+  "description": "Code coverage from a webpack build of TypeScript sources",
+  "private": true,
+  "scripts": {
+    "cy:run": "cypress run",
+    "build": "webpack && cp ./index.html ./dist/index.html",
+    "start": "serve -p 1234 dist",
+    "pretest": "rimraf .nyc_output coverage dist",
+    "test": "npm run build && start-test 1234 cy:run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "check-coverage src/index.ts && check-coverage src/calc.ts && only-covered src/index.ts src/calc.ts"
+  },
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.28.5"
+  }
+}

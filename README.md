@@ -462,71 +462,71 @@ If there is ONLY frontend code coverage, set `expectFrontendCoverageOnly: true` 
 
 Is code that runs in a [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) missing from your report, even though your tests exercise it? That's expected. The plugin reads `window.__coverage__` from the app and spec windows, but an instrumented worker keeps its counters on its own global, `self.__coverage__`, and the plugin never sees it.
 
-You can close the gap yourself in two steps: have the worker hand over its coverage when asked, and have your tests ask for it and pass it to the plugin's `combineCoverage` task.
+You can close the gap yourself: have the worker hand over its coverage when asked, and have your tests ask for it and pass it to the plugin's `combineCoverage` task.
 
 1. Make sure your bundler instruments the worker file too. Worker bundles are often built separately from the main bundle. If you're not sure, log `self.__coverage__` from inside the worker.
 2. In the worker, reply to a coverage request. A [`MessageChannel`](https://developer.mozilla.org/en-US/docs/Web/API/MessageChannel) port carries the reply, so your app's own `message` handlers on the main thread never see it.
 
-```js
-// src/worker.js
-/* istanbul ignore next */
-if (self.__coverage__) {
-  self.addEventListener('message', (event) => {
-    if (event.data === 'cypress:coverage') {
-      event.ports[0].postMessage(self.__coverage__)
-    }
-  })
-}
-```
+   ```js
+   // src/worker.js
+   /* istanbul ignore next */
+   if (self.__coverage__) {
+     self.addEventListener('message', (event) => {
+       if (event.data === 'cypress:coverage') {
+         event.ports[0].postMessage(self.__coverage__)
+       }
+     })
+   }
+   ```
 
-If the worker has its own `message` handler, have it ignore the `'cypress:coverage'` message.
+   If the worker has its own `message` handler, have it ignore the `'cypress:coverage'` message.
 
 3. In your support file, keep track of every worker the app creates. After each test, ask each one for its coverage and send it to the plugin.
 
-```js
-// cypress/support/e2e.js
-import '@cypress/code-coverage/support'
+   ```js
+   // cypress/support/e2e.js
+   import '@cypress/code-coverage/support'
 
-let workers = []
+   let workers = []
 
-Cypress.on('window:before:load', (win) => {
-  win.Worker = class extends win.Worker {
-    constructor(...args) {
-      super(...args)
-      workers.push(this)
-    }
-  }
-})
+   Cypress.on('window:before:load', (win) => {
+     win.Worker = class extends win.Worker {
+       constructor(...args) {
+         super(...args)
+         workers.push(this)
+       }
+     }
+   })
 
-function getWorkerCoverage(worker) {
-  return new Promise((resolve) => {
-    const channel = new MessageChannel()
-    // A worker that was terminated, or belonged to a page that's gone,
-    // never answers
-    const timer = setTimeout(() => resolve(null), 1000)
-    channel.port1.onmessage = (event) => {
-      clearTimeout(timer)
-      resolve(event.data)
-    }
-    worker.postMessage('cypress:coverage', [channel.port2])
-  })
-}
+   function getWorkerCoverage(worker) {
+     return new Promise((resolve) => {
+       const channel = new MessageChannel()
+       // A worker that was terminated, or belonged to a page that's gone,
+       // never answers
+       const timer = setTimeout(() => resolve(null), 1000)
+       channel.port1.onmessage = (event) => {
+         clearTimeout(timer)
+         resolve(event.data)
+       }
+       worker.postMessage('cypress:coverage', [channel.port2])
+     })
+   }
 
-afterEach(() => {
-  const testWorkers = workers
-  workers = []
+   afterEach(() => {
+     const testWorkers = workers
+     workers = []
 
-  cy.then(() => Promise.all(testWorkers.map(getWorkerCoverage))).then(
-    (coverages) => {
-      coverages.filter(Boolean).forEach((coverage) => {
-        cy.task('combineCoverage', JSON.stringify(coverage), { log: false })
-      })
-    }
-  )
-})
-```
+     cy.then(() => Promise.all(testWorkers.map(getWorkerCoverage))).then(
+       (coverages) => {
+         coverages.filter(Boolean).forEach((coverage) => {
+           cy.task('combineCoverage', JSON.stringify(coverage), { log: false })
+         })
+       }
+     )
+   })
+   ```
 
-Before you rely on this workaround, know where it stops working:
+This workaround has a few limits:
 
 - A worker's counters live only as long as the worker does. Collect coverage before the test terminates the worker or leaves the page that started it.
 - The example asks each worker for coverage once, at the end of the test that started it. That suits tests that call `cy.visit()` in each test or in `beforeEach()`, because every visit starts new workers. Workers that outlive their test don't report their activity in later tests.

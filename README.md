@@ -68,6 +68,8 @@ This plugin **DOES NOT** instrument your code. You have to instrument it yoursel
 
 Please see the [Test Apps](#internal-test-apps) section below. You can find a linked project matching your situation to see how to instrument your application's source code before running end-to-end tests to get the code coverage.
 
+If you instrument ahead of time with `nyc instrument`, write the output to a separate folder, for example `nyc instrument src dist-instrumented`, and serve that folder. Don't use `--in-place`. It overwrites your source files with instrumented code, and the HTML report shows the source files as they are on disk, so the report would show instrumented code instead of your own source.
+
 If your application has been instrumented correctly, you should see additional counters and instructions in the application's JavaScript resources, as the image below shows.
 
 ![Instrumented code](images/instrumented-code.png)

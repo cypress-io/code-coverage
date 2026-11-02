@@ -350,7 +350,7 @@ module.exports = (on, config) => {
 
 The code coverage from spec files will be combined with end-to-end coverage.
 
-`use-babelrc` compiles `.js`, `.jsx`, `.ts` and `.tsx` files with your `.babelrc`. For TypeScript, add `@babel/preset-typescript` to it:
+`use-babelrc` compiles `.js`, `.jsx`, `.ts` and `.tsx` files with your `.babelrc`. For TypeScript, add `@babel/preset-typescript` to it (and a JSX preset such as `@babel/preset-react` for `.tsx` files):
 
 ```json
 {

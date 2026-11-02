@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, afterEach } from 'vitest'
 import { EventEmitter } from 'events'
-import { mkdtempSync, readFileSync } from 'fs'
+import { mkdtempSync, readFileSync, rmSync } from 'fs'
 import { tmpdir } from 'os'
 import path from 'path'
 import preprocessor from '../../lib/use-babelrc'
@@ -8,13 +8,20 @@ import preprocessor from '../../lib/use-babelrc'
 const fixtures = path.join(__dirname, '__fixtures__', 'use-babelrc-ts')
 
 describe('use-babelrc', () => {
+  let outDir: string | undefined
+
+  afterEach(() => {
+    if (outDir) {
+      rmSync(outDir, { recursive: true, force: true })
+      outDir = undefined
+    }
+  })
+
   it('bundles TypeScript specs and instruments the .ts files they import', async () => {
+    outDir = mkdtempSync(path.join(tmpdir(), 'use-babelrc-'))
     const file = Object.assign(new EventEmitter(), {
       filePath: path.join(fixtures, 'spec.ts'),
-      outputPath: path.join(
-        mkdtempSync(path.join(tmpdir(), 'use-babelrc-')),
-        'spec.js'
-      ),
+      outputPath: path.join(outDir, 'spec.js'),
       shouldWatch: false
     }) as unknown as Cypress.FileObject
 

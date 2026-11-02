@@ -157,6 +157,19 @@ export function fixSourcePaths(coverage: CoverageObject): void {
   })
 }
 
+/**
+ * Whether a test ran against an app server, which is the only case where
+ * there's a backend to ask for coverage. A test without a `baseUrl` that
+ * visits a local file is served from the Cypress proxy origin instead.
+ */
+export function isTestingAppServer(
+  baseUrl: string | null | undefined,
+  windowOrigin: string | undefined,
+  proxyUrl: string
+): boolean {
+  return (baseUrl || windowOrigin) !== proxyUrl
+}
+
 export function getSendCoverageBatchSize(): number | null {
   const batchSize = Cypress.expose('sendCoverageBatchSize')
   const parsedBatchSize = parseInt(String(batchSize), 10)

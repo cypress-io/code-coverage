@@ -488,6 +488,8 @@ Or if you have multiple servers from which you are wanting to gather code covera
 
 That should be enough - the code coverage from the server will be requested at the end of the test run and merged with the client-side code coverage, producing a combined report.
 
+The plugin requests backend coverage after each spec's tests, as long as at least one test in that spec ran against your app: it had a `baseUrl` or visited a page outside the Cypress proxy. A test that sets `{ baseUrl: null }` to visit a local HTML file doesn't stop the request.
+
 ### expectBackendCoverageOnly
 
 If there is NO frontend code coverage, and you only want to collect backend code coverage using Cypress tests, set `expectBackendCoverageOnly: true` in the `cypress.json` file. Otherwise, Cypress complains that it cannot find the frontend code coverage.

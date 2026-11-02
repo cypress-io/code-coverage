@@ -5,7 +5,8 @@ import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import {
   filterFilesFromCoverage,
-  getSendCoverageBatchSize
+  getSendCoverageBatchSize,
+  isTestingAppServer
 } from './support-utils'
 
 dayjs.extend(duration)
@@ -59,6 +60,16 @@ function logMessage(s: string): void {
 
 function registerHooks(): void {
   let windowCoverageObjects: WindowCoverageObject[] = []
+  let anyTestUsedAppServer = false
+
+  const isCurrentTestUsingAppServer = (): boolean =>
+    isTestingAppServer(
+      Cypress.config('baseUrl'),
+      // @ts-ignore - state is a runtime property
+      (cy.state('window') as Window).origin,
+      // @ts-ignore - proxyUrl is a runtime property
+      Cypress.config('proxyUrl')
+    )
 
   const hasE2ECoverage = (): boolean => Boolean(windowCoverageObjects.length)
 
@@ -67,6 +78,8 @@ function registerHooks(): void {
     Boolean((window as typeof window & { __coverage__?: unknown }).__coverage__)
 
   before(() => {
+    anyTestUsedAppServer = false
+
     // we need to reset the coverage when running
     // in the interactive mode, otherwise the counters will
     // keep increasing every time we rerun the tests
@@ -144,6 +157,12 @@ function registerHooks(): void {
   })
 
   afterEach(() => {
+    // after() hooks run under the last test's config overrides, so a final
+    // `{ baseUrl: null }` test would hide that earlier tests used the app
+    if (isCurrentTestUsingAppServer()) {
+      anyTestUsedAppServer = true
+    }
+
     // The last page never unloads during the test
     cy.window({ log: false }).then(saveCoverageObject)
 
@@ -177,11 +196,8 @@ function registerHooks(): void {
 
   after(function collectBackendCoverage() {
     // Backend counters accumulate across tests, so fetch them once at the end
-    const baseUrl =
-      // @ts-ignore - state is a runtime property
-      Cypress.config('baseUrl') || (cy.state('window') as Window).origin
-    // @ts-ignore - proxyUrl is a runtime property
-    const runningEndToEndTests = baseUrl !== Cypress.config('proxyUrl')
+    const runningEndToEndTests =
+      anyTestUsedAppServer || isCurrentTestUsingAppServer()
     const expectFrontendCoverageOnly = Cypress._.get(
       Cypress.expose('codeCoverage'),
       'expectFrontendCoverageOnly',

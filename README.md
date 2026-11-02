@@ -612,7 +612,10 @@ The plugin looks for these files in that folder only. It doesn't search parent f
 - `.nycrc.yml`
 - `nyc.config.js`
 - `nyc.config.cjs`
+- `nyc.config.mjs`
 - the `nyc` object in `package.json`
+
+`nyc.config.js` can be an ES module (with `export default`) when your `package.json` has `"type": "module"`, and `nyc.config.mjs` is always one. The plugin loads ES module configs synchronously, so they need Node 20.19 or later and can't use top-level `await`. If either of those rules out an ES module config for you, write it as CommonJS in `nyc.config.cjs` instead.
 
 Unlike the `nyc` CLI, which uses the first config file it finds, the plugin merges every file it finds. If two files set the same option, the one later in the list wins, so the `nyc` object in `package.json` overrides the rest. The [`coverage:report` script](#custom-nyc-command) is looked up in that same `package.json`. Relative paths such as `report-dir`, `temp-dir`, and the `include` and `exclude` globs are resolved against that folder as well.
 

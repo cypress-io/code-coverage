@@ -31,6 +31,50 @@ export interface CoverageMap {
   [key: string]: CoverageEntry
 }
 
+// Loading stays synchronous because the NYC options are read when task.ts is
+// first required. require() can load ES modules without top-level await on
+// Node >= 20.19 and returns their namespace, so the config is under `default`.
+function loadNycConfigModule(
+  workingDirectory: string,
+  basename: string
+): NycOptions {
+  const filename = join(workingDirectory, basename)
+  if (!existsSync(filename)) {
+    return {}
+  }
+
+  let loaded: unknown
+  try {
+    loaded = require(filename)
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException | undefined)?.code
+    const message = error instanceof Error ? error.message : String(error)
+    if (code === 'ERR_REQUIRE_ASYNC_MODULE') {
+      throw new Error(
+        `Failed to load ${basename}: ES module configs can't use top-level await. ` +
+          `Remove it, or move the config to nyc.config.cjs. ${message}`
+      )
+    }
+    if (code === 'ERR_REQUIRE_ESM') {
+      throw new Error(
+        `Failed to load ${basename}: this Node version can't load ES module configs synchronously. ` +
+          `Use Node 20.19 or later, or move the config to nyc.config.cjs. ${message}`
+      )
+    }
+    throw new Error(`Failed to load ${basename}: ${message}`)
+  }
+
+  if (
+    loaded &&
+    typeof loaded === 'object' &&
+    (loaded as { __esModule?: boolean }).__esModule &&
+    'default' in loaded
+  ) {
+    return (loaded as { default: NycOptions }).default
+  }
+  return loaded as NycOptions
+}
+
 export function readNycOptions(workingDirectory: string): NycOptions {
   const pkgFilename = join(workingDirectory, 'package.json')
   const pkg = existsSync(pkgFilename)
@@ -74,29 +118,12 @@ export function readNycOptions(workingDirectory: string): NycOptions {
     }
   }
 
-  const nycConfigFilename = join(workingDirectory, 'nyc.config.js')
-  let nycConfig: NycOptions = {}
-  if (existsSync(nycConfigFilename)) {
-    try {
-      nycConfig = require(nycConfigFilename) as NycOptions
-    } catch (error) {
-      throw new Error(
-        `Failed to load nyc.config.js: ${error instanceof Error ? error.message : String(error)}`
-      )
-    }
-  }
-
-  const nycConfigCommonJsFilename = join(workingDirectory, 'nyc.config.cjs')
-  let nycConfigCommonJs: NycOptions = {}
-  if (existsSync(nycConfigCommonJsFilename)) {
-    try {
-      nycConfigCommonJs = require(nycConfigCommonJsFilename) as NycOptions
-    } catch (error) {
-      throw new Error(
-        `Failed to load nyc.config.cjs: ${error instanceof Error ? error.message : String(error)}`
-      )
-    }
-  }
+  const nycConfig = loadNycConfigModule(workingDirectory, 'nyc.config.js')
+  const nycConfigCommonJs = loadNycConfigModule(
+    workingDirectory,
+    'nyc.config.cjs'
+  )
+  const nycConfigEsm = loadNycConfigModule(workingDirectory, 'nyc.config.mjs')
 
   const nycOptions = combineNycOptions(
     defaultNycOptions,
@@ -106,6 +133,7 @@ export function readNycOptions(workingDirectory: string): NycOptions {
     nycrcYml,
     nycConfig,
     nycConfigCommonJs,
+    nycConfigEsm,
     pkgNycOptions
   )
   log('combined NYC options %o', nycOptions)

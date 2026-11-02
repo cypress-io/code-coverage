@@ -14,6 +14,7 @@ This test app demonstrates using `@cypress/code-coverage` with ES Module syntax 
    ```javascript
    import '@cypress/code-coverage/support'
    ```
+5. **nyc.config.js**: The NYC options are an ES module with `export default`
 
 ## Usage
 

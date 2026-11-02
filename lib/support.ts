@@ -208,7 +208,10 @@ function registerHooks(): void {
           {
             url,
             baseUrl,
-            timeout: Cypress.config('responseTimeout')
+            // Node ignores the Cypress proxy, so a backend reachable only
+            // through it can hang instead of refusing. Keep this short so
+            // the cy.request fallback starts soon and cy.task can't time out.
+            timeout: Math.min(Cypress.config('responseTimeout'), 5000)
           },
           { log: false }
         ).then((files) => {

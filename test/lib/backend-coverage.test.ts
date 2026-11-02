@@ -79,6 +79,26 @@ describe('requestBackendCoverage', () => {
     })
   })
 
+  it('gives up on a server that never responds', async () => {
+    const fetchImpl = vi.fn(
+      (_url: URL, init?: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () =>
+            reject(init.signal?.reason)
+          )
+        })
+    )
+
+    const result = await requestBackendCoverage(
+      'http://localhost:3003/__coverage__',
+      undefined,
+      50,
+      fetchImpl as unknown as typeof fetch
+    )
+
+    expect(result).toHaveProperty('reason')
+  })
+
   it('reports an error status, such as a backend that needs cookies', async () => {
     const fetchImpl = vi.fn(async () => jsonResponse({}, 401))
 

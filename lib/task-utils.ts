@@ -31,9 +31,10 @@ export interface CoverageMap {
   [key: string]: CoverageEntry
 }
 
-// Loading stays synchronous because the NYC options are read when task.ts is
+// Loading is synchronous because the NYC options are read when task.ts is
 // first required. require() can load ES modules without top-level await on
-// Node >= 20.19 and returns their namespace, so the config is under `default`.
+// Node 20.19+ and 22.12+, and returns their namespace, so the config is the
+// `default` export.
 function loadNycConfigModule(
   workingDirectory: string,
   basename: string
@@ -58,21 +59,44 @@ function loadNycConfigModule(
     if (code === 'ERR_REQUIRE_ESM') {
       throw new Error(
         `Failed to load ${basename}: this Node version can't load ES module configs synchronously. ` +
-          `Use Node 20.19 or later, or move the config to nyc.config.cjs. ${message}`
+          `Use Node 20.19+ or 22.12+, or move the config to nyc.config.cjs. ${message}`
       )
     }
     throw new Error(`Failed to load ${basename}: ${message}`)
   }
 
+  const config = unwrapDefaultExport(loaded, basename)
   if (
-    loaded &&
-    typeof loaded === 'object' &&
-    (loaded as { __esModule?: boolean }).__esModule &&
+    config === null ||
+    typeof config !== 'object' ||
+    Array.isArray(config) ||
+    typeof (config as { then?: unknown }).then === 'function'
+  ) {
+    throw new Error(
+      `Failed to load ${basename}: it must export a plain object of NYC options`
+    )
+  }
+  return config as NycOptions
+}
+
+function unwrapDefaultExport(loaded: unknown, basename: string): unknown {
+  if (!loaded || typeof loaded !== 'object') {
+    return loaded
+  }
+  // The nyc CLI rejects ES module configs without a default export too
+  const isEsModuleNamespace =
+    (loaded as { [Symbol.toStringTag]?: unknown })[Symbol.toStringTag] ===
+    'Module'
+  if (isEsModuleNamespace && !('default' in loaded)) {
+    throw new Error(`Failed to load ${basename}: it has no default export`)
+  }
+  if (
+    (isEsModuleNamespace || (loaded as { __esModule?: boolean }).__esModule) &&
     'default' in loaded
   ) {
-    return (loaded as { default: NycOptions }).default
+    return (loaded as { default: unknown }).default
   }
-  return loaded as NycOptions
+  return loaded
 }
 
 export function readNycOptions(workingDirectory: string): NycOptions {

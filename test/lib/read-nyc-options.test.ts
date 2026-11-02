@@ -28,4 +28,29 @@ describe('readNycOptions', () => {
       /Failed to load nyc\.config\.js: .*top-level await.*nyc\.config\.cjs/
     )
   })
+
+  it('merges config files in order, with package.json last', () => {
+    const options = readNycOptions(join(fixtures, 'precedence'))
+    expect(options['report-dir']).toBe('from-mjs')
+    expect(options.reporter).toEqual(['lcov'])
+    expect(options.all).toBe(true)
+  })
+
+  it('rejects an ES module config without a default export', () => {
+    expect(() => readNycOptions(join(fixtures, 'named-exports'))).toThrow(
+      'Failed to load nyc.config.mjs: it has no default export'
+    )
+  })
+
+  it('rejects a config that does not export an object', () => {
+    expect(() => readNycOptions(join(fixtures, 'function-export'))).toThrow(
+      'Failed to load nyc.config.mjs: it must export a plain object of NYC options'
+    )
+  })
+
+  it('reports why a config file failed to load', () => {
+    expect(() => readNycOptions(join(fixtures, 'syntax-error'))).toThrow(
+      /Failed to load nyc\.config\.cjs: .*Unexpected end of input/
+    )
+  })
 })

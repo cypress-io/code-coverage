@@ -1,6 +1,6 @@
 {
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
   "automerge": true,
   "major": {
@@ -17,7 +17,7 @@
   "schedule": [
     "every weekend"
   ],
-  "masterIssue": true,
+  "dependencyDashboard": true,
   "packageRules": [
     {
       "matchPackageNames": ["cypress"],

@@ -2,7 +2,7 @@
 
 /// <reference types="node" />
 import { readFileSync, writeFileSync, existsSync } from 'fs'
-import { isAbsolute, resolve, join } from 'path'
+import { isAbsolute, resolve, join, normalize } from 'path'
 import debug from 'debug'
 import chalk from 'chalk'
 import { globSync } from 'tinyglobby'
@@ -395,10 +395,13 @@ export function includeAllFiles(
   }
 
   let changed = false
-  allFiles.forEach((fullPath) => {
-    if (coveredPaths.includes(fullPath)) {
+  allFiles.forEach((globbedPath) => {
+    if (coveredPaths.includes(globbedPath)) {
       return
     }
+    // The glob always returns forward slashes, but instrumented entries use
+    // the OS separator, so match them to keep the report consistent on Windows
+    const fullPath = normalize(globbedPath)
     log('adding empty coverage for file %s', fullPath)
     changed = true
     const placeholder = fileCoveragePlaceholder(fullPath)

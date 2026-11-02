@@ -942,7 +942,7 @@ Look up the list of examples under the GitHub topic [cypress-code-coverage-examp
 
 ### `@cypress/code-coverage` 3.x to 4.x
 
-`Cypress.env()` was deprecated in Cypress v15.10.0, and will be removed in Cypress 16. This necessitates a breaking change to how you configure `@cypress/code-coverage`.
+`Cypress.env()` was deprecated in Cypress v15.10.0 and removed in Cypress v16.0.0. This necessitates a breaking change to how you configure `@cypress/code-coverage`.
 
 ```js
 // BEFORE

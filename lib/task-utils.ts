@@ -2,7 +2,7 @@
 
 /// <reference types="node" />
 import { readFileSync, writeFileSync, existsSync } from 'fs'
-import { isAbsolute, resolve, join, normalize } from 'path'
+import { isAbsolute, resolve, join, sep } from 'path'
 import debug from 'debug'
 import chalk from 'chalk'
 import { globSync } from 'tinyglobby'
@@ -383,25 +383,30 @@ export function includeAllFiles(
   const nycCoverage: CoverageMapData = JSON.parse(
     readFileSync(nycFilename, 'utf8')
   )
-  const coverageKeys = Object.keys(nycCoverage)
-  const coveredPaths = coverageKeys.map((key) =>
-    nycCoverage[key].path.replace(/\\/g, '/')
-  )
+  const rawPaths = Object.keys(nycCoverage).map((key) => nycCoverage[key].path)
+  const coveredPaths = new Set(rawPaths.map((p) => p.replace(/\\/g, '/')))
 
-  log('coverage has %d record(s)', coveredPaths.length)
+  log('coverage has %d record(s)', coveredPaths.size)
   if (log.enabled) {
     console.error('coverage has the following first paths')
-    console.error(coveredPaths.slice(0, 4).join('\n'))
+    console.error(rawPaths.slice(0, 4).join('\n'))
   }
+
+  // The glob always returns forward slashes. On Windows, babel-plugin-istanbul
+  // records backslashes but not every instrumenter does, so follow the entries
+  // already in the report and only fall back to backslashes when it is empty.
+  const useBackslashes =
+    sep === '\\' &&
+    (rawPaths.length === 0 || rawPaths.some((p) => p.includes('\\')))
 
   let changed = false
   allFiles.forEach((globbedPath) => {
-    if (coveredPaths.includes(globbedPath)) {
+    if (coveredPaths.has(globbedPath)) {
       return
     }
-    // The glob always returns forward slashes, but instrumented entries use
-    // the OS separator, so match them to keep the report consistent on Windows
-    const fullPath = normalize(globbedPath)
+    const fullPath = useBackslashes
+      ? globbedPath.replace(/\//g, '\\')
+      : globbedPath
     log('adding empty coverage for file %s', fullPath)
     changed = true
     const placeholder = fileCoveragePlaceholder(fullPath)

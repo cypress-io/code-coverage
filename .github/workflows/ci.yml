@@ -175,6 +175,9 @@ jobs:
       - name: Check code coverage files 📈
         run: npm i -D check-code-coverage && npm run coverage:check-files
         working-directory: test-apps/all-files
+      - name: Check coverage paths use one separator style
+        run: npm run coverage:check-separators
+        working-directory: test-apps/all-files
 
   release:
     name: Release

@@ -766,6 +766,7 @@ npm i -D webpack webpack-cli babel-loader @babel/core @babel/preset-typescript b
 // webpack.config.js
 module.exports = {
   entry: './src/index.ts',
+  mode: 'development',
   resolve: {
     extensions: ['.ts', '.js']
   },
@@ -781,8 +782,9 @@ module.exports = {
 }
 ```
 
+Then add the TypeScript preset and the `istanbul` plugin to `.babelrc`:
+
 ```json
-// .babelrc
 {
   "presets": ["@babel/preset-typescript"],
   "env": {
@@ -795,10 +797,12 @@ module.exports = {
 
 Instrumented code is slower and larger, so the `env` block only adds `istanbul` when the Babel env is `test`. Babel reads `BABEL_ENV` first and falls back to `NODE_ENV` only when `BABEL_ENV` is unset, so if your environment already sets `BABEL_ENV`, set that one instead. Set it for the build you run Cypress against, for example `npx cross-env NODE_ENV=test webpack`. [cross-env](https://github.com/kentcdodds/cross-env) makes the variable work in Windows shells too. Babel doesn't type-check, so run `tsc --noEmit` separately if you need it.
 
+For `.tsx` files, add `.tsx` to `resolve.extensions`, change the rule's `test` to `/\.[jt]sx?$/`, and add `@babel/preset-react` to the presets so Babel can compile the JSX.
+
 To also collect coverage from TypeScript files that your specs import directly, bundle the specs with the same webpack config through [@cypress/webpack-preprocessor](https://github.com/cypress-io/cypress/tree/develop/npm/webpack-preprocessor):
 
 ```shell
-npm i -D @cypress/webpack-preprocessor @babel/preset-env
+npm i -D @cypress/webpack-preprocessor
 ```
 
 Run Cypress with the Babel env set to `test` too, so the specs are bundled with instrumentation. Specs and the support file are left out of the report automatically. Other files under `cypress/` that the specs import, such as `cypress/support/commands.ts`, are instrumented and reported unless you exclude them:

@@ -488,8 +488,6 @@ Or if you have multiple servers from which you are wanting to gather code covera
 
 That should be enough - the code coverage from the server will be requested at the end of the test run and merged with the client-side code coverage, producing a combined report.
 
-The plugin fetches the coverage from the Cypress Node process, so large coverage objects don't have to pass through the browser. A relative `url` resolves against your `baseUrl`. If Node can't get coverage from a URL, for example because the server needs your test's cookies or is only reachable through a proxy that Cypress uses, the plugin requests it with `cy.request` instead. To see why the Node request failed, run Cypress with `DEBUG=code-coverage`.
-
 ### expectBackendCoverageOnly
 
 If there is NO frontend code coverage, and you only want to collect backend code coverage using Cypress tests, set `expectBackendCoverageOnly: true` in the `cypress.json` file. Otherwise, Cypress complains that it cannot find the frontend code coverage.

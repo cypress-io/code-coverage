@@ -773,7 +773,7 @@ For example, to ensure the final report includes all JS files from the "src/page
 }
 ```
 
-By default, the plugin adds each file that no test loaded as an empty placeholder. The file shows up in the report, but with no lines, statements, or functions to count, so it doesn't lower your totals. You notice this most with bundlers such as Vite, which only instrument the modules a test actually imports ([#539](https://github.com/cypress-io/code-coverage/issues/539)).
+By default, the plugin adds each file that no test loaded as an empty placeholder. The file shows up in the report, but with no lines, statements, or functions to count, so it doesn't lower your totals. You notice this most with bundlers such as Vite, which only instrument the modules a test actually imports.
 
 To count those files as 0% covered instead, set `instrumentUnloadedFiles: true` in the `expose.codeCoverage` object:
 

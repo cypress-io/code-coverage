@@ -754,7 +754,7 @@ The [cypress-example-conduit-app](https://github.com/cypress-io/cypress-example-
 
 ### Several Cypress processes on one machine
 
-Tools such as `cypress-parallel` start several `cypress run` processes in the same project folder at once. By default they all share one `.nyc_output/out.json`. The plugin writes that file atomically, so a process never reads a half-written file. But each process saves the coverage it has collected, so a process that saves later replaces coverage that another process saved after it started, and the final report can miss some of your specs.
+Some tools run specs faster by starting several `cypress run` processes in the same project folder at once. By default they all share one `.nyc_output/out.json`. The plugin writes that file atomically, so a process never reads a half-written file. But each process saves the coverage it has collected, so a process that saves later replaces coverage that another process saved after it started, and the final report can miss some of your specs.
 
 To keep every process's coverage, give each process its own temp folder in `nyc.config.js`, next to your Cypress config:
 

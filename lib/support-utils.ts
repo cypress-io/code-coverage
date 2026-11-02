@@ -57,7 +57,7 @@ function filterSpecsFromCoverage(
   expose: typeof Cypress.expose = Cypress.expose,
   spec: typeof Cypress.spec = Cypress.spec
 ): CoverageObject {
-  const testFilePatterns = getCypressExcludePatterns(config, expose)
+  const patternLists = getCypressExcludePatterns(config, expose)
 
   const absoluteSpec = toForwardSlashes(spec.absolute)
   const relativeSpec = toForwardSlashes(spec.relative)
@@ -71,51 +71,58 @@ function filterSpecsFromCoverage(
       workingDir && normalizedPath.startsWith(workingDir)
         ? normalizedPath.slice(workingDir.length)
         : normalizedPath
-    const matchedPattern = testFilePatterns.some((specPattern) =>
-      Cypress.minimatch(filename, specPattern, { debug: false })
-    )
-    const matchedEndOfPath = testFilePatterns.some((specPattern) =>
-      filename.endsWith(specPattern)
-    )
-    return matchedPattern || matchedEndOfPath
+    return patternLists.some((patterns) => matchesPatterns(filename, patterns))
   }
 
   const coverage = Cypress._.omitBy(totalCoverage, isTestFile)
   return coverage
 }
 
+function matchesPattern(filename: string, pattern: string): boolean {
+  return (
+    Cypress.minimatch(filename, pattern, { debug: false }) ||
+    filename.endsWith(pattern)
+  )
+}
+
+/**
+ * Applies a glob list the way Cypress applies `specPattern`: a file matches
+ * when a positive entry matches it and no `!` entry does. Passing a `!` entry
+ * to minimatch on its own would match nearly every app file instead.
+ * https://github.com/cypress-io/code-coverage/issues/472
+ */
+function matchesPatterns(filename: string, patterns: string[]): boolean {
+  const included = patterns.filter((p) => !p.startsWith('!'))
+  const negated = patterns
+    .filter((p) => p.startsWith('!'))
+    .map((p) => p.slice(1))
+  return (
+    included.some((p) => matchesPattern(filename, p)) &&
+    !negated.some((p) => matchesPattern(filename, p))
+  )
+}
+
+function toStringList(value: unknown): string[] {
+  const values = Array.isArray(value) ? value : [value]
+  return values.filter((p): p is string => typeof p === 'string' && p !== '')
+}
+
+/**
+ * Returns `specPattern` and `codeCoverage.exclude` as separate lists so a
+ * negated entry only makes exceptions within its own list
+ */
 function getCypressExcludePatterns(
   config: typeof Cypress.config,
   expose: typeof Cypress.expose
-): string[] {
-  const testFilePattern = config('specPattern')
+): string[][] {
   const codeCoverageConfig = expose().codeCoverage as
     | { exclude?: string | string[] }
     | undefined
-  const excludePattern = codeCoverageConfig?.exclude
 
-  let testFilePatterns: string[] = []
-  if (Array.isArray(testFilePattern)) {
-    for (const p of testFilePattern) {
-      if (p !== undefined && typeof p === 'string') {
-        testFilePatterns.push(p)
-      }
-    }
-  } else if (testFilePattern && typeof testFilePattern === 'string') {
-    testFilePatterns = [testFilePattern]
-  }
-
-  if (Array.isArray(excludePattern)) {
-    for (const p of excludePattern) {
-      if (p !== undefined && typeof p === 'string') {
-        testFilePatterns.push(p)
-      }
-    }
-  } else if (typeof excludePattern === 'string') {
-    testFilePatterns.push(excludePattern)
-  }
-
-  return testFilePatterns
+  return [
+    toStringList(config('specPattern')),
+    toStringList(codeCoverageConfig?.exclude)
+  ]
 }
 
 function filterSupportFilesFromCoverage(

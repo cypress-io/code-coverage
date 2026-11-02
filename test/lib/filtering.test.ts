@@ -245,6 +245,80 @@ describe('filtering specs', () => {
         'C:\\user\\app\\src\\codeA.js': {}
       })
     })
+
+    // https://github.com/cypress-io/code-coverage/issues/472
+    it('treats negated specPattern entries as exclusions from the spec set', () => {
+      config.mockImplementation((key: string) => {
+        if (key === 'specPattern')
+          return ['**/*.feature', '!**/ignored/**/*.feature']
+        return undefined
+      })
+
+      const totalCoverage = {
+        '/user/app/src/codeA.js': {},
+        '/user/app/src/codeB.js': {},
+        '/user/app/features/login.feature': {},
+        '/user/app/features/ignored/legacy.feature': {}
+      }
+      const result = filterFilesFromCoverage(
+        totalCoverage,
+        config as any,
+        expose as any,
+        spec as any
+      )
+      expect(result).toEqual({
+        '/user/app/src/codeA.js': {},
+        '/user/app/src/codeB.js': {},
+        '/user/app/features/ignored/legacy.feature': {}
+      })
+    })
+
+    it('treats negated codeCoverage.exclude entries as exceptions', () => {
+      expose = vi.fn().mockReturnValue({
+        codeCoverage: {
+          exclude: ['src/**/*.js', '!src/keep/**']
+        }
+      })
+      config.mockImplementation((key: string) => {
+        if (key === 'specPattern') return '**/*.cy.js'
+        return undefined
+      })
+
+      const totalCoverage = {
+        '/user/app/src/codeA.js': {},
+        '/user/app/src/keep/codeB.js': {}
+      }
+      const result = filterFilesFromCoverage(
+        totalCoverage,
+        config as any,
+        expose as any,
+        spec as any
+      )
+      expect(result).toEqual({
+        '/user/app/src/keep/codeB.js': {}
+      })
+    })
+
+    it('does not let a negated specPattern entry keep a file codeCoverage.exclude removes', () => {
+      config.mockImplementation((key: string) => {
+        if (key === 'specPattern') return ['**/*.cy.js', '!cypress/ignored/**']
+        return undefined
+      })
+
+      const totalCoverage = {
+        '/user/app/cypress/ignored/helper.js': {},
+        '/user/app/src/codeA.js': {}
+      }
+      const result = filterFilesFromCoverage(
+        totalCoverage,
+        config as any,
+        expose as any,
+        spec as any
+      )
+      expect(result).toEqual({
+        '/user/app/src/codeA.js': {}
+      })
+    })
   })
 
   // https://github.com/cypress-io/code-coverage/issues/908

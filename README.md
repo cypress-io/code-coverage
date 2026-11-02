@@ -829,6 +829,8 @@ expose: {
 
 Cypress 10 and later users should set the `exclude` option to exclude any items from the `cypress` folder they don't want included in the coverage reports.
 
+Entries that start with `!` in `specPattern` or `exclude` are treated as exceptions to the other entries in the same list. For example, with `specPattern: ['**/*.feature', '!**/ignored/**/*.feature']`, only the `.feature` files outside `ignored` folders are removed from coverage. To skip spec files, prefer Cypress's [`excludeSpecPattern`](https://docs.cypress.io/app/references/configuration#excludeSpecPattern) option over negated `specPattern` entries.
+
 Additionally, you can use [`nyc` configuration](https://github.com/istanbuljs/nyc#common-configuration-options) and [include and exclude options](https://github.com/istanbuljs/nyc#using-include-and-exclude-arrays). You can include and exclude files using `minimatch` patterns in the `.nycrc` file or the "nyc" object inside your `package.json` file. Whichever you use, put it in the [same folder as your Cypress config file](#where-nyc-options-are-read-from).
 
 For example, if you want only to include files in the `app` folder but exclude the `app/util.js` file, you can set it in your `package.json`.

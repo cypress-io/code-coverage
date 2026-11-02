@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "cy:run": "cross-env NODE_ENV=test cypress run",
+    "cy:open": "cross-env NODE_ENV=test cypress open",
     "build": "cross-env NODE_ENV=test webpack && node -e \"require('fs').copyFileSync('index.html', 'dist/index.html')\"",
     "start": "serve -p 1234 dist",
     "pretest": "rimraf .nyc_output coverage dist",

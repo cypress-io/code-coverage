@@ -759,7 +759,7 @@ TypeScript source files should be automatically included in the report if they a
 If you bundle TypeScript with webpack, let `babel-loader` handle the `.ts` files so that Babel can strip the types and instrument the code in one pass:
 
 ```shell
-npm i -D webpack webpack-cli babel-loader @babel/core @babel/preset-typescript babel-plugin-istanbul
+npm i -D webpack webpack-cli babel-loader @babel/core @babel/preset-typescript babel-plugin-istanbul cross-env typescript
 ```
 
 ```js
@@ -817,7 +817,7 @@ module.exports = defineConfig({
     setupNodeEvents(on, config) {
       on(
         'file:preprocessor',
-        webpack({ webpackOptions: require('./webpack.config') })
+        webpack({ webpackOptions: { ...require('./webpack.config') } })
       )
       require('@cypress/code-coverage/task')(on, config)
       return config
@@ -831,7 +831,7 @@ module.exports = defineConfig({
 })
 ```
 
-`webpackOptions` takes a configuration object. If your `webpack.config.js` exports a function, or uses plugins that only the app build needs, such as `HtmlWebpackPlugin`, pass an object with just the `resolve` and `module` settings instead.
+The preprocessor overwrites `entry` and `output` on the object it receives, so pass a copy to keep the shared config intact for anything else in `cypress.config.js` that loads it. `webpackOptions` takes a configuration object. If your `webpack.config.js` exports a function, or uses plugins that only the app build needs, such as `HtmlWebpackPlugin`, pass an object with just the `resolve` and `module` settings instead.
 
 See [test-apps/webpack-ts](test-apps/webpack-ts) for a working example.
 

@@ -1,7 +1,7 @@
 // Node-side helpers for task.ts that need the file system
 
 /// <reference types="node" />
-import { readFileSync, writeFileSync, existsSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync, renameSync, rmSync } from 'fs'
 import { isAbsolute, resolve, join } from 'path'
 import debug from 'debug'
 import chalk from 'chalk'
@@ -29,6 +29,46 @@ export interface CoverageEntry {
 
 export interface CoverageMap {
   [key: string]: CoverageEntry
+}
+
+/**
+ * Writes the file through a temporary sibling and a rename, so other Cypress
+ * processes sharing the same nyc temp folder never read a half-written file.
+ */
+export function writeFileAtomic(filename: string, contents: string): void {
+  const tempFilename = `${filename}.${process.pid}.tmp`
+  try {
+    writeFileSync(tempFilename, contents, 'utf8')
+    renameSync(tempFilename, filename)
+  } catch (error) {
+    try {
+      rmSync(tempFilename, { force: true })
+    } catch {
+      log('could not remove temporary file %s', tempFilename)
+    }
+    throw error
+  }
+}
+
+/**
+ * Reads saved coverage, returning an empty object when the file is missing
+ * or not valid JSON, for example when an older plugin version or a crashed
+ * process left it truncated.
+ */
+export function readCoverageFile(filename: string): CoverageMapData {
+  if (!existsSync(filename)) {
+    return {}
+  }
+  try {
+    return JSON.parse(readFileSync(filename, 'utf8'))
+  } catch (error) {
+    console.warn(
+      '⚠️ Ignoring coverage file %s because it is not valid JSON: %s',
+      filename,
+      error instanceof Error ? error.message : String(error)
+    )
+    return {}
+  }
 }
 
 export function readNycOptions(workingDirectory: string): NycOptions {
@@ -209,11 +249,7 @@ export function resolveRelativePaths(nycFilename: string): void {
   if (changed) {
     log('resolveRelativePaths saving updated file %s', nycFilename)
     log('there are %d keys in the file', coverageKeys.length)
-    writeFileSync(
-      nycFilename,
-      JSON.stringify(nycCoverage, null, 2) + '\n',
-      'utf8'
-    )
+    writeFileAtomic(nycFilename, JSON.stringify(nycCoverage, null, 2) + '\n')
   }
 }
 
@@ -298,11 +334,7 @@ export function tryFindingLocalFiles(nycFilename: string): void {
   if (changed) {
     log('tryFindingLocalFiles saving updated file %s', nycFilename)
     log('there are %d keys in the file', coverageKeys.length)
-    writeFileSync(
-      nycFilename,
-      JSON.stringify(nycCoverage, null, 2) + '\n',
-      'utf8'
-    )
+    writeFileAtomic(nycFilename, JSON.stringify(nycCoverage, null, 2) + '\n')
   }
 }
 
@@ -410,11 +442,7 @@ export function includeAllFiles(
     log('includeAllFiles saving updated file %s', nycFilename)
     log('there are %d keys in the file', Object.keys(nycCoverage).length)
 
-    writeFileSync(
-      nycFilename,
-      JSON.stringify(nycCoverage, null, 2) + '\n',
-      'utf8'
-    )
+    writeFileAtomic(nycFilename, JSON.stringify(nycCoverage, null, 2) + '\n')
   }
 }
 

@@ -752,6 +752,28 @@ A few things to know:
 
 The [cypress-example-conduit-app](https://github.com/cypress-io/cypress-example-conduit-app) example follows the same steps on a different CI provider.
 
+### Several Cypress processes on one machine
+
+Tools such as `cypress-parallel` start several `cypress run` processes in the same project folder at once. By default they all share one `.nyc_output/out.json`. The plugin writes that file atomically, so a process never reads a half-written file. But each process saves the coverage it has collected, so a process that saves later replaces coverage that another process saved after it started, and the final report can miss some of your specs.
+
+To keep every process's coverage, give each process its own temp folder in `nyc.config.js`, next to your Cypress config:
+
+```js
+module.exports = {
+  'temp-dir': `.nyc_output-${process.pid}`
+}
+```
+
+Each process still writes a report from its own coverage. After all processes finish, copy their files into one folder and report on it:
+
+```shell
+rm -rf .nyc_output && mkdir .nyc_output
+for dir in .nyc_output-*; do cp "$dir/out.json" ".nyc_output/${dir#.nyc_output-}.json"; done
+npx nyc report --temp-dir .nyc_output --reporter=lcov --reporter=text-summary
+```
+
+Delete the `.nyc_output-*` folders before each run, so coverage from older runs isn't merged in. See [#589](https://github.com/cypress-io/code-coverage/issues/589).
+
 ## TypeScript users
 
 TypeScript source files should be automatically included in the report if they are instrumented.

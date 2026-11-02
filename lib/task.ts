@@ -4,7 +4,7 @@ import {
   CoverageMap as IstanbulCoverageMap
 } from 'istanbul-lib-coverage'
 import { join, resolve } from 'path'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync } from 'fs'
 import execa from 'execa'
 import {
   showNycInfo,
@@ -13,7 +13,9 @@ import {
   tryFindingLocalFiles,
   readNycOptions,
   includeAllFiles,
-  checkCoverageThresholds
+  checkCoverageThresholds,
+  readCoverageFile,
+  writeFileAtomic
 } from './task-utils'
 import { fixSourcePaths } from './support-utils'
 import debug from 'debug'
@@ -64,12 +66,9 @@ const nycReportOptions = (function getNycOption() {
 
 const nycFilename = join(nycReportOptions['temp-dir'] as string, 'out.json')
 
-let coverageMap: IstanbulCoverageMap = (() => {
-  const previousCoverage = existsSync(nycFilename)
-    ? JSON.parse(readFileSync(nycFilename, 'utf8'))
-    : {}
-  return createCoverageMap(previousCoverage)
-})()
+let coverageMap: IstanbulCoverageMap = createCoverageMap(
+  readCoverageFile(nycFilename)
+)
 
 function saveCoverage(coverage: unknown): void {
   if (!existsSync(nycReportOptions.tempDir as string)) {
@@ -77,7 +76,7 @@ function saveCoverage(coverage: unknown): void {
     log('created folder %s for output coverage', nycReportOptions.tempDir)
   }
 
-  writeFileSync(nycFilename, JSON.stringify(coverage, null, 2))
+  writeFileAtomic(nycFilename, JSON.stringify(coverage, null, 2))
 }
 
 function maybePrintFinalCoverageFiles(folder: string): void {

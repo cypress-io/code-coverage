@@ -1,7 +1,6 @@
 const { defineConfig } = require('cypress')
 
 module.exports = defineConfig({
-  allowCypressEnv: false,
   fixturesFolder: false,
   viewportHeight: 400,
   viewportWidth: 400,

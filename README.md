@@ -773,6 +773,28 @@ For example, to ensure the final report includes all JS files from the "src/page
 }
 ```
 
+By default, the plugin adds each file that no test loaded as an empty placeholder. The file shows up in the report, but with no lines, statements, or functions to count, so it doesn't lower your totals. You notice this most with bundlers such as Vite, which only instrument the modules a test actually imports ([#539](https://github.com/cypress-io/code-coverage/issues/539)).
+
+To count those files as 0% covered instead, set `instrumentUnloadedFiles: true` in the `expose.codeCoverage` object:
+
+```js
+// cypress.config.js
+module.exports = defineConfig({
+  expose: {
+    codeCoverage: {
+      instrumentUnloadedFiles: true
+    }
+  }
+})
+```
+
+When the report is generated, the plugin reads each missing file from disk and instruments it with [istanbul-lib-instrument](https://github.com/istanbuljs/istanbuljs/tree/main/packages/istanbul-lib-instrument), so the report lists its real statements, functions, and branches with zero hits. A few things to know:
+
+- Turning this on lowers your reported percentages, and coverage thresholds you already meet can start failing.
+- JavaScript, JSX, and TypeScript files (`.ts`, `.tsx`, `.mts`, `.cts`) are supported. If you set NYC's `parser-plugins`, the plugin uses them to parse the files.
+- Files the parser can't read on its own, such as `.vue` or `.svelte` single-file components, still get an empty placeholder. Run `DEBUG=code-coverage` to see which files fell back.
+- The counts come from your source files, not from your bundler's output, so they can differ a little from what the same file reports once a test loads it.
+
 See example [test-app/all-files](./test-apps/all-files)
 
 ## Exclude code
@@ -842,7 +864,7 @@ For example, if you want only to include files in the `app` folder but exclude t
 }
 ```
 
-**Note:** If you have the `all: true` NYC option set, this plugin will check the produced `.nyc_output/out.json` before generating the final report. If the `out.json` file does not have information for some files that should be there according to the `include` list, then an empty placeholder will be included. See [PR 208](https://github.com/cypress-io/code-coverage/pull/208).
+**Note:** If you have the `all: true` NYC option set, this plugin will check the produced `.nyc_output/out.json` before generating the final report. If the `out.json` file does not have information for some files that should be there according to the `include` list, then an empty placeholder will be included, or a 0% entry if you turn on [`instrumentUnloadedFiles`](#include-code). See [PR 208](https://github.com/cypress-io/code-coverage/pull/208).
 
 Another important option is `excludeAfterRemap`. By default, it is false, which might let excluded files through. If you exclude the files, and the instrumenter does not respect the `nyc.exclude` setting, then add `excludeAfterRemap: true` to tell `nyc report` to exclude files. See [test-apps/exclude-files](test-apps/exclude-files).
 

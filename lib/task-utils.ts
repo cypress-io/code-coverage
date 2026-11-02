@@ -2,7 +2,7 @@
 
 /// <reference types="node" />
 import { readFileSync, writeFileSync, existsSync } from 'fs'
-import { isAbsolute, resolve, join } from 'path'
+import { isAbsolute, resolve, join, extname } from 'path'
 import debug from 'debug'
 import chalk from 'chalk'
 import { globSync } from 'tinyglobby'
@@ -354,6 +354,75 @@ function findSourceFiles(nycOptions: NycOptions): string[] {
   return allFiles
 }
 
+interface Instrumenter {
+  instrumentSync(code: string, filename: string): string
+  lastFileCoverage(): FileCoverageData
+}
+
+interface IstanbulLibInstrument {
+  createInstrumenter(options: Record<string, unknown>): Instrumenter
+  defaultOpts: { parserPlugins: string[] }
+}
+
+const typeScriptExtensions = ['.ts', '.mts', '.cts', '.tsx']
+
+function parserPluginsFor(fullPath: string, nycOptions: NycOptions): string[] {
+  const { defaultOpts } =
+    require('istanbul-lib-instrument') as IstanbulLibInstrument
+  const configured = nycOptions['parser-plugins'] ?? nycOptions.parserPlugins
+  const plugins: string[] = Array.isArray(configured)
+    ? [...configured]
+    : [...defaultOpts.parserPlugins]
+
+  const extension = extname(fullPath)
+  if (typeScriptExtensions.includes(extension)) {
+    plugins.push('typescript')
+  }
+  // the "typescript" parser plugin reads `<T>(x) => x` in a .ts file as a
+  // generic arrow function, so JSX is only turned on where it can appear
+  if (extension === '.tsx' || !typeScriptExtensions.includes(extension)) {
+    plugins.push('jsx')
+  }
+  return [...new Set(plugins)]
+}
+
+/**
+ * Instruments a source file without running it, returning its coverage
+ * object with every counter at zero. Returns null if the file can't be parsed,
+ * for example a `.vue` single-file component.
+ */
+export function initialFileCoverage(
+  fullPath: string,
+  nycOptions: NycOptions
+): FileCoverageData | null {
+  const { createInstrumenter } =
+    require('istanbul-lib-instrument') as IstanbulLibInstrument
+  try {
+    const instrumenter = createInstrumenter({
+      esModules: true,
+      produceSourceMap: false,
+      parserPlugins: parserPluginsFor(fullPath, nycOptions)
+    })
+    instrumenter.instrumentSync(readFileSync(fullPath, 'utf8'), fullPath)
+    return instrumenter.lastFileCoverage()
+  } catch (error) {
+    log(
+      'could not instrument %s, using an empty placeholder: %s',
+      fullPath,
+      error instanceof Error ? error.message : String(error)
+    )
+    return null
+  }
+}
+
+export interface IncludeAllFilesOptions {
+  /**
+   * Instrument the files that no test loaded, so they count as 0% covered
+   * instead of being added as empty placeholders that don't change the totals
+   */
+  instrumentUnloadedFiles?: boolean
+}
+
 /**
  * If the website or unit tests did not load ALL files we need to
  * include, then we should include the missing files ourselves
@@ -363,7 +432,8 @@ function findSourceFiles(nycOptions: NycOptions): string[] {
  */
 export function includeAllFiles(
   nycFilename: string,
-  nycOptions: NycOptions
+  nycOptions: NycOptions,
+  { instrumentUnloadedFiles = false }: IncludeAllFilesOptions = {}
 ): void {
   if (!nycOptions.all) {
     log('NYC "all" option is not set, skipping including all files')
@@ -399,11 +469,20 @@ export function includeAllFiles(
     if (coveredPaths.includes(fullPath)) {
       return
     }
-    log('adding empty coverage for file %s', fullPath)
     changed = true
-    const placeholder = fileCoveragePlaceholder(fullPath)
+    const initialCoverage = instrumentUnloadedFiles
+      ? initialFileCoverage(fullPath, nycOptions)
+      : null
+    if (initialCoverage) {
+      log('adding zero coverage for file %s', fullPath)
+      nycCoverage[fullPath] = initialCoverage
+      return
+    }
 
-    nycCoverage[fullPath] = placeholder as FileCoverageData
+    log('adding empty coverage for file %s', fullPath)
+    nycCoverage[fullPath] = fileCoveragePlaceholder(
+      fullPath
+    ) as FileCoverageData
   })
 
   if (changed) {

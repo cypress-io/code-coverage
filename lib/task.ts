@@ -62,6 +62,8 @@ const nycReportOptions = (function getNycOption() {
   return nycReportOptions
 })()
 
+let instrumentUnloadedFiles = false
+
 const nycFilename = join(nycReportOptions['temp-dir'] as string, 'out.json')
 
 let coverageMap: IstanbulCoverageMap = (() => {
@@ -219,7 +221,9 @@ const tasks = {
 
     if (nycReportOptions.all) {
       log('nyc needs to report on all included files')
-      includeAllFiles(nycFilename, nycReportOptions)
+      includeAllFiles(nycFilename, nycReportOptions, {
+        instrumentUnloadedFiles
+      })
     }
 
     log('calling NYC reporter with options %o', nycReportOptions)
@@ -257,8 +261,9 @@ export = function registerCodeCoverageTasks(
   on('task', tasks)
 
   const codeCoverageConfig = config.expose.codeCoverage as
-    | { checkCoverage?: boolean }
+    | { checkCoverage?: boolean; instrumentUnloadedFiles?: boolean }
     | undefined
+  instrumentUnloadedFiles = codeCoverageConfig?.instrumentUnloadedFiles === true
   if (codeCoverageConfig?.checkCoverage === true) {
     on('after:run', checkCoverageAfterRun)
   } else if (

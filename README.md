@@ -122,6 +122,63 @@ SWC plugins only load in the SWC version they were built for, and a mismatch mak
 
 See [test-apps/swc-webpack](test-apps/swc-webpack) for a complete example.
 
+### Instrument an Angular app
+
+Angular CLI ignores `.babelrc` and `babel.config.json`, so adding `babel-plugin-istanbul` there has no effect. Angular 17 and later build with the esbuild-based `application` builder by default, which has no option to add Istanbul. One way to instrument the app is to switch the `build` and `serve` targets in `angular.json` to the webpack-based builders from [@angular-builders/custom-webpack](https://github.com/just-jeb/angular-builders/tree/master/packages/custom-webpack), then add a loader that instruments your TypeScript source after Angular compiles it.
+
+Install the builder with the same major version as your Angular release (18 in this example), plus the loader and the Istanbul plugin:
+
+```shell
+npm i -D @angular-builders/custom-webpack@18 babel-loader babel-plugin-istanbul
+```
+
+Then create the webpack config:
+
+```js
+// coverage.webpack.js
+const path = require('path')
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        include: path.join(__dirname, 'src'),
+        exclude: /\.spec\.ts$/,
+        enforce: 'post',
+        use: {
+          loader: 'babel-loader',
+          options: { plugins: ['istanbul'] }
+        }
+      }
+    ]
+  }
+}
+```
+
+Instrumented code is slower and larger, so point to it from a separate `coverage` configuration instead of the default `options`. Add it to both the `build` and `serve` targets in `angular.json`, replacing `my-app` with your project name:
+
+```json
+"build": {
+  "configurations": {
+    "coverage": {
+      "optimization": false,
+      "sourceMap": true,
+      "customWebpackConfig": { "path": "./coverage.webpack.js" }
+    }
+  }
+},
+"serve": {
+  "configurations": {
+    "coverage": { "buildTarget": "my-app:build:coverage" }
+  }
+}
+```
+
+Then start the app with `ng serve --configuration coverage` before running Cypress.
+
+The `custom-webpack:browser` builder takes `main` where the `application` builder takes `browser`, so rename that option when you switch. Setting options such as `env.coverage` or `instrument` in your Cypress config doesn't instrument anything. Check for `window.__coverage__` in the app as described above.
+
 ### More information
 
 - Read [Cypress Code Coverage: Instrumenting code](https://on.cypress.io/code-coverage#Instrumenting-code) guide

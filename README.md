@@ -793,9 +793,15 @@ module.exports = {
 }
 ```
 
-Instrumented code is slower and larger, so the `env` block only adds `istanbul` when `NODE_ENV` (or `BABEL_ENV`) is `test`. Set it for the build you run Cypress against, for example `NODE_ENV=test webpack`. Babel doesn't type-check, so run `tsc --noEmit` separately if you need it.
+Instrumented code is slower and larger, so the `env` block only adds `istanbul` when the Babel env is `test`. Babel reads `BABEL_ENV` first and falls back to `NODE_ENV` only when `BABEL_ENV` is unset, so if your environment already sets `BABEL_ENV`, set that one instead. Set it for the build you run Cypress against, for example `npx cross-env NODE_ENV=test webpack`. [cross-env](https://github.com/kentcdodds/cross-env) makes the variable work in Windows shells too. Babel doesn't type-check, so run `tsc --noEmit` separately if you need it.
 
-To also collect coverage from TypeScript files that your specs import directly, install [@cypress/webpack-preprocessor](https://github.com/cypress-io/cypress/tree/develop/npm/webpack-preprocessor) and bundle the specs with the same webpack config. Run Cypress with `NODE_ENV=test` too, so the specs are bundled with instrumentation. The plugin leaves spec and support files out of the report, so you don't need to exclude them.
+To also collect coverage from TypeScript files that your specs import directly, bundle the specs with the same webpack config through [@cypress/webpack-preprocessor](https://github.com/cypress-io/cypress/tree/develop/npm/webpack-preprocessor):
+
+```shell
+npm i -D @cypress/webpack-preprocessor @babel/preset-env
+```
+
+Run Cypress with the Babel env set to `test` too, so the specs are bundled with instrumentation. Specs and the support file are left out of the report automatically. Other files under `cypress/` that the specs import, such as `cypress/support/commands.ts`, are instrumented and reported unless you exclude them:
 
 ```js
 // cypress.config.js
@@ -811,10 +817,17 @@ module.exports = defineConfig({
       )
       require('@cypress/code-coverage/task')(on, config)
       return config
+    },
+    expose: {
+      codeCoverage: {
+        exclude: ['cypress/**/*.*']
+      }
     }
   }
 })
 ```
+
+`webpackOptions` takes a configuration object. If your `webpack.config.js` exports a function, or uses plugins that only the app build needs, such as `HtmlWebpackPlugin`, pass an object with just the `resolve` and `module` settings instead.
 
 See [test-apps/webpack-ts](test-apps/webpack-ts) for a working example.
 

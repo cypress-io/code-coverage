@@ -17,6 +17,11 @@ module.exports = defineConfig({
       )
       require('@cypress/code-coverage/task')(on, config)
       return config
+    },
+    expose: {
+      codeCoverage: {
+        exclude: ['cypress/**/*.*']
+      }
     }
   }
 })

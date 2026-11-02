@@ -13,6 +13,7 @@ import {
   fileCoveragePlaceholder,
   type NycOptions
 } from './common-utils'
+import type { CoverageObject } from './support-utils'
 import type {
   CoverageMap as IstanbulCoverageMap,
   CoverageMapData,
@@ -29,6 +30,60 @@ export interface CoverageEntry {
 
 export interface CoverageMap {
   [key: string]: CoverageEntry
+}
+
+export type BackendCoverageResult =
+  | { coverage: CoverageObject }
+  | { reason: string }
+
+/**
+ * Fetches coverage from a backend's coverage endpoint in Node, so it doesn't
+ * have to pass through the browser. Any failure returns a reason instead of
+ * throwing, because the caller falls back to `cy.request`, which can still
+ * succeed where Node can't (browser cookies, Cypress proxy settings).
+ */
+export async function requestBackendCoverage(
+  url: string,
+  baseUrl: string | undefined,
+  timeout: number,
+  fetchImpl: typeof fetch = fetch
+): Promise<BackendCoverageResult> {
+  let target: URL
+  try {
+    target = new URL(url, baseUrl)
+  } catch {
+    return { reason: `could not resolve ${url} against ${baseUrl}` }
+  }
+
+  try {
+    const response = await fetchImpl(target, {
+      signal: AbortSignal.timeout(timeout)
+    })
+    if (!response.ok) {
+      return { reason: `${target} responded with ${response.status}` }
+    }
+    const body = (await response.json()) as { coverage?: unknown } | null
+    const coverage = body?.coverage
+    if (!coverage || typeof coverage !== 'object') {
+      return { reason: `${target} did not return a coverage object` }
+    }
+    return { coverage: coverage as CoverageObject }
+  } catch (err) {
+    return { reason: `could not fetch ${target}: ${(err as Error).message}` }
+  }
+}
+
+export function pickFileCoverage(
+  coverage: CoverageObject,
+  files: string[]
+): CoverageObject {
+  const picked: CoverageObject = {}
+  for (const file of files) {
+    if (Object.prototype.hasOwnProperty.call(coverage, file)) {
+      picked[file] = coverage[file]
+    }
+  }
+  return picked
 }
 
 export function readNycOptions(workingDirectory: string): NycOptions {

@@ -13,9 +13,12 @@ import {
   tryFindingLocalFiles,
   readNycOptions,
   includeAllFiles,
-  checkCoverageThresholds
+  checkCoverageThresholds,
+  requestBackendCoverage,
+  pickFileCoverage
 } from './task-utils'
-import { fixSourcePaths } from './support-utils'
+import type { CoverageMapData } from 'istanbul-lib-coverage'
+import { fixSourcePaths, type CoverageObject } from './support-utils'
 import debug from 'debug'
 
 const log = debug('code-coverage')
@@ -152,6 +155,21 @@ interface TaskParams {
   isInteractive?: boolean
 }
 
+interface FetchBackendCoverageParams {
+  url: string
+  baseUrl?: string
+  timeout: number
+}
+
+interface CombineBackendCoverageParams {
+  url: string
+  files: string[]
+}
+
+// Held between fetchBackendCoverage and combineBackendCoverage so the browser
+// only has to see file names to apply its spec and support file filters
+const fetchedBackendCoverage = new Map<string, CoverageObject>()
+
 const tasks = {
   /**
    * Clears accumulated code coverage information.
@@ -185,6 +203,49 @@ const tasks = {
     fixSourcePaths(coverage)
 
     coverageMap.merge(coverage)
+
+    return null
+  },
+
+  /**
+   * Fetches a backend's coverage in Node and keeps it until
+   * combineBackendCoverage merges it.
+   *
+   * @returns The covered file names, or null when Node couldn't get the
+   * coverage and the browser should fall back to `cy.request`
+   */
+  async fetchBackendCoverage({
+    url,
+    baseUrl,
+    timeout
+  }: FetchBackendCoverageParams): Promise<string[] | null> {
+    fetchedBackendCoverage.delete(url)
+    const result = await requestBackendCoverage(url, baseUrl, timeout)
+    if ('reason' in result) {
+      log('%s, falling back to cy.request', result.reason)
+      return null
+    }
+    log('fetched backend coverage from %s', url)
+    fetchedBackendCoverage.set(url, result.coverage)
+    return Object.keys(result.coverage)
+  },
+
+  /**
+   * Merges the listed files from coverage fetched by fetchBackendCoverage.
+   *
+   * @param files File names left after the browser filtered out specs and
+   * support files
+   */
+  combineBackendCoverage({ url, files }: CombineBackendCoverageParams): null {
+    const coverage = fetchedBackendCoverage.get(url)
+    if (!coverage) {
+      throw new Error(`No backend coverage was fetched from ${url}`)
+    }
+    fetchedBackendCoverage.delete(url)
+
+    const picked = pickFileCoverage(coverage, files)
+    fixSourcePaths(picked)
+    coverageMap.merge(picked as unknown as CoverageMapData)
 
     return null
   },

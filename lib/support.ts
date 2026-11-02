@@ -202,6 +202,36 @@ function registerHooks(): void {
         '/__coverage__'
       )
       function captureCoverage(url: string, suffix = ''): void {
+        const pathname = `backend${suffix}`
+        cy.task<string[] | null>(
+          'fetchBackendCoverage',
+          {
+            url,
+            baseUrl,
+            timeout: Cypress.config('responseTimeout')
+          },
+          { log: false }
+        ).then((files) => {
+          if (!files) {
+            requestCoverage(url, pathname)
+            return
+          }
+          logMessage(`Saving code coverage for **${pathname}**`)
+          const placeholders = Object.fromEntries(
+            files.map((file) => [file, {}])
+          )
+          const keptFiles = Object.keys(filterFilesFromCoverage(placeholders))
+          cy.task(
+            'combineBackendCoverage',
+            { url, files: keptFiles },
+            { log: false }
+          )
+        })
+      }
+
+      // Unlike Node, cy.request sends the browser's cookies and goes through
+      // the Cypress proxy, so some backends are only reachable this way
+      function requestCoverage(url: string, pathname: string): void {
         cy.request({
           url,
           log: false,
@@ -225,7 +255,7 @@ function registerHooks(): void {
                 return
               }
             }
-            sendCoverage(coverage, `backend${suffix}`)
+            sendCoverage(coverage, pathname)
           })
       }
 

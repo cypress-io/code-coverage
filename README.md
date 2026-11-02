@@ -1108,7 +1108,7 @@ it('loads an instrumented app', () => {
 
 ### `window.__coverage__` exists but the report is empty
 
-If DevTools shows `window.__coverage__` on your page but `.nyc_output/out.json` is empty, your app probably creates the coverage object after the page's `load` event. That happens when the only instrumented files load later, for example route components that Nuxt or Vue Router import lazily, or code that runs during hydration. Versions before 4.1.2 only read the coverage object on `load`, so they missed it. Upgrade to 4.1.2 or later, which reads each page again before it unloads and at the end of each test. See [#843](https://github.com/cypress-io/code-coverage/issues/843).
+If DevTools shows `window.__coverage__` on your page but `.nyc_output/out.json` is empty, your app probably creates the coverage object after the page's `load` event. That happens when the only instrumented files load later, for example route components that Nuxt or Vue Router import lazily, or code that runs during hydration. Versions before 4.1.2 read the coverage object only on `load` and at the start of each test, so they missed it. Upgrade to 4.1.2 or later, which reads each page again before it unloads and at the end of each test. If you're on 3.x, follow the [3.x to 4.x migration](#cypresscode-coverage-3x-to-4x) first. See [#843](https://github.com/cypress-io/code-coverage/issues/843).
 
 ### Coverage reporting timeouts
 

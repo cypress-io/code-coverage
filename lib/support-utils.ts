@@ -137,6 +137,32 @@ function filterSupportFilesFromCoverage(
   return coverage
 }
 
+const isUrl = (p: string): boolean => /^[a-z][a-z\d+.-]*:\/\//i.test(p)
+
+const isAbsolutePath = (p: string): boolean =>
+  /^([a-z]:)?[\\/]/i.test(p) || isUrl(p)
+
+/**
+ * Bundlers that split one source file into several generated files (e.g. Qwik's
+ * `example.tsx_Component_onClick_hash.js` segments) name them after the source,
+ * so a project-relative source such as `src/example.tsx` shows up verbatim in
+ * the generated file's absolute path. Recover the source's absolute path from
+ * there, since nothing else in the browser knows the project root.
+ */
+function resolveFromGeneratedPath(
+  source: string,
+  absolutePath: string
+): string | undefined {
+  const relativeSource = source.replace(/^\.\//, '')
+  const normalizedPath = absolutePath.replace(/\\/g, '/')
+  const start = normalizedPath.lastIndexOf(`/${relativeSource}`)
+  if (start === -1) return
+
+  const end = start + 1 + relativeSource.length
+  const isInFileName = !normalizedPath.includes('/', end)
+  return isInFileName ? absolutePath.slice(0, end) : undefined
+}
+
 /**
  * Replace source-map's path by the corresponding absolute file path
  * (coverage report wouldn't work with source-map path being relative
@@ -149,11 +175,26 @@ export function fixSourcePaths(coverage: CoverageObject): void {
     const fileNameMatch = /([^\/\\]+)$/.exec(absolutePath)
     if (!fileNameMatch) return
     const fileName = fileNameMatch[1]
+    const sourceRoot = inputSourceMap.sourceRoot
 
-    if (inputSourceMap.sourceRoot) inputSourceMap.sourceRoot = ''
-    inputSourceMap.sources = inputSourceMap.sources.map((source) =>
-      source.includes(fileName) ? absolutePath : source
-    )
+    // sourceRoot gets cleared below, so fold it into each relative source
+    // first. URL roots such as `webpack://` don't point at files on disk.
+    const withSourceRoot = (source: string): string =>
+      sourceRoot && !isUrl(sourceRoot) && !isAbsolutePath(source)
+        ? `${sourceRoot.replace(/[\\/]+$/, '')}/${source}`
+        : source
+
+    inputSourceMap.sources = inputSourceMap.sources.map((source) => {
+      if (source.includes(fileName)) return absolutePath
+
+      const rootedSource = withSourceRoot(source)
+      if (isAbsolutePath(rootedSource)) return rootedSource
+
+      return (
+        resolveFromGeneratedPath(rootedSource, absolutePath) ?? rootedSource
+      )
+    })
+    if (sourceRoot) inputSourceMap.sourceRoot = ''
   })
 }
 

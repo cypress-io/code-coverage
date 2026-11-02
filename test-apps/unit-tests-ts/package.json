@@ -1,0 +1,10 @@
+{
+  "name": "example-unit-tests-ts",
+  "description": "Run unit tests written using TypeScript",
+  "scripts": {
+    "pretest": "rimraf .nyc_output .cache coverage dist",
+    "test": "cypress run",
+    "coverage:verify": "npx nyc report --check-coverage true --lines 100",
+    "coverage:check-files": "check-coverage misc.ts math.ts && only-covered misc.ts math.ts"
+  }
+}

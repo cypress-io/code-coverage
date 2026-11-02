@@ -30,4 +30,22 @@ describe('use-babelrc', () => {
     expect(bundle).toContain('__coverage__')
     expect(bundle).toContain(JSON.stringify(path.join(fixtures, 'math.ts')))
   }, 60_000)
+
+  it('keeps resolving .js files when a .ts file sits next to them', async () => {
+    // this .babelrc has no TypeScript preset, so bundling math.ts would fail
+    const jsFixtures = path.join(__dirname, '__fixtures__', 'use-babelrc-js')
+    outDir = mkdtempSync(path.join(tmpdir(), 'use-babelrc-'))
+    const file = Object.assign(new EventEmitter(), {
+      filePath: path.join(jsFixtures, 'spec.cy.js'),
+      outputPath: path.join(outDir, 'spec.js'),
+      shouldWatch: false
+    }) as unknown as Cypress.FileObject
+
+    const bundle = readFileSync(await preprocessor(file), 'utf8')
+
+    expect(bundle).toContain(JSON.stringify(path.join(jsFixtures, 'math.js')))
+    expect(bundle).not.toContain(
+      JSON.stringify(path.join(jsFixtures, 'math.ts'))
+    )
+  }, 60_000)
 })

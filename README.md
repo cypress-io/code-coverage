@@ -418,6 +418,8 @@ The code coverage from spec files will be combined with end-to-end coverage.
 }
 ```
 
+Imports without an extension resolve to a `.js` file before a `.ts` file. If your build writes compiled `.js` files next to your `.ts` sources, delete them before running the specs, or the report covers the compiled files instead of your sources.
+
 Find examples of just the unit tests with collected code coverage in [test-apps/unit-tests-js](./test-apps/unit-tests-js) (JavaScript) and [test-apps/unit-tests-ts](./test-apps/unit-tests-ts) (TypeScript).
 
 ## Instrument backend code

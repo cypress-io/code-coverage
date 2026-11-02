@@ -8,7 +8,7 @@
   - `task.ts` — Node side. Registers the `cy.task` handlers that reset, combine, and report coverage (`./task`).
   - `support.ts` — browser side. Hooks into the test lifecycle and sends `window.__coverage__` to the tasks (`./support`).
   - `plugins.ts`, `use-babelrc.ts` — helper entry points (`./plugins`, `./use-babelrc`).
-  - `common-utils.ts`, `support-utils.ts`, `task-utils.ts` — shared logic. Put testable logic here, not in the entry points.
+  - `common-utils.ts`, `support-utils.ts`, `task-utils.ts`, `use-babelrc-utils.ts` — shared logic. Put testable logic here, not in the entry points.
 - `middleware/` — Express, Hapi, and Next.js handlers that expose backend coverage at `/__coverage__`.
 - `test/lib/` — Vitest unit tests, with fixtures in `test/lib/__fixtures__/`.
 - `test-apps/` — end-to-end example apps. Each one is a real Cypress project that exercises one scenario and checks the resulting coverage.

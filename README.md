@@ -752,6 +752,12 @@ A few things to know:
 
 The [cypress-example-conduit-app](https://github.com/cypress-io/cypress-example-conduit-app) example follows the same steps on a different CI provider.
 
+### Workers on one machine
+
+`cypress run --workers` runs specs in several processes on the same machine. Each worker saves its coverage to its own file, `.nyc_output/out-<worker index>.json`, and the plugin writes one report from all of them after the last spec finishes. `checkCoverage` thresholds are checked against that combined report.
+
+This needs a Cypress version that passes `workerIndex` to `setupNodeEvents`. Delete `.nyc_output` before each run, as you would without workers, so files left by an earlier run with more workers aren't merged in. If you also split specs across CI machines, save every file in `.nyc_output` from each machine, not only `out.json`.
+
 ## TypeScript users
 
 TypeScript source files should be automatically included in the report if they are instrumented.

@@ -4,7 +4,13 @@ import {
   CoverageMap as IstanbulCoverageMap
 } from 'istanbul-lib-coverage'
 import { join, resolve } from 'path'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  renameSync,
+  writeFileSync
+} from 'fs'
 import execa from 'execa'
 import {
   showNycInfo,
@@ -62,14 +68,16 @@ const nycReportOptions = (function getNycOption() {
   return nycReportOptions
 })()
 
-const nycFilename = join(nycReportOptions['temp-dir'] as string, 'out.json')
+// Set when "cypress run --workers" runs specs in several processes at once
+let workerIndex: number | null = null
+let nycFilename = join(nycReportOptions['temp-dir'] as string, 'out.json')
+let coverageMap: IstanbulCoverageMap = createCoverageMap({})
 
-let coverageMap: IstanbulCoverageMap = (() => {
-  const previousCoverage = existsSync(nycFilename)
-    ? JSON.parse(readFileSync(nycFilename, 'utf8'))
-    : {}
-  return createCoverageMap(previousCoverage)
-})()
+function loadCoverage(): void {
+  coverageMap = createCoverageMap(
+    existsSync(nycFilename) ? JSON.parse(readFileSync(nycFilename, 'utf8')) : {}
+  )
+}
 
 function saveCoverage(coverage: unknown): void {
   if (!existsSync(nycReportOptions.tempDir as string)) {
@@ -77,7 +85,10 @@ function saveCoverage(coverage: unknown): void {
     log('created folder %s for output coverage', nycReportOptions.tempDir)
   }
 
-  writeFileSync(nycFilename, JSON.stringify(coverage, null, 2))
+  // nyc reads every file in the temp folder, so a half-written one would be merged as empty
+  const tempFilename = `${nycFilename}.${process.pid}.tmp`
+  writeFileSync(tempFilename, JSON.stringify(coverage, null, 2))
+  renameSync(tempFilename, nycFilename)
 }
 
 function maybePrintFinalCoverageFiles(folder: string): void {
@@ -130,8 +141,11 @@ async function checkCoverageAfterRun(): Promise<void> {
     )
     return
   }
-  if (!existsSync(nycFilename)) {
-    log('skipping coverage threshold check, cannot find %s', nycFilename)
+  // Under --workers, worker 0 may have run no specs and have no file of its own
+  const coverageOutput =
+    workerIndex == null ? nycFilename : (nycReportOptions.tempDir as string)
+  if (!existsSync(coverageOutput)) {
+    log('skipping coverage threshold check, cannot find %s', coverageOutput)
     return
   }
 
@@ -191,7 +205,9 @@ const tasks = {
 
   /**
    * Saves the coverage to the nyc output file and generates the report,
-   * using the "coverage:report" script when package.json has one
+   * using the "coverage:report" script when package.json has one.
+   * With "--workers", each worker only saves its own coverage, and the report
+   * is generated once from "after:run".
    */
   coverageReport(): Promise<string | null> {
     saveCoverage(coverageMap)
@@ -205,38 +221,47 @@ const tasks = {
 
     resolveRelativePaths(nycFilename)
 
-    if (customNycReportScript) {
-      log(
-        'saving coverage report using script "%s" from package.json, command: %s',
-        DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME,
-        customNycReportScript
-      )
-      log('current working directory is %s', process.cwd())
-      return execa('npm', ['run', DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME], {
-        stdio: 'inherit'
-      }).then(() => null)
-    }
-
-    if (nycReportOptions.all) {
+    if (!customNycReportScript && nycReportOptions.all) {
       log('nyc needs to report on all included files')
       includeAllFiles(nycFilename, nycReportOptions)
     }
 
-    log('calling NYC reporter with options %o', nycReportOptions)
-    log('current working directory is %s', process.cwd())
-    const NYC = require('nyc')
-    const nyc = new NYC(nycReportOptions)
-
-    const returnReportFolder = (): string => {
-      const reportFolder = nycReportOptions['report-dir'] as string
-      log('after reporting, returning the report folder name %s', reportFolder)
-
-      maybePrintFinalCoverageFiles(reportFolder)
-
-      return reportFolder
+    if (workerIndex != null) {
+      log('worker %d saved its coverage to %s', workerIndex, nycFilename)
+      return Promise.resolve(null)
     }
-    return nyc.report().then(returnReportFolder)
+
+    return generateReport()
   }
+}
+
+function generateReport(): Promise<string | null> {
+  if (customNycReportScript) {
+    log(
+      'saving coverage report using script "%s" from package.json, command: %s',
+      DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME,
+      customNycReportScript
+    )
+    log('current working directory is %s', process.cwd())
+    return execa('npm', ['run', DEFAULT_CUSTOM_COVERAGE_SCRIPT_NAME], {
+      stdio: 'inherit'
+    }).then(() => null)
+  }
+
+  log('calling NYC reporter with options %o', nycReportOptions)
+  log('current working directory is %s', process.cwd())
+  const NYC = require('nyc')
+  const nyc = new NYC(nycReportOptions)
+
+  const returnReportFolder = (): string => {
+    const reportFolder = nycReportOptions['report-dir'] as string
+    log('after reporting, returning the report folder name %s', reportFolder)
+
+    maybePrintFinalCoverageFiles(reportFolder)
+
+    return reportFolder
+  }
+  return nyc.report().then(returnReportFolder)
 }
 
 /**
@@ -254,16 +279,41 @@ export = function registerCodeCoverageTasks(
   on: Cypress.PluginEvents,
   config: Cypress.PluginConfigOptions
 ): Cypress.PluginConfigOptions {
+  // Each worker saves to its own file, since workers finish specs at the same time
+  workerIndex =
+    'workerIndex' in config && typeof config.workerIndex === 'number'
+      ? config.workerIndex
+      : null
+  if (workerIndex != null) {
+    nycFilename = join(
+      nycReportOptions['temp-dir'] as string,
+      `out-${workerIndex}.json`
+    )
+  }
+  loadCoverage()
+
   on('task', tasks)
 
   const codeCoverageConfig = config.expose.codeCoverage as
     | { checkCoverage?: boolean }
     | undefined
-  if (codeCoverageConfig?.checkCoverage === true) {
-    on('after:run', checkCoverageAfterRun)
-  } else if (
-    nycReportOptions['check-coverage'] ||
-    nycReportOptions.checkCoverage
+  const checkCoverage = codeCoverageConfig?.checkCoverage === true
+
+  if (workerIndex != null || checkCoverage) {
+    // Under --workers, after:run fires once, in worker 0, after every worker has finished
+    on('after:run', async () => {
+      if (workerIndex != null) {
+        await generateReport()
+      }
+      if (checkCoverage) {
+        await checkCoverageAfterRun()
+      }
+    })
+  }
+
+  if (
+    !checkCoverage &&
+    (nycReportOptions['check-coverage'] || nycReportOptions.checkCoverage)
   ) {
     console.warn(
       'NYC option "check-coverage" is ignored. To enforce coverage thresholds, set "expose.codeCoverage.checkCoverage" to true in your Cypress config'
